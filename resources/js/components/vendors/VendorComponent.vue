@@ -55,7 +55,7 @@
                   <v-container>
                     <v-row>
                       <v-col cols="12" md="6">
-                        <v-text-field v-model="editedItem.title" label="Title" prepend-icon="mdi-account"></v-text-field>
+                        <v-text-field v-model="editedItem.title" label="name" prepend-icon="mdi-account"></v-text-field>
                       </v-col>
                       <v-col cols="12" md="6">
                         <v-text-field v-model="editedItem.email" label="Email" prepend-icon="mdi-email"></v-text-field>
@@ -74,28 +74,8 @@
                           prepend-icon="mdi-phone"
                         ></v-text-field>
                       </v-col>
-                      <v-col cols="12" md="6">
-                        <v-text-field
-                          v-model="editedItem.contact_person"
-                          label="Contact Person (optional)"
-                          prepend-icon="mdi-account"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" md="6">
-                        <v-text-field
-                          v-model="editedItem.close_date"
-                          label="Close Date"
-                          prepend-icon="mdi-calendar"
-                          type="date"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12">
-                        <v-textarea
-                          v-model="editedItem.comment"
-                          label="Comment (optional)"
-                          prepend-icon="mdi-comment"
-                        ></v-textarea>
-                      </v-col>
+                   
+                  
                       <v-col cols="12">
                         <v-subheader>Services</v-subheader>
                         <v-row>
@@ -136,22 +116,8 @@
                           </v-col>
                         </v-row>
                       </v-col>
-                      <v-col cols="12">
-                        <v-text-field
-                          v-model="editedItem.deal_source"
-                          label="Deal Source"
-                          prepend-icon="mdi-source-branch"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12">
-                        <v-select
-                          v-model="editedItem.priority"
-                          :items="['High', 'Medium', 'Low']"
-                          label="Priority"
-                          prepend-icon="mdi-flag"
-                          dense
-                        ></v-select>
-                      </v-col>
+                    
+      
                     </v-row>
                   </v-container>
                 </v-card-text>

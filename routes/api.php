@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\DashboardApiContoller;
 use App\Http\Controllers\Api\ServicesApiController;
 use App\Http\Controllers\Api\IndustriesApiController;
 use App\Http\Controllers\Api\ReportApiController as ApiReportApiController;
+use App\Http\Controllers\Api\SheetApiController;
 
 Route::apiResource('v1/users', UsersApiController::class)->only([
   'index', 'store', 'update', 'destroy'
@@ -60,3 +61,8 @@ Route::get('v1/dealStatusCounts', [DashboardApiContoller::class, 'dealStatusCoun
 Route::get('v1/statistics', [DashboardApiContoller::class, 'statistics']);
 
 Route::get('google-sheets/read', [GoogleSheetsController::class, 'readSheets'])->name('google.sheets.read');
+
+
+// Route::resource('sheets', SheetApiController::class);
+Route::apiResource('sheets', SheetApiController::class);
+

@@ -1,11 +1,10 @@
 <template>
+      <AppLayout>
   <v-container>
     <v-card class="mb-5">
       <v-card-title>Google Sheets</v-card-title>
       <v-card-subtitle>
-        Integrating your googlesheets with Boxleo Transport and Logistics bridges the gap between your sales channel and inventory, giving you the ability to tackle <br> 
-        any number of online orders with ease while keeping the stock in continuous sync in both platforms<br>
-          boxleologistics-transport@boxleotransport.iam.gserviceaccount.com
+      
       </v-card-subtitle>
       <v-card-actions>
         <v-btn @click="addSheet" color="primary">Add Sheet</v-btn>
@@ -25,12 +24,24 @@
           </template>
         </v-data-table>
       </v-tab-item>
+      <AddSheet ref="AddSheetComponent" />
+
     </v-card>
+
   </v-container>
+  </AppLayout>
+
 </template>
 
 <script>
+import AddSheet from '@/components/market/AddSheet.vue';
+
 export default {
+
+  components: {
+    AddSheet
+  },
+
   data() {
     return {
       search: '',
@@ -66,6 +77,9 @@ export default {
   methods: {
     addSheet() {
       // Function to add a new Google Sheet
+
+      this.$refs.AddSheetComponent.show();
+      this.dialog = true;
     }
   }
 };
