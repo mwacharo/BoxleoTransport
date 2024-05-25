@@ -4,7 +4,15 @@
       <v-card-title class="headline">Google Sheets</v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="valid" lazy-validation>
-          <v-text-field v-model="vendor" label="Vendor" :rules="vendorRules" required></v-text-field>
+          <!-- <v-text-field v-model="vendor" label="Vendor" :rules="vendorRules" required></v-text-field> -->
+          <v-select
+            v-model="vendor"
+            :items="vendors"
+            item-title="name"
+            item-value="id"
+            label="Vendor"
+            required
+          ></v-select>
           <v-text-field v-model="sheetName" label="Sheet name" :rules="sheetNameRules" required></v-text-field>
           <v-text-field
             v-model="spreadsheetId"
@@ -32,7 +40,8 @@ export default {
       dialog: false,
       valid: false,
       vendor: '',
-      sheetName: 'Sheet1',
+      vendors: [],
+      sheetName: '',
       spreadsheetId: '',
       vendorRules: [
         v => !!v || 'Vendor is required',
@@ -41,6 +50,9 @@ export default {
       sheetNameRules: [v => !!v || 'Sheet name is required'],
       spreadsheetIdRules: [v => !!v || 'Spreadsheet ID is required']
     };
+  },
+  created() {
+    this.fetchVendors();
   },
   methods: {
     show(item) {
@@ -51,23 +63,37 @@ export default {
     close() {
       this.dialog = false;
     },
+
+    fetchVendors() {
+      const url = `/api/v1/vendors`;
+      axios
+        .get(url, {})
+        .then(response => {
+          this.vendors = response.data;
+        })
+        .catch(error => {
+          console.error('Error fetching vendor:', error);
+        });
+    },
     async save() {
-      if (this.$refs.form && this.$refs.form.validate()) {
-        try {
-          const response = await axios.post('/api/sheets', {
-            vendor: this.vendor,
-            sheetName: this.sheetName,
-            spreadsheetId: this.spreadsheetId
-          });
-          console.log(response.data);
-          this.close();
-        } catch (error) {
-          console.error('There was an error!', error);
-        }
-      } else {
-        console.error('Form reference or validation is not available.');
+    if (this.$refs.form && this.$refs.form.validate()) {
+      try {
+        const response = await axios.post('/api/v1/sheets', {
+          vendor_id: this.vendor,
+          sheet_name: this.sheetName,
+          post_spreadsheet_id: this.spreadsheetId
+        });
+        console.log(response.data);
+
+        this.close();
+      } catch (error) {
+        console.error('There was an error!', error);
       }
+    } else {
+      console.error('Form reference or validation is not available.');
     }
   }
+  },
+
 };
 </script>

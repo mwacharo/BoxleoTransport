@@ -15,21 +15,21 @@ use Illuminate\Http\Request;
         return response()->json($this->model::all(), 200);
     }
 
-    public function show($id)
-    {
-        $item = $this->model::find($id);
+    // public function show($id)
+    // {
+    //     $item = $this->model::find($id);
 
-        if (!$item) {
-            return response()->json(['message' => 'Item not found'], 404);
-        }
+    //     if (!$item) {
+    //         return response()->json(['message' => 'Item not found'], 404);
+    //     }
 
-        return response()->json($item, 200);
-    }
+    //     return response()->json($item, 200);
+    // }
 
     public function store(Request $request)
     {
         $this->validate($request, $this->model::$rules);
-        $item = $this->model::create($request->all());
+        $item = $this->model::firstorcreate($request->all());
 
         return response()->json($item, 201);
     }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class vendor extends Model
+class Vendor extends Model
 {
     use HasFactory ,SoftDeletes;
 
@@ -42,5 +42,14 @@ class vendor extends Model
     // protected $dates = [
       
     // ];
+
+
+    public static $rules = [
+        'name' => 'required|string|max:255',
+        'address' => 'required|string|max:255',
+        'email' => 'required|string|max:255',
+        'phone' => 'required|string|max:255',
+
+    ];
 
 }

@@ -31,10 +31,9 @@ class sheet extends Model
     ];
 
     public static $rules = [
-        // 'sheet_name' => 'required|string|max:255',
-        // 'column2' => 'required|string|max:255',
-        // 'column3' => 'required|string|max:255',
-        // Add more rules as per your requirements
+        'sheet_name' => 'required|string|max:255',
+        'post_spreadsheet_id' => 'required|string|max:255',
+        'vendor_id' => 'required|max:255',
     ];
 
 }
