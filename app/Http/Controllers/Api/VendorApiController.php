@@ -12,4 +12,7 @@ class VendorApiController extends BaseController
 {
     //
     protected $model =Vendor::class;
+
+
+    
 }

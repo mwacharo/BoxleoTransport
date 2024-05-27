@@ -52,4 +52,8 @@ class Vendor extends Model
 
     ];
 
+    public function sheet(){
+        return $this->hasMany(Sheet::class);
+    }
+
 }

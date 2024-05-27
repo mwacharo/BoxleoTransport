@@ -36,4 +36,8 @@ class sheet extends Model
         'vendor_id' => 'required|max:255',
     ];
 
+    public function vendor(){
+        return $this->belongsTo(Vendor::class);
+    }
+
 }

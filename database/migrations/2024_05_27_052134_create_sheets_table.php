@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sheets', function (Blueprint $table) {
             $table->id();
             $table->string('sheet_name', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
-            $table->string('post_spreadsheet_id', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
+            $table->string('post_spreadsheet_id')->nullable();
             $table->boolean('active')->default(true);
             $table->boolean('auto_sync')->default(true);
             $table->boolean('sync_all')->default(false);
@@ -23,10 +23,10 @@ return new class extends Migration
             $table->dateTime('last_order_upload')->nullable();
             $table->dateTime('last_product_synced')->nullable();
             $table->boolean('is_current')->default(false);
-            $table->string('order_prefix', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
-                $table->foreignId('vendor_id');
-            $table->string('lastUpdatedOrderNumber', 191)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
-            $table->bigInteger('ou_id')->unsigned();
+            $table->string('order_prefix')->nullable();
+            $table->foreignId('vendor_id')->constrained()->onDelete('cascade');
+            $table->string('lastUpdatedOrderNumber')->nullable();
+            $table->bigInteger('ou_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -66,6 +66,10 @@ Route::get('v1/statistics', [DashboardApiContoller::class, 'statistics']);
 
 // Route::resource('sheets', SheetApiController::class);
 Route::apiResource('v1/sheets', SheetApiController::class);
+Route::post('v1/sheets/{id}/sync', [SheetApiController::class, 'sync']);
+
 Route::apiResource('/v1/vendors', VendorApiController::class);
+
+
 
 

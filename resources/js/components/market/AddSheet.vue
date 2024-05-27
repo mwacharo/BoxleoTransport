@@ -4,14 +4,14 @@
       <v-card-title class="headline">Google Sheets</v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="valid" lazy-validation>
-          <!-- <v-text-field v-model="vendor" label="Vendor" :rules="vendorRules" required></v-text-field> -->
           <v-select
+          :rules="vendorRules" required
             v-model="vendor"
             :items="vendors"
             item-title="name"
             item-value="id"
             label="Vendor"
-            required
+            
           ></v-select>
           <v-text-field v-model="sheetName" label="Sheet name" :rules="sheetNameRules" required></v-text-field>
           <v-text-field
@@ -45,7 +45,6 @@ export default {
       spreadsheetId: '',
       vendorRules: [
         v => !!v || 'Vendor is required',
-        v => (v && v.length >= 3) || 'Vendor must be at least 3 characters'
       ],
       sheetNameRules: [v => !!v || 'Sheet name is required'],
       spreadsheetIdRules: [v => !!v || 'Spreadsheet ID is required']
@@ -84,6 +83,8 @@ export default {
           post_spreadsheet_id: this.spreadsheetId
         });
         console.log(response.data);
+        this.$toastr.success(response.data.message);
+
 
         this.close();
       } catch (error) {

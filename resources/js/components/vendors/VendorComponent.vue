@@ -8,16 +8,16 @@
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
 
-            <v-btn color="primary" @click="addDeal">
+            <v-btn color="primary" @click="addVendor">
               <v-icon>mdi-plus</v-icon>
             </v-btn>
 
-            <v-btn color="primary" @click="refreshDeals">
+            <v-btn color="primary" @click="refreshVendors">
               <v-icon>mdi-refresh</v-icon>
             </v-btn>
           </v-toolbar>
 
-          <v-text-field v-model="search" label="Search" clearable @input="filterDeals" dense></v-text-field>
+          <v-text-field v-model="search" label="Search" clearable @input="filterVendors" dense></v-text-field>
           <v-responsive>
             <v-data-table :headers="headers" :items="vendors">
               <!-- <template v-slot:item.status="{ item }">
@@ -166,9 +166,9 @@ export default {
     };
   },
   computed: {
-    SearchDeals() {
-      if (!this.search) return this.deals;
-      return this.deals.filter(
+    SearchVendors() {
+      if (!this.search) return this.vendors;
+      return this.vendors.filter(
         deal =>
           deal.name.toLowerCase().includes(this.search.toLowerCase()) ||
           deal.email.toLowerCase().includes(this.search.toLowerCase()) ||
@@ -185,19 +185,19 @@ export default {
     this.fetchVendors();
   },
   methods: {
-    addDeal() {
+    addVendor() {
       this.editedItem = { ...this.defaultItem };
       this.dialog = true;
     },
 
-    editDeal(deal) {
-      this.editedIndex = this.deals.indexOf(deal);
+    editVendor(deal) {
+      this.editedIndex = this.vendors.indexOf(deal);
       this.editedItem = { ...deal };
       this.prepareEditedItem(deal);
       this.dialog = true;
     },
     deleteDeal(deal) {
-      this.editedIndex = this.deals.indexOf(deal);
+      this.editedIndex = this.vendors.indexOf(deal);
       this.editedItem = { ...deal };
       this.dialogDelete = true;
     },
