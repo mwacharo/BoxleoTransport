@@ -18,6 +18,7 @@ class Order extends Model
         'address',
         'country',
         'phone',
+        'alt_phone',
         'city',
         'sku_no',
         'product_name',
@@ -102,4 +103,9 @@ class Order extends Model
         'loading_no',
 
     ];
+
+    public function vendor(){
+        return $this->belongsTo(Vendor::class);
+        
+    }
 }

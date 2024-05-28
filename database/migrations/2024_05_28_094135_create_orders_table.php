@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('address')->nullable();;
             $table->string('country')->nullable();;
             $table->string('phone')->nullable();
+            $table->string('alt_phone')->nullable();
             $table->string('city')->nullable();
             $table->string('sku_no')->nullable();
             $table->string('product_name')->nullable();
@@ -30,11 +31,11 @@ return new class extends Migration
             $table->text('special_instruction')->nullable();
             $table->integer('distance')->nullable();
             $table->boolean('pod_returned')->default(false);
-            $table->foreignId('client_id');
+            $table->foreignId('client_id')->nullable()->constrained();
             $table->unsignedBigInteger('agent_id')->nullable();
             $table->unsignedBigInteger('rider_id')->nullable();
             $table->unsignedBigInteger('driver_id')->nullable();
-            $table->decimal('total_price', 10, 2);
+            $table->decimal('total_price', 10, 2)->nullable();
             $table->decimal('invoice_value', 10, 2)->nullable();
             $table->decimal('amount_paid', 10, 2)->nullable();
             $table->decimal('sub_total', 10, 2)->nullable();
@@ -46,7 +47,7 @@ return new class extends Migration
             $table->decimal('charges', 10, 2)->nullable();
             $table->string('delivery_status')->nullable();
             $table->unsignedBigInteger('warehouse_id')->nullable();
-            $table->foreignId('vendor_id')->nullable();
+            $table->foreignId('vendor_id')->nullable()->constrained();
             $table->string('payment_method')->nullable();
             $table->unsignedBigInteger('payment_id')->nullable();
             $table->string('mpesa_code')->nullable();

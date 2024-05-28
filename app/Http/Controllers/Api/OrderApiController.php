@@ -1,25 +1,23 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\StoreRiderRequest;
-use App\Http\Requests\UpdateRiderRequest;
-use App\Models\Rider;
+use App\Http\Controllers\BaseController;
+use App\Http\Controllers\Controller;
+use App\Models\Order;
+use Illuminate\Http\Request;
 
-class RiderController extends Controller
+class OrderApiController extends BaseController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
-        $user = auth()->user();
-
-        return view('riders.index', ['user' => $user]);
-        
+        // 
+        $orders= Order::with('vendor')->get();
+        return  response()->json($orders);
     }
-    
 
     /**
      * Show the form for creating a new resource.
@@ -32,7 +30,7 @@ class RiderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRiderRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -40,7 +38,7 @@ class RiderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Rider $rider)
+    public function show(string $id)
     {
         //
     }
@@ -48,7 +46,7 @@ class RiderController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Rider $rider)
+    public function edit(string $id)
     {
         //
     }
@@ -56,16 +54,16 @@ class RiderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRiderRequest $request, Rider $rider)
-    {
-        //
-    }
+    // public function update(Request $request, string $id)
+    // {
+    //     //
+    // }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Rider $rider)
-    {
-        //
-    }
+    // public function destroy(string $id)
+    // {
+    //     //
+    // }
 }

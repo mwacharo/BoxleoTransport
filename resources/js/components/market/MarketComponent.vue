@@ -45,11 +45,11 @@ export default {
       tab: null,
 
       headers: [
-        { title: 'Merchant', value: 'name' },
+        { title: 'Merchant', value: 'vendor.name' },
         { title: 'Sheet Name', value: 'sheet_name' },
-        { title: 'Status', value: 'status' },
-        { title: 'Default', value: 'default' },
-        { title: 'Last update', value: 'lastUpdate' },
+        // { title: 'Status', value: 'status' },
+        // { title: 'Default', value: 'default' },
+        // { title: 'Last update', value: 'lastUpdate' },
         { title: 'Created On', value: 'created_at' },
         { title: 'Actions', value: 'actions', sortable: false }
       ],
@@ -85,7 +85,9 @@ export default {
       try {
         const response = await axios.post(`/api/v1/sheets/${sheet.id}/sync`);
         console.log('Sync response:', response.data);
+        this.$toastr.success(response.data.message);
         this.loadAllData(); // Reload data after sync
+
       } catch (error) {
         console.error('Error syncing sheet:', error);
       }

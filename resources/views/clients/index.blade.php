@@ -3,5 +3,5 @@
 @section('title', 'Dashboard - Analytics')
 
 @section('content')
-    <rider-component :user="{{ json_encode($user) }}"></rider-component>
+    <client-component :user="{{ json_encode($user) }}"></client-component>
 @endsection

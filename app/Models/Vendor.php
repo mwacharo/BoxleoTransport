@@ -56,4 +56,10 @@ class Vendor extends Model
         return $this->hasMany(Sheet::class);
     }
 
+    public function orders(){
+        return $this->hasMany(Order::class);
+    }
+
+  
+
 }

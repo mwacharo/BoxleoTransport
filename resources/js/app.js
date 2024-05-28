@@ -33,6 +33,14 @@ import ServiceComponent from './components/services/ServiceComponent.vue';
 import ReportComponent from './components/reports/ReportComponent.vue';
 import MarketComponent from './components/market/MarketComponent.vue';
 import VendorComponent from './components/vendors/VendorComponent.vue';
+import OrderComponent from './components/orders/OrderComponent.vue';
+import DriverComponent from './components/drivers/DriverComponent.vue';
+import RiderComponent from './components/riders/RiderComponent.vue';
+import ClientComponent from './components/clients/ClientComponent.vue';
+
+
+
+
 
 
 
@@ -48,6 +56,14 @@ app.component('service-component', ServiceComponent);
 app.component('report-component', ReportComponent);
 app.component('market-component', MarketComponent);
 app.component('vendor-component', VendorComponent);
+app.component('order-component', OrderComponent);
+app.component('driver-component', DriverComponent);
+app.component('rider-component', RiderComponent);
+app.component('client-component', ClientComponent);
+
+
+
+
 
 
 

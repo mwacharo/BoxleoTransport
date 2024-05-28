@@ -15,23 +15,13 @@ use Illuminate\Http\Request;
         return response()->json($this->model::all(), 200);
     }
 
-    // public function show($id)
-    // {
-    //     $item = $this->model::find($id);
-
-    //     if (!$item) {
-    //         return response()->json(['message' => 'Item not found'], 404);
-    //     }
-
-    //     return response()->json($item, 200);
-    // }
-
     public function store(Request $request)
     {
         $this->validate($request, $this->model::$rules);
         $item = $this->model::firstorcreate($request->all());
 
-        return response()->json($item, 201);
+        return response()->json( ['item' => $item,
+        'message' => 'Item created successfully']);
     }
 
     public function update(Request $request, $id)

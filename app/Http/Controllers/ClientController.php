@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreRiderRequest;
-use App\Http\Requests\UpdateRiderRequest;
-use App\Models\Rider;
+use App\Http\Requests\StoreClientRequest;
+use App\Http\Requests\UpdateClientRequest;
+use App\Models\Client;
 
-class RiderController extends Controller
+class ClientController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,23 +16,21 @@ class RiderController extends Controller
         //
         $user = auth()->user();
 
-        return view('riders.index', ['user' => $user]);
-        
+        return view('clients.index', ['user' => $user]);
     }
-    
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        //
+       
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRiderRequest $request)
+    public function store(StoreClientRequest $request)
     {
         //
     }
@@ -40,7 +38,7 @@ class RiderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Rider $rider)
+    public function show(Client $client)
     {
         //
     }
@@ -48,7 +46,7 @@ class RiderController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Rider $rider)
+    public function edit(Client $client)
     {
         //
     }
@@ -56,7 +54,7 @@ class RiderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRiderRequest $request, Rider $rider)
+    public function update(UpdateClientRequest $request, Client $client)
     {
         //
     }
@@ -64,7 +62,7 @@ class RiderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Rider $rider)
+    public function destroy(Client $client)
     {
         //
     }

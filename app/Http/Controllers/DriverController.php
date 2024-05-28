@@ -13,7 +13,9 @@ class DriverController extends Controller
      */
     public function index()
     {
-        //
+        // 
+        $user= Auth()->user();
+        return view('drivers.index',['user'=>$user]);
     }
 
     /**
