@@ -50,6 +50,7 @@ class SheetApiController extends BaseController
 
         $response = $service->spreadsheets_values->get($spreadsheetId, $range);
         $values = $response->getValues();
+        // dd($values);
 
         if (empty($values)) {
             throw new \Exception('No data found in the spreadsheet.');

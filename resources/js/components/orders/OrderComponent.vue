@@ -1,6 +1,6 @@
 <template>
   <ReusableCrudComponent
-    entity-name="Orders"
+    entity-name="Order"
     api-endpoint="/api/v1/orders"
     :entity-fields="[
       { name: 'created_at', label: 'Created', icon: 'mdi-calendar' },
@@ -26,5 +26,7 @@ export default {
   components: {
     ReusableCrudComponent
   }
+
+  
 };
 </script>

@@ -17,8 +17,10 @@ use App\Http\Controllers\Api\DashboardApiContoller;
 use App\Http\Controllers\Api\DriverApiContoller;
 use App\Http\Controllers\Api\ServicesApiController;
 use App\Http\Controllers\Api\IndustriesApiController;
+use App\Http\Controllers\Api\OrderCategoryApiController;
 use App\Http\Controllers\Api\ReportApiController as ApiReportApiController;
 use App\Http\Controllers\Api\RiderApiContoller;
+use App\Models\OrderCategory;
 
 Route::apiResource('v1/users', UsersApiController::class)->only([
   'index', 'store', 'update', 'destroy'
@@ -78,6 +80,8 @@ Route::apiResource('/v1/orders', OrderApiController::class);
 Route::apiResource('/v1/riders', RiderApiContoller::class);
 Route::apiResource('/v1/drivers', DriverApiContoller::class);
 Route::apiResource('/v1/clients', ClientApiContoller::class);
+Route::apiResource('/v1/ordercategories', OrderCategoryApiController::class);
+
 
 
 

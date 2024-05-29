@@ -9,46 +9,46 @@
     {
       "url": "orders",
       "name": "Orders",
-      "icon": "menu-icon tf-icons bx bx-layout",
+      "icon": "menu-icon tf-icons bx bx-cart",
       "slug": "deals"
     },
     {
       "url": "vendors",
       "name": "Vendors",
-      "icon": "menu-icon tf-icons bx bx-building-house",
+      "icon": "menu-icon tf-icons bx bx-building",
       "slug": "industries"
     },
     {
       "url": "drivers",
       "name": "Drivers",
-      "icon": "menu-icon tf-icons bx bx-briefcase",
+      "icon": "menu-icon tf-icons bx bx-user",
       "slug": "services"
     },
     {
       "url": "riders",
       "name": "Riders",
-      "icon": "menu-icon tf-icons bx bx-building-house",
+      "icon": "menu-icon tf-icons bx bx-cycling",
       "slug": "branches"
     },
 
     {
       "url": "clients",
       "name": "Clients",
-      "icon": "menu-icon tf-icons bx bx-task",
+      "icon": "menu-icon tf-icons bx bx-group",
       "slug": "tasks"
     },
 
     {
       "url": "fleet",
       "name": "Fleet Management",
-      "icon": "menu-icon tf-icons bx bx-task",
+      "icon": "menu-icon tf-icons bx bx-car",
       "slug": "tasks"
     },
 
     {
       "url": "market",
       "name": "Market",
-      "icon": "menu-icon tf-icons bx bx-task",
+      "icon": "menu-icon tf-icons bx bx-store",
       "slug": "tasks"
     },
     {
