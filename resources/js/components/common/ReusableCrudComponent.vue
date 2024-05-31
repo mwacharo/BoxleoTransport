@@ -12,9 +12,9 @@
               <v-icon>mdi-plus</v-icon>
             </v-btn>
 
-            <v-btn color="primary" @click="FilterEntity">
+            <!-- <v-btn color="primary" @click="FilterEntity">
               <v-icon>mdi-filter</v-icon>
-            </v-btn>
+            </v-btn> -->
 
             <v-btn color="primary" @click="refreshEntities">
               <v-icon>mdi-refresh</v-icon>

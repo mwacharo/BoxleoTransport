@@ -1,9 +1,13 @@
 <?php
 
 use App\Models\Branch;
+use App\Models\OrderCategory;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportApiController;
+use App\Http\Controllers\Api\RiderApiContoller;
+use App\Http\Controllers\Api\ClientApiContoller;
 use App\Http\Controllers\Api\DealsApiController;
+use App\Http\Controllers\Api\DriverApiContoller;
 use App\Http\Controllers\Api\OrderApiController;
 use App\Http\Controllers\Api\RiderApiController;
 use App\Http\Controllers\Api\SheetApiController;
@@ -12,15 +16,12 @@ use App\Http\Controllers\Api\UsersApiController;
 use App\Http\Controllers\Api\VendorApiController;
 use App\Http\Controllers\Api\BranchesApiController;
 use App\Http\Controllers\Api\CalendarApiController;
-use App\Http\Controllers\Api\ClientApiContoller;
 use App\Http\Controllers\Api\DashboardApiContoller;
-use App\Http\Controllers\Api\DriverApiContoller;
+
 use App\Http\Controllers\Api\ServicesApiController;
-use App\Http\Controllers\Api\IndustriesApiController;
+use App\Http\Controllers\Api\OrderStatusApiController;
 use App\Http\Controllers\Api\OrderCategoryApiController;
 use App\Http\Controllers\Api\ReportApiController as ApiReportApiController;
-use App\Http\Controllers\Api\RiderApiContoller;
-use App\Models\OrderCategory;
 
 Route::apiResource('v1/users', UsersApiController::class)->only([
   'index', 'store', 'update', 'destroy'
@@ -51,9 +52,9 @@ Route::post('/upload', [DealsApiController::class, 'upload']);
 Route::post('/reports/generate', [ApiReportApiController::class, 'generate']);
 
 
-Route::apiResource('v1/industries', IndustriesApiController::class)->only([
-  'index', 'store', 'update', 'destroy'
-]);
+// Route::apiResource('v1/industries', IndustriesApiController::class)->only([
+//   'index', 'store', 'update', 'destroy'
+// ]);
 
 Route::apiResource('v1/services', ServicesApiController::class)->only([
   'index', 'store', 'update', 'destroy'
@@ -81,6 +82,8 @@ Route::apiResource('/v1/riders', RiderApiContoller::class);
 Route::apiResource('/v1/drivers', DriverApiContoller::class);
 Route::apiResource('/v1/clients', ClientApiContoller::class);
 Route::apiResource('/v1/ordercategories', OrderCategoryApiController::class);
+Route::apiResource('/v1/orderstatus', OrderStatusApiController::class);
+
 
 
 

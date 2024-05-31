@@ -37,6 +37,11 @@ import OrderComponent from './components/orders/OrderComponent.vue';
 import DriverComponent from './components/drivers/DriverComponent.vue';
 import RiderComponent from './components/riders/RiderComponent.vue';
 import ClientComponent from './components/clients/ClientComponent.vue';
+import CategoryComponent from './components/orders/CategoryComponent.vue';
+import StatusComponent from './components/orders/StatusComponent.vue';
+
+
+
 
 
 
@@ -60,6 +65,9 @@ app.component('order-component', OrderComponent);
 app.component('driver-component', DriverComponent);
 app.component('rider-component', RiderComponent);
 app.component('client-component', ClientComponent);
+app.component('category-component', CategoryComponent);
+app.component('status-component', StatusComponent);
+
 
 
 

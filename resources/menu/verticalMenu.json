@@ -7,11 +7,26 @@
       "slug": "dashboard"
     },
     {
-      "url": "orders",
+  
       "name": "Orders",
+      "url":"orders",
       "icon": "menu-icon tf-icons bx bx-cart",
-      "slug": "deals"
+      "slug":"orders"
+     
     },
+    {
+      "url": "orderstatus",
+      "name": "Order Status",
+      "icon": "menu-icon tf-icons bx bx-info-circle",
+      "slug": "orderstatus"
+    },
+    {
+      "url": "ordercategories",
+      "name": "Order Categories",
+      "icon": "menu-icon tf-icons bx bx-collection",
+      "slug": "ordercategories"
+    },
+   
     {
       "url": "vendors",
       "name": "Vendors",
