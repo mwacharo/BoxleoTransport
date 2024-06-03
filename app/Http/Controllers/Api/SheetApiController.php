@@ -39,7 +39,9 @@ class SheetApiController extends BaseController
     private function syncGoogleSheetData(Sheet $sheet)
     {
         $client = new GoogleClient();
-        $client->setAuthConfig('/home/engineer/Desktop/BoxleoTransport/public/credentials.json'); // Ensure the path is correct
+        // $client->setAuthConfig('/home/engineer/Desktop/BoxleoTransport/public/credentials.json');
+        $client->setAuthConfig('/var/www/BoxleoTransport/public/credentials.json'); // Ensure the path is correct
+        // Ensure the path is correct
         $client->addScope(\Google\Service\Sheets::SPREADSHEETS_READONLY);
         $client->setApplicationName('boxleotransport');
         $client->setAccessType('offline');
