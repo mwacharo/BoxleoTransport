@@ -12,13 +12,14 @@ use App\Http\Controllers\MarketController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MappedOrderController;
 use App\Http\Controllers\OrderStatusController;
 use App\Http\Controllers\OrderCategoryController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::get('mappedOrders', [MappedOrderController::class, 'index'])->name('mappedOrders');
     Route::get('/ordercategories', [OrderCategoryController::class, 'index'])->name('ordercategories');
     Route::get('/orderstatus', [OrderStatusController::class, 'index'])->name('orderstatus');
 
