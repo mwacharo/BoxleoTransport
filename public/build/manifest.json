@@ -15,19 +15,34 @@
     "file": "assets/materialdesignicons-webfont-Dp5v-WZN.woff2",
     "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff2"
   },
+  "node_modules/leaflet/dist/images/layers-2x.png": {
+    "file": "assets/layers-2x-Bpkbi35X.png",
+    "src": "node_modules/leaflet/dist/images/layers-2x.png"
+  },
+  "node_modules/leaflet/dist/images/layers.png": {
+    "file": "assets/layers-BWBAp2CZ.png",
+    "src": "node_modules/leaflet/dist/images/layers.png"
+  },
+  "node_modules/leaflet/dist/images/marker-icon.png": {
+    "file": "assets/marker-icon-hN30_KVU.png",
+    "src": "node_modules/leaflet/dist/images/marker-icon.png"
+  },
   "resources/js/app.js": {
-    "file": "assets/app-Ci-Qka0E.js",
+    "file": "assets/app-D-V0VStw.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-QXMS9Ras.css"
+      "assets/app-D5W3gYYX.css"
     ],
     "assets": [
       "assets/materialdesignicons-webfont-CSr8KVlo.eot",
       "assets/materialdesignicons-webfont-Dp5v-WZN.woff2",
       "assets/materialdesignicons-webfont-PXm3-2wK.woff",
-      "assets/materialdesignicons-webfont-B7mPwVP_.ttf"
+      "assets/materialdesignicons-webfont-B7mPwVP_.ttf",
+      "assets/layers-BWBAp2CZ.png",
+      "assets/layers-2x-Bpkbi35X.png",
+      "assets/marker-icon-hN30_KVU.png"
     ]
   },
   "resources/sass/app.scss": {

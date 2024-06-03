@@ -7,12 +7,16 @@
       "slug": "dashboard"
     },
     {
-  
       "name": "Orders",
-      "url":"orders",
+      "url": "orders",
       "icon": "menu-icon tf-icons bx bx-cart",
-      "slug":"orders"
-     
+      "slug": "orders"
+    },
+    {
+      "name": "map",
+      "url": "mappedOrders",
+      "icon": "menu-icon tf-icons bx bx-map",
+      "slug": "map"
     },
     {
       "url": "orderstatus",
@@ -26,7 +30,7 @@
       "icon": "menu-icon tf-icons bx bx-collection",
       "slug": "ordercategories"
     },
-   
+
     {
       "url": "vendors",
       "name": "Vendors",
@@ -72,8 +76,6 @@
       "icon": "menu-icon tf-icons bx bx-building-house",
       "slug": "branches"
     },
-
-
 
     {
       "menuHeader": "Apps"

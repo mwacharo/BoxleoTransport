@@ -39,6 +39,7 @@ import RiderComponent from './components/riders/RiderComponent.vue';
 import ClientComponent from './components/clients/ClientComponent.vue';
 import CategoryComponent from './components/orders/CategoryComponent.vue';
 import StatusComponent from './components/orders/StatusComponent.vue';
+import OrdermapComponent from './components/orders/OrdermapComponent.vue';
 
 
 
@@ -67,6 +68,8 @@ app.component('rider-component', RiderComponent);
 app.component('client-component', ClientComponent);
 app.component('category-component', CategoryComponent);
 app.component('status-component', StatusComponent);
+app.component('ordermap-component', OrdermapComponent);
+
 
 
 

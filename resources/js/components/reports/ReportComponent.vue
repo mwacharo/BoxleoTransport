@@ -34,16 +34,7 @@
             </v-col>
 
             <v-col cols="12" md="6">
-              <!-- <v-text-field
-                    v-model="startSelectedDate"
-                    label="Select Start Date"
-                    outlined
-                    dense
-                    prepend-icon="mdi-calendar"
-                    readonly
-                    v-on="on"
-                    type="date"
-                  ></v-text-field> -->
+           
 
               <v-text-field
                 v-model="startSelectedDate"
