@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\SheetApiController;
 use App\Http\Controllers\Api\TasksApiController;
 use App\Http\Controllers\Api\UsersApiController;
 use App\Http\Controllers\Api\VendorApiController;
+use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\BranchesApiController;
 use App\Http\Controllers\Api\CalendarApiController;
 use App\Http\Controllers\Api\DashboardApiContoller;
@@ -84,6 +85,8 @@ Route::apiResource('/v1/clients', ClientApiContoller::class);
 Route::apiResource('/v1/ordercategories', OrderCategoryApiController::class);
 Route::apiResource('/v1/orderstatus', OrderStatusApiController::class);
 Route::get('/v1/geocode-orders', [OrderApiController::class, 'geocodeOrders']);
+Route::get('/v1/products', ProductApiController::class);
+
 
 
 

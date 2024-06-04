@@ -11,6 +11,7 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\MarketController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MappedOrderController;
 use App\Http\Controllers\OrderStatusController;
@@ -22,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('mappedOrders', [MappedOrderController::class, 'index'])->name('mappedOrders');
     Route::get('/ordercategories', [OrderCategoryController::class, 'index'])->name('ordercategories');
     Route::get('/orderstatus', [OrderStatusController::class, 'index'])->name('orderstatus');
+    Route::get('/inventory', [ProductController::class, 'index'])->name('index');
 
     Route::get('/drivers', [DriverController::class, 'index'])->name('drivers');
     Route::get('/riders', [RiderController::class, 'index'])->name('riders');

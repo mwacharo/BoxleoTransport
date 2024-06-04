@@ -11,7 +11,7 @@ class Product extends Model
     use HasFactory ,SoftDeletes;
 
     protected $fillable = [
-        'sku', 'name', 'description', 'price', 'quantity'
+        'sku', 'name', 'description', 'price', 'quantity','vendor_id','active','virtual','user_id','low_stockvalue'
     ];
 
     public function productInstances()

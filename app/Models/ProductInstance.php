@@ -28,8 +28,8 @@ class ProductInstance extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function activities()
-    {
-        return $this->hasMany(ProductActivity::class);
-    }
+    // public function activities()
+    // {
+    //     return $this->hasMany(ProductActivity::class);
+    // }
 }
