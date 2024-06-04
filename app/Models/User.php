@@ -29,4 +29,15 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+    public function productActivities()
+    {
+        return $this->hasMany(ProductActivity::class);
+    }
+
+    public function orderActivities()
+    {
+        return $this->hasMany(OrderActivity::class);
+    }
 }

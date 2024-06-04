@@ -110,6 +110,32 @@ class Order extends Model
         
     }
 
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function orderProducts()
+    {
+        return $this->hasMany(OrderProduct::class);
+    }
+
+    public function returns()
+    {
+        return $this->hasMany(ReturnProduct::class);
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+
     public static $rules = [
         // 'name' => 'required|string|max:255',
         // 'address' => 'required|string|max:255',
