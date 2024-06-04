@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\BaseController;
-use App\Http\Controllers\Controller;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
 
 class ProductApiController extends BaseController
 {
+
+    protected $model =Product::class;
     /**
      * Display a listing of the resource.
      */
