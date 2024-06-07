@@ -15,7 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('sku')->unique();
             $table->string('name');
+            $table->foreignId('vendor_id')->constrained()->onDeletedelete('cascade');
+            // $table->foreignId('warehouse_id')->constrained()->onDeletedelete('cascade');
+            // $table->foreignId('ou_id')->constrained()->onDeletedelete('cascade');
             $table->string('quantity');
+            // $table->string('low_stock_level');
+            // $table->string('image');
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->timestamps();

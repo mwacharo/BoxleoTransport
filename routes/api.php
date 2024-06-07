@@ -86,6 +86,8 @@ Route::apiResource('/v1/ordercategories', OrderCategoryApiController::class);
 Route::apiResource('/v1/orderstatus', OrderStatusApiController::class);
 Route::get('/v1/geocode-orders', [OrderApiController::class, 'geocodeOrders']);
 Route::apiResource('/v1/products', ProductApiController::class);
+Route::get('v1/products/{id}/instances', [ProductApiController::class, 'getProductInstances']);
+
 
 
 

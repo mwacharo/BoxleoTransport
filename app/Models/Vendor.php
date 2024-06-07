@@ -34,7 +34,8 @@ class Vendor extends Model
         'remember_token',
         'created_at',
         'updated_at',
-        'date'
+        'date',
+        'last_identifier'
     
     
     ];
@@ -49,6 +50,7 @@ class Vendor extends Model
         'address' => 'required|string|max:255',
         'email' => 'required|string|max:255',
         'phone' => 'required|string|max:255',
+        'last_identifier' => 'string|max:255',
 
     ];
 

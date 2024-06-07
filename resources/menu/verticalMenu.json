@@ -66,7 +66,7 @@
 
     {
       "url": "market",
-      "name": "Market",
+      "name": "Google Sheets",
       "icon": "menu-icon tf-icons bx bx-store",
       "slug": "tasks"
     },

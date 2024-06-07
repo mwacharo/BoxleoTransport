@@ -54,15 +54,7 @@ export default {
     this.fetchVendors();
   },
   methods: {
-    show(item) {
-      console.log(item);
-      this.dialog = true;
-      // this.id = item.id;
-    },
-    close() {
-      this.dialog = false;
-    },
-
+    
     fetchVendors() {
       const url = `/api/v1/vendors`;
       axios
@@ -98,3 +90,5 @@ export default {
 
 };
 </script>
+
+

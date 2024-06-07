@@ -11,7 +11,7 @@ class Product extends Model
     use HasFactory ,SoftDeletes;
 
     protected $fillable = [
-        'sku', 'name', 'description', 'price', 'quantity','vendor_id','active','virtual','user_id','low_stockvalue'
+        'sku','warehouse_id','ou_id', 'name', 'description', 'price', 'quantity','vendor_id','active','virtual','user_id','low_stockvalue'
     ];
 
     public function productInstances()
@@ -38,4 +38,12 @@ class Product extends Model
     {
         return $this->belongsTo(Vendor::class);
     }
+
+    public static $rules = [
+        'name' => 'required|string|max:255',
+        'sku' => 'required|string|max:255',
+        // 'vendor_id' => 'required|string|max:255',
+
+
+    ];
 }

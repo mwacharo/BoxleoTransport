@@ -7,20 +7,22 @@
             <v-toolbar-title>Product</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
+            <v-btn color="primary" @click="toggleFilterDrawer">
+              <v-icon>mdi-filter</v-icon>
+            </v-btn>
 
             <v-btn color="primary" @click="addProduct">
               <v-icon>mdi-plus</v-icon>
             </v-btn>
-
-           
           </v-toolbar>
 
-          <v-text-field v-model="search" label="Search" clearable @input="searchProducts" dense></v-text-field>
+          <v-text-field v-model="search" label="Search by name or sku" clearable @input="searchProducts" dense></v-text-field>
           <v-responsive>
             <v-data-table :headers="headers" :items="searchProducts">
               <template v-slot:item.actions="{ item }">
                 <div class="d-flex align-center">
                   <v-icon class="mx-1" color="blue" @click="editProduct(item)">mdi-pencil</v-icon>
+                  <v-icon class="mx-1" color="blue" @click="viewProductInstances(item.id)">mdi-eye</v-icon>
                   <v-icon class="mx-1" color="red" @click="deleteProduct(item)">mdi-delete</v-icon>
                 </div>
               </template>
@@ -51,21 +53,25 @@
                     <v-col cols="12" md="6">
                       <v-text-field v-model="editedItem.price" label="Price" prepend-icon="mdi-web"></v-text-field>
                     </v-col>
-                    <!-- <v-col cols="12" md="6"> -->
+                    <v-col cols="12" md="6">
                       <v-select
                         :rules="vendorRules"
                         required
-                        v-model="vendor"
+                        v-model="editedItem.vendor_id"
                         prepend-icon="mdi-web"
                         :items="vendors"
                         item-title="name"
                         item-value="id"
                         label="Vendor"
                       ></v-select>
-                    <!-- </v-col> -->
+                    </v-col>
 
                     <v-col cols="12" md="6">
-                      <v-text-field v-model="editedItem.quantity" label="Quantity" prepend-icon="mdi-phone"></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.quantity"
+                        label="Quantity"
+                        prepend-icon="mdi-phone"
+                      ></v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -84,37 +90,49 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="closeDelete">Cancel</v-btn>
-                <v-btn color="primary" text @click="deleteproductConfirm">OK</v-btn>
+                <v-btn color="primary" text @click="deleteProductConfirm">OK</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
         </v-main>
       </v-app>
     </v-layout>
+    <instance ref="InstanceComponent" :productId="selectedProductId"/>
   </v-card>
 </template>
 
 <script>
+import Instance from '@/components/products/Instance.vue';
+
 export default {
+  components: {
+    Instance
+  },
   props: {
     user_id: {
       type: Number,
       required: true
-    }
+
+    },
+    
   },
 
   data() {
     return {
       search: '',
       vendors: [],
-      products:[],
+      vendor: '',
+      products: [],
+      selectedProductId: '',
+      id: '',
       headers: [
-        { title: '#', value: 'index' },
+        // { title: '#', value: 'index' },
         { title: 'Name', value: 'name' },
+        { title: 'SKU', value: 'sku' },
         { title: 'Description', value: 'description' },
         { title: 'Price', value: 'price' },
         { title: 'Quantity Available', value: 'quantity' },
-        { title: 'Committed stock', value: 'quantity' },
+        // { title: 'Committed stock', value: 'quantity' },
         { title: 'Total price', value: 'total_price' },
         { title: 'Actions', value: 'actions', sortable: false }
       ],
@@ -125,18 +143,17 @@ export default {
         user_id: this.user_id,
         price: '',
         quantity: '',
-        sku:'',
-        vendor_id:''
+        sku: '',
+        vendor: '',
+        vendor_id: this.vendor,
       },
       defaultItem: {
         name: '',
-        descriptiom: '',
         user_id: this.user_id,
         price: '',
         quantity: '',
-        sku:'',
-        vendor_id:''
-
+        sku: '',
+        vendor: this.vendor_id,
       },
       dialog: false,
       dialogDelete: false
@@ -159,9 +176,16 @@ export default {
 
   created() {
     this.fetchVendors();
+    this.fetchProducts();
   },
 
   methods: {
+
+
+    viewProductInstances(id) {
+      this.selectedProductId = id;
+      this.$refs.InstanceComponent.show();
+    },
     addProduct() {
       this.editedItem = { ...this.defaultItem };
       this.dialog = true;
@@ -174,7 +198,7 @@ export default {
     },
 
     deleteProduct(product) {
-      this.editedIndex = this.product.indexOf(product);
+      this.editedIndex = this.products.indexOf(product);
       this.editedItem = { ...product };
       this.dialogDelete = true;
     },
@@ -243,7 +267,6 @@ export default {
           console.error('Error fetching products:', error);
         });
     },
-
 
     closeDialog() {
       this.dialog = false;
