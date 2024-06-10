@@ -13,9 +13,19 @@ return new class extends Migration
     {
         Schema::create('warehouses', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('location');
-            $table->integer('capacity');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('branch_id')->constrained()->onDelete('cascade');
+            $table->string('name', 191)->nullable();
+            $table->longText('phone')->nullable();
+            $table->longText('location')->nullable();
+            $table->string('length', 191)->default('0');
+            $table->string('width', 191)->default('0');
+            $table->string('height', 191)->default('0');
+            $table->string('non_storage', 191)->default('0');
+            $table->string('capacity', 191)->default('0');
+            $table->string('code', 191);
+            $table->softDeletes();
+        
             $table->timestamps();
         });
     }

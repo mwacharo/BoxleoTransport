@@ -22,13 +22,14 @@
             @input="filterEntities"
             dense
           ></v-text-field>
-          <div v-if="selectedItems.length>0" class="x-actions">
-            <v-icon class="mx-1" color="error" @click="bulkDelete" title="Delete">mdi-delete</v-icon>
+          <div v-if="selectedItems.length > 0" class="x-actions">
+            <v-icon class="mx-1" color="error" @click="confirmBulkDeleteDialog" title="Delete">mdi-delete</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkAssignRider" title="Assign Rider">mdi-bicycle</v-icon>
-            <v-icon class="mx-1" color="primary" @click="bulkAssignDriver" title="Assign Vendor">mdi-car</v-icon>
+            <v-icon class="mx-1" color="primary" @click="bulkAssignDriver" title="Assign Driver">mdi-car</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkUpdateStatus" title="Update Status">mdi-update</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkCategorize" title="Categorize">mdi-label</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkAutoAllocate" title="Auto Allocate">mdi-auto-fix</v-icon>
+            <v-icon class="mx-1" color="primary" @click="bulkPrint" title="Print">mdi-printer</v-icon>
           </div>
           <v-responsive>
             <v-data-table
@@ -39,7 +40,6 @@
               show-select
               v-model="selectedItems"
             >
-   
               <template v-slot:item.actions="{ item }">
                 <div class="d-flex align-center">
                   <v-icon class="mx-1" color="blue" @click="editEntity(item)">mdi-pencil</v-icon>
@@ -88,15 +88,63 @@
 
           <v-dialog v-model="bulkDialog" max-width="500">
             <v-card>
-              <v-card-title class="headline">Bulk Action</v-card-title>
+              <v-card-title class="headline">{{ bulkActionTitle }}</v-card-title>
               <v-card-text>
-                <v-select v-model="bulkAction" :items="bulkActionOptions" label="Select Action" clearable></v-select>
-                <!-- Add any additional input fields required for bulk actions here -->
+                <v-select
+                  v-if="bulkAction === 'bulkAssignRider'"
+                  :items="riders"
+                  label="Select Rider"
+                  clearable
+                  v-model="selectedRider"
+                  item-title="name"
+                  item-value="id"
+                ></v-select>
+                <v-select
+                  v-if="bulkAction === 'bulkAssignDriver'"
+                  v-model="selectedDriver"
+                  :items="drivers"
+                  label="Select Driver"
+                  item-title="name"
+                  item-value="id"
+                  clearable
+                ></v-select>
+                <v-select
+                  v-if="bulkAction === 'bulkUpdateStatus'"
+                  v-model="selectedStatus"
+                  :items="statuses"
+                  label="Select Status"
+                  item-title="name"
+                  item-value="name"
+                  clearable
+                ></v-select>
+
+                <v-select
+                  v-if="bulkAction === 'bulkCategorize'"
+                  v-model="selectedCategory"
+                  :items="categories"
+                  label="Select Category"
+                  item-title="name"
+                  item-value="name"
+                  clearable
+                ></v-select>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="closeBulkDialog">Cancel</v-btn>
                 <v-btn color="primary" text @click="performBulkAction">OK</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+          <!-- delete bulk -->
+          <v-dialog v-model="confirmDeleteDialog" max-width="500">
+            <v-card>
+              <v-card-title class="headline">Confirm Delete</v-card-title>
+              <v-card-text> Are you sure you want to delete the selected items? </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" text @click="closeConfirmDeleteDialog">Cancel</v-btn>
+                <v-btn color="error" text @click="confirmDelete">Delete</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -197,6 +245,16 @@ export default {
       dialogDelete: false,
       bulkDialog: false,
       search: '',
+      bulkActionTitle: '',
+      riders: [],
+      rider: '',
+      selectedDriver: '',
+      selectedStatus: '',
+      selectedRider: [],
+      drivers: [],
+      ordercategories: [],
+      selectedCategory: '',
+
       entities: [],
       headers: [
         { title: '#', value: 'index' },
@@ -208,6 +266,7 @@ export default {
       defaultItem: this.getDefaultItem(),
       filterDrawer: false,
       filterType: null,
+
       filterVendor: null,
       filterAgent: null,
       filterStatus: null,
@@ -220,15 +279,8 @@ export default {
       statusOptions: [],
       selectedItems: [],
       // selected: [],
-      bulkAction: null
-      // bulkActionOptions: [
-      //   { name: 'Delete', id: 'bulkDelete' },
-      //   { name: 'Assign Rider', id: 'bulkAssignRider' },
-      //   { name: 'Assign Vendor', id: 'bulkAssignDriver' },
-      //   { name: 'Update Status', id: 'bulkUpdateStatus' },
-      //   { name: 'Categorize', id: 'bulkCategorize' },
-      //   { name: 'Auto Allocate', id: 'bulkAutoAllocate' }
-      // ]
+      bulkAction: null,
+      confirmDeleteDialog: false
     };
   },
   computed: {
@@ -275,13 +327,12 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? `New ${this.entityName}` : `Edit ${this.entityName}`;
     }
-    // hasSelectedItems() {
-    //   return this.selectedItems.length > 0;
-    // }
   },
   created() {
     this.fetchEntities();
     this.fetchFilterData();
+    // fetch riders ,drivers, status
+    this.fetchBulkData();
   },
   methods: {
     getDefaultItem() {
@@ -291,17 +342,7 @@ export default {
       });
       return item;
     },
-    // enterSelect(event) {
-    // if (event.length > 0) {
-    //   this.select = true;
-    // } else {
-    //   this.select = false;
-    // }
-    //   enterSelect(selectedItems) {
-    //     this.selectedItems = selectedItems;
-    //     console.log(this.selectedItems); // This will log the selected items to the console
 
-    // },
     addEntity() {
       this.editedItem = { ...this.defaultItem };
       this.dialog = true;
@@ -329,7 +370,8 @@ export default {
       try {
         if (this.editedIndex > -1) {
           await axios.put(`${this.apiEndpoint}/${this.editedItem.id}`, this.editedItem);
-        } else {selected
+        } else {
+          selected;
           await axios.post(this.apiEndpoint, this.editedItem);
         }
         this.fetchEntities();
@@ -351,6 +393,12 @@ export default {
       this.vendorOptions = await this.fetchDataFromApi('/api/v1/vendors');
       this.agentOptions = await this.fetchDataFromApi('/api/v1/riders');
       this.statusOptions = await this.fetchDataFromApi('/api/v1/orderstatus');
+    },
+    async fetchBulkData() {
+      this.riders = await this.fetchDataFromApi('/api/v1/riders');
+      this.drivers = await this.fetchDataFromApi('/api/v1/drivers');
+      this.statuses = await this.fetchDataFromApi('/api/v1/orderstatus');
+      this.categories = await this.fetchDataFromApi('/api/v1/ordercategories');
     },
     closeDialog() {
       this.dialog = false;
@@ -379,62 +427,187 @@ export default {
     refreshEntities() {
       this.fetchEntities();
     },
-    async bulkDelete() {
+
+    confirmBulkDeleteDialog() {
+      this.confirmDeleteDialog = true;
+    },
+
+    closeConfirmDeleteDialog() {
+      this.confirmDeleteDialog = false;
+    },
+    async confirmDelete() {
       try {
-        await Promise.all(this.selectedItems.map(item => axios.delete(`${this.apiEndpoint}/${item.id}`)));
-        this.refreshEntities();
+        const response = await axios.post('/api/v1/orders/bulk-delete', {
+          ids: this.selectedItems
+        });
+        console.log('Items deleted:', response.data);
+        this.$toastr.success(response.data.message);
+        this.fetchEntities();
+
+        // Handle successful deletion, e.g., update UI, show success message
       } catch (error) {
-        console.error('Error performing bulk delete:', error);
+        console.error('Error deleting items:', error);
+        // Handle error, e.g., show error message
+      } finally {
+        this.confirmDeleteDialog = false;
       }
     },
     bulkAssignRider() {
       this.bulkAction = 'bulkAssignRider';
+      this.bulkActionTitle = 'Assign Rider';
       this.bulkDialog = true;
     },
     bulkAssignDriver() {
       this.bulkAction = 'bulkAssignDriver';
+      this.bulkActionTitle = 'Assign Driver';
       this.bulkDialog = true;
     },
     bulkUpdateStatus() {
       this.bulkAction = 'bulkUpdateStatus';
+      this.bulkActionTitle = 'Update Status';
+
       this.bulkDialog = true;
     },
     bulkCategorize() {
       this.bulkAction = 'bulkCategorize';
+      this.bulkActionTitle = 'Categorize';
       this.bulkDialog = true;
     },
     bulkAutoAllocate() {
       this.bulkAction = 'bulkAutoAllocate';
-      this.bulkDialog = true;
+      // this.bulkDialog = true;
     },
     performBulkAction() {
       switch (this.bulkAction) {
         case 'bulkAssignRider':
-          // Implement bulk assign rider logic here
-          console.log('Performing bulk assign rider');
+          this.assignRider();
           break;
         case 'bulkAssignDriver':
-          // Implement bulk assign vendor logic here
-          console.log('Performing bulk assign vendor');
+          this.assignDriver();
           break;
         case 'bulkUpdateStatus':
-          // Implement bulk update status logic here
-          console.log('Performing bulk update status');
+          this.updateStatus();
           break;
         case 'bulkCategorize':
-          // Implement bulk categorize logic here
-          console.log('Performing bulk categorize');
+          this.categorizeOrders();
           break;
         case 'bulkAutoAllocate':
-          // Implement bulk auto allocate logic here
-          console.log('Performing bulk auto allocate');
+          this.autoAllocateOrders();
+          break;
+        case 'bulkPrint':
+          this.printOrders();
+          break;
+        default:
           break;
       }
+
       this.closeBulkDialog();
+    },
+
+    assignRider() {
+      axios
+        .post('/api/v1/orders/bulk-assign-rider', {
+          ids: this.selectedItems,
+          rider: this.selectedRider
+        })
+        .then(response => {
+          console.log('Rider assigned:', response.data);
+          this.$toastr.success(response.data.message);
+
+          // Handle successful assignment, e.g., update UI, show success message
+        })
+        .catch(error => {
+          console.error('Error assigning rider:', error);
+          // Handle error, e.g., show error message
+        });
+    },
+    assignDriver() {
+      axios
+        .post('/api/v1/orders/bulk-assign-driver', {
+          ids: this.selectedItems,
+          driver_id: this.selectedDriver
+        })
+        .then(response => {
+          console.log('Driver assigned:', response.data);
+          this.$toastr.success(response.data.message);
+
+          // Handle successful assignment, e.g., update UI, show success message
+        })
+        .catch(error => {
+          console.error('Error assigning driver:', error);
+          // Handle error, e.g., show error message
+        });
+    },
+    updateStatus() {
+      axios
+        .post('/api/v1/orders/bulk-update-status', {
+          ids: this.selectedItems,
+          status: this.selectedStatus
+        })
+        .then(response => {
+          console.log('Status updated:', response.data);
+          this.$toastr.success(response.data.message);
+
+          // Handle successful update, e.g., update UI, show success message
+        })
+        .catch(error => {
+          console.error('Error updating status:', error);
+          // Handle error, e.g., show error message
+        });
+    },
+    categorizeOrders() {
+      axios
+        .post('/api/v1/orders/bulk-categorize', {
+          ids: this.selectedItems,
+          category: this.selectedCategory
+        })
+        .then(response => {
+          console.log('Orders categorized:', response.data);
+          this.$toastr.success(response.data.message);
+
+          // Handle successful categorization, e.g., update UI, show success message
+        })
+        .catch(error => {
+          console.error('Error categorizing orders:', error);
+          // Handle error, e.g., show error message
+        });
+    },
+    autoAllocateOrders() {
+      axios
+        .post('/api/v1/orders/bulk-auto-allocate', {
+          ids: this.selectedItems
+        })
+        .then(response => {
+          console.log('Orders auto-allocated:', response.data);
+          // Handle successful allocation, e.g., update UI, show success message
+        })
+        .catch(error => {
+          console.error('Error auto-allocating orders:', error);
+          // Handle error, e.g., show error message
+        });
+    },
+    printOrders() {
+      axios
+        .post('/api/v1/orders/bulk-print', {
+          ids: this.selectedItems
+        })
+        .then(response => {
+          // Create a download link for the file
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'orders.pdf'); // or any other format
+          document.body.appendChild(link);
+          link.click();
+          // Clean up
+          link.remove();
+          window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+          console.error('Error printing orders:', error);
+          // Handle error, e.g., show error message
+        });
     }
   }
 };
 </script>
-
-
-

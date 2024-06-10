@@ -5,16 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Warehouse extends Model
+class Area extends Model
 {
     use HasFactory;
 
 
+    protected $fillable = ['code', 'name', 'warehouse_id'];
 
-    protected $fillable = [
-        'user_id', 'ou_id', 'name', 'phone', 'location', 
-        'length', 'width', 'height', 'non_storage', 'capacity', 'code'
-    ];
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
 
     public function bins()
     {

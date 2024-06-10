@@ -54,6 +54,13 @@ export default {
     this.fetchVendors();
   },
   methods: {
+
+    show() {
+      this.dialog = true;
+    },
+    close() {
+      this.dialog = false;
+    },
     
     fetchVendors() {
       const url = `/api/v1/vendors`;

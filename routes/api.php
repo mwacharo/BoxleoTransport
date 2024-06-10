@@ -78,7 +78,18 @@ Route::apiResource('v1/sheets', SheetApiController::class);
 Route::post('v1/sheets/{id}/sync', [SheetApiController::class, 'sync']);
 
 Route::apiResource('/v1/vendors', VendorApiController::class);
+
 Route::apiResource('/v1/orders', OrderApiController::class);
+
+Route::post('/v1/orders/bulk-delete', [OrderApiController::class, 'bulkDelete']);
+Route::post('/v1/orders/bulk-assign-rider', [OrderApiController::class, 'bulkAssignRider']);
+Route::post('/v1/orders/bulk-assign-driver', [OrderApiController::class, 'bulkAssignDriver']);
+Route::post('/v1/orders/bulk-update-status', [OrderApiController::class, 'bulkUpdateStatus']);
+Route::post('/v1/orders/bulk-categorize', [OrderApiController::class, 'bulkCategorize']);
+Route::post('/v1/orders/bulk-auto-allocate', [OrderApiController::class, 'bulkAutoAllocate']);
+Route::post('/v1/orders/bulk-print', [OrderApiController::class, 'bulkPrint']);
+
+
 Route::apiResource('/v1/riders', RiderApiContoller::class);
 Route::apiResource('/v1/drivers', DriverApiContoller::class);
 Route::apiResource('/v1/clients', ClientApiContoller::class);
@@ -87,6 +98,67 @@ Route::apiResource('/v1/orderstatus', OrderStatusApiController::class);
 Route::get('/v1/geocode-orders', [OrderApiController::class, 'geocodeOrders']);
 Route::apiResource('/v1/products', ProductApiController::class);
 Route::get('v1/products/{id}/instances', [ProductApiController::class, 'getProductInstances']);
+
+
+
+
+
+
+
+// routes/web.php
+
+// use App\Http\Controllers\ProductInstanceController;
+// use App\Http\Controllers\OrderController;
+// use App\Http\Controllers\InventoryController;
+
+// Receiving Inventory
+Route::post('/api/receive-single', [ProductApiController::class, 'receiveSingle']);
+Route::post('/api/receive-bulk', [ProductApiController::class, 'receiveBulk']);
+
+// Storage and Binning
+Route::post('/api/assign-bin', [ProductApiController::class, 'assignBin']);
+Route::post('/api/relocate', [ProductApiController::class, 'relocate']);
+Route::post('/api/bulk-assign-bin', [ProductApiController::class, 'bulkAssignBin']);
+Route::post('/api/bulk-relocate', [ProductApiController::class, 'bulkRelocate']);
+
+// Picking and Packing
+Route::post('/api/pick', [ProductApiController::class, 'pick']);
+Route::post('/api/pack', [ProductApiController::class, 'pack']);
+Route::post('/api/bulk-pick', [ProductApiController::class, 'bulkPick']);
+Route::post('/api/bulk-pack', [ProductApiController::class, 'bulkPack']);
+
+// Inventory Management
+Route::post('/api/adjust-quantity', [InventoryController::class, 'adjustQuantity']);
+Route::get('/api/check-availability', [InventoryController::class, 'checkAvailability']);
+Route::post('/api/bulk-adjust-quantity', [InventoryController::class, 'bulkAdjustQuantity']);
+Route::get('/api/bulk-check-availability', [InventoryController::class, 'bulkCheckAvailability']);
+
+// Stock Transfers
+Route::post('/api/transfer', [InventoryController::class, 'transfer']);
+Route::post('/api/bulk-transfer', [InventoryController::class, 'bulkTransfer']);
+
+// Order Management
+Route::post('/api/create-order', [OrderController::class, 'createOrder']);
+Route::post('/api/update-order-status', [OrderController::class, 'updateOrderStatus']);
+Route::post('/api/bulk-create-orders', [OrderController::class, 'bulkCreateOrders']);
+Route::post('/api/bulk-update-order-statuses', [OrderController::class, 'bulkUpdateOrderStatuses']);
+
+// Returns and Restocking
+Route::post('/api/process-return', [InventoryController::class, 'processReturn']);
+Route::post('/api/bulk-process-returns', [InventoryController::class, 'bulkProcessReturns']);
+
+// Cycle Counting and Auditing
+Route::post('/api/perform-cycle-count', [InventoryController::class, 'performCycleCount']);
+Route::post('/api/audit-inventory', [InventoryController::class, 'auditInventory']);
+Route::post('/api/bulk-perform-cycle-counts', [InventoryController::class, 'bulkPerformCycleCounts']);
+Route::post('/api/bulk-audit-inventory', [InventoryController::class, 'bulkAuditInventory']);
+
+// Reporting and Analytics
+Route::get('/api/generate-product-report', [InventoryController::class, 'generateProductReport']);
+Route::get('/api/track-product-movement', [InventoryController::class, 'trackProductMovement']);
+Route::get('/api/generate-bulk-product-reports', [InventoryController::class, 'generateBulkProductReports']);
+Route::get('/api/track-bulk-product-movement', [InventoryController::class, 'trackBulkProductMovement']);
+
 
 
 

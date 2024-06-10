@@ -19,9 +19,10 @@ return new class extends Migration
             // $table->foreignId('warehouse_id')->constrained()->onDeletedelete('cascade');
             // $table->foreignId('ou_id')->constrained()->onDeletedelete('cascade');
             $table->string('quantity');
-            // $table->string('low_stock_level');
-            // $table->string('image');
+            $table->integer('reorder_point')->nullable();           
+             // $table->string('image');
             $table->text('description')->nullable();
+            $table->decimal('buying_price', 8, 2)->nullable();
             $table->decimal('price', 10, 2);
             $table->timestamps();
             $table->softDeletes();

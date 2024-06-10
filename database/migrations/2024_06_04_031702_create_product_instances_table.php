@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->string('barcode')->unique();
+            $table->string('bin_location')->nullable();
             $table->string('batch_number')->nullable();
             $table->date('expiry_date')->nullable();
             $table->enum('status', ['available', 'reserved', 'sold', 'returned'])->default('available');
