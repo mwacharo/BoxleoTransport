@@ -72,58 +72,26 @@
     },
     {
       "url": "inventory",
-      "name": "Inventory Management:",
+      "name": "Inventory Management",
       "icon": "menu-icon tf-icons bx bx-building-house",
       "slug": "branches"
     },
 
+
     {
-      "menuHeader": "Apps"
+        "url": "warehouses",
+      "name": "WHS Dashboard",
+      "icon": "menu-icon tf-icons bx bx bx-dock-top",
+      "slug": "pages-account-settings",
+        "slug": "branches"
     },
 
     {
-      "name": "Account Settings",
+      "url": "warehouses",
+      "name": "Warehouse",
       "icon": "menu-icon tf-icons bx bx bx-dock-top",
-      "slug": "pages-account-settings",
-      "submenu": [
-        {
-          "url": "pages/account-settings-account",
-          "name": "Account",
-          "slug": "pages-account-settings-account"
-        },
-        {
-          "url": "pages/account-settings-notifications",
-          "name": "Notifications",
-          "slug": "pages-account-settings-notifications"
-        },
-        {
-          "url": "pages/account-settings-connections",
-          "name": "Connections",
-          "slug": "pages-account-settings-connections"
-        }
-      ]
-    },
-    {
-      "name": "Authentications",
-      "icon": "menu-icon tf-icons bx bx-lock-open-alt",
-      "slug": "auth",
-      "submenu": [
-        {
-          "url": "auth/login-basic",
-          "name": "Login",
-          "slug": "auth-login-basic"
-        },
-        {
-          "url": "auth/register-basic",
-          "name": "Register",
-          "slug": "auth-register-basic"
-        },
-        {
-          "url": "auth/forgot-password-basic",
-          "name": "Forgot Password",
-          "slug": "auth-forgot-password-basic"
-        }
-      ]
+      "slug": "pages-account-settings"
+
     },
 
     {
@@ -136,9 +104,7 @@
       "slug": "reports"
     },
 
-    {
-      "menuHeader": "User management"
-    },
+
     {
       "url": "users",
       "icon": "menu-icon tf-icons bx bx-group",

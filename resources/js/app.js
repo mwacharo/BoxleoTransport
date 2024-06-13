@@ -41,6 +41,8 @@ import CategoryComponent from './components/orders/CategoryComponent.vue';
 import StatusComponent from './components/orders/StatusComponent.vue';
 import OrdermapComponent from './components/orders/OrdermapComponent.vue';
 import ProductComponent from './components/products/ProductComponent.vue';
+import WarehouseComponent from './components/warehouse/WarehouseComponent.vue';
+
 
 
 
@@ -71,6 +73,8 @@ app.component('category-component', CategoryComponent);
 app.component('status-component', StatusComponent);
 app.component('ordermap-component', OrdermapComponent);
 app.component('product-component',ProductComponent);
+app.component('warehouse-component',WarehouseComponent);
+
 
 
 

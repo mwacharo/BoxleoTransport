@@ -16,6 +16,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MappedOrderController;
 use App\Http\Controllers\OrderStatusController;
 use App\Http\Controllers\OrderCategoryController;
+use App\Http\Controllers\WarehouseController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -30,6 +31,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/vendors', [VendorController::class, 'index'])->name('vendors');
     Route::get('/market', [MarketController::class, 'index'])->name('market');
     Route::get('/clients', [ClientController::class, 'index'])->name('clients');
+    Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses');
+
 
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
