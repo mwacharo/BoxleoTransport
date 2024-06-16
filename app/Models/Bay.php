@@ -21,4 +21,9 @@ class Bay extends Model
         return $this->hasMany(Level::class);
     }
 
+    public static $rules = [
+        'name' => 'required|string|max:255',
+
+    ];
+
 }

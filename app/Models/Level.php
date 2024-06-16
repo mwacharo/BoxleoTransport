@@ -18,4 +18,11 @@ class Level extends Model
     {
         return $this->belongsTo(Bay::class);
     }
+
+    public static $rules = [
+        'name' => 'required|string|max:255',
+      
+
+    ];
+
 }

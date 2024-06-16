@@ -18,4 +18,11 @@ class Bin extends Model
     {
         return $this->belongsTo(Warehouse::class);
     }
-}
+
+    public static $rules = [
+        'name' => 'required|string|max:255',
+
+
+    ];
+
+  }

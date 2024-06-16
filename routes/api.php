@@ -22,6 +22,13 @@ use App\Http\Controllers\Api\DashboardApiContoller;
 use App\Http\Controllers\Api\ServicesApiController;
 use App\Http\Controllers\Api\OrderStatusApiController;
 use App\Http\Controllers\Api\OrderCategoryApiController;
+use App\Http\Controllers\Api\LevelApiController;
+use App\Http\Controllers\Api\BinApiController;
+use App\Http\Controllers\Api\BayApiController;
+use App\Http\Controllers\Api\RowApiController;
+
+
+
 use App\Http\Controllers\Api\ReportApiController as ApiReportApiController;
 
 Route::apiResource('v1/users', UsersApiController::class)->only([
@@ -99,6 +106,17 @@ Route::get('/v1/geocode-orders', [OrderApiController::class, 'geocodeOrders']);
 Route::apiResource('/v1/products', ProductApiController::class);
 Route::get('v1/products/{id}/instances', [ProductApiController::class, 'getProductInstances']);
 
+Route::apiResource('/v1/warehouses', WarehouseApiController::class);
+Route::apiResource('/v1/levels', LevelApiController::class);
+Route::apiResource('/v1/bins', BinApiController::class);
+Route::apiResource('/v1/bays', BayApiController::class);
+Route::apiResource('/v1/rows', RowApiController::class);
+Route::apiResource('/v1/areas', AreaApiController::class);
+
+
+
+
+
 
 
 
@@ -158,18 +176,3 @@ Route::get('/api/generate-product-report', [InventoryController::class, 'generat
 Route::get('/api/track-product-movement', [InventoryController::class, 'trackProductMovement']);
 Route::get('/api/generate-bulk-product-reports', [InventoryController::class, 'generateBulkProductReports']);
 Route::get('/api/track-bulk-product-movement', [InventoryController::class, 'trackBulkProductMovement']);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

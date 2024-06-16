@@ -8,7 +8,6 @@
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
 
-
       <v-btn color="primary" @click="receive(item)">
               Receive
               <v-icon right>mdi-receive</v-icon>
@@ -34,19 +33,15 @@
         <v-icon right>mdi-row</v-icon>
       </v-btn>
 
-      <v-btn color="primary" @click="area(item)">
-       Area
-        <v-icon right>mdi-area</v-icon>
-      </v-btn>
+            <v-btn color="primary" @click="area(item)">
+             Area
+              <v-icon right>mdi-area</v-icon>
+            </v-btn>
 
 
         <v-btn color="primary" @click="addVendor">
         <v-icon>mdi-plus</v-icon>
         </v-btn>
-
-        <!-- <v-btn color="primary" @click="refreshVendors">
-        <v-icon>mdi-refresh</v-icon>
-        </v-btn> -->
         </v-toolbar>
 
           <v-text-field v-model="search" label="Search" clearable @input="filterVendors" dense></v-text-field>
@@ -109,24 +104,25 @@
         </v-main>
       </v-app>
     </v-layout>
-    <area ref="AreaComponent"/>
     <bay ref="BayComponent"/>
     <bin ref="BinComponent"/>
     <level ref="LevelComponent"/>
     <receive ref="ReceiveComponent"/>
     <row ref="RowComponent"/>
+              <area ref="AreaComponent"/>
+
+
 
   </v-card>
 </template>
 
 <script>
-
-import Area from '@/components/warehouse/Area.vue';
 import Bay from '@/components/warehouse/Bay.vue';
 import Level from '@/components/warehouse/Level.vue';
 import Receive from '@/components/warehouse/Receive.vue';
 import Row from '@/components/warehouse/Row.vue';
 import Bin from '@/components/warehouse/Bin.vue';
+import Area from '@/components/warehouse/Area.vue';
 
 export default {
 components: {
@@ -143,7 +139,6 @@ components: {
       required: true,
     },
   },
-
   data() {
     return {
       search: '',
@@ -195,6 +190,7 @@ components: {
     this.fetchVendors();
   },
   methods: {
+
     receive(){
     this.$refs.ReceiveComponent.show();
     },
@@ -207,29 +203,27 @@ components: {
     bin(){
     this.$refs.BinComponent.show();
     },
+    area(){
+     // Call the show method on the AreaComponent ref
+     this.$refs.AreaComponent.show();
+   },
     row(){
     this.$refs.RowComponent.show();
-    },
-    area(){
-    this.$refs.AreaComponent.show();
     },
     addVendor() {
       this.editedItem = { ...this.defaultItem };
       this.dialog = true;
     },
-
     editVendor(vendor) {
       this.editedIndex = this.vendors.indexOf(vendor);
       this.editedItem = { ...vendor };
       this.dialog = true;
     },
-
     deleteVendor(vendor) {
       this.editedIndex = this.vendors.indexOf(vendor);
       this.editedItem = { ...vendor };
       this.dialogDelete = true;
     },
-
     deleteVendorConfirm() {
       axios
         .delete(`/api/v1/vendors/${this.editedItem.id}`)
@@ -243,7 +237,6 @@ components: {
           this.$toastr.error('Failed to delete the vendor!');
         });
     },
-
     saveVendor() {
       this.editedItem.user_id = this.user_id;
 

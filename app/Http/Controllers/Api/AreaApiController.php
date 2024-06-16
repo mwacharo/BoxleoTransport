@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\StoreLevelRequest;
-use App\Http\Requests\UpdateLevelRequest;
-use App\Models\Level;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
-class LevelController extends Controller
+class AreaApiController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +26,7 @@ class LevelController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreLevelRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -35,7 +34,7 @@ class LevelController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Level $level)
+    public function show(string $id)
     {
         //
     }
@@ -43,7 +42,7 @@ class LevelController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Level $level)
+    public function edit(string $id)
     {
         //
     }
@@ -51,7 +50,7 @@ class LevelController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateLevelRequest $request, Level $level)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -59,7 +58,7 @@ class LevelController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Level $level)
+    public function destroy(string $id)
     {
         //
     }
