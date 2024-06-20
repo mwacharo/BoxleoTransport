@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
             // $table->unsignedBigInteger('user_id');
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->string('email')->nullable();
-            $table->string('phone');
+            $table->string('phone')->nullable();
             $table->string('alt_phone')->nullable();
-            $table->string('address');
+            $table->string('address')->nullable();
+            $table->string('headquarters')->nullable();
             $table->softDeletes(); // Add this line for soft deletes
             $table->timestamps();
         });

@@ -102,12 +102,13 @@ class Order extends Model
         'latitude',
         'geocoded',
         'loading_no',
+        'branch_id'
 
     ];
 
     public function vendor(){
         return $this->belongsTo(Vendor::class);
-        
+
     }
 
     public function client()

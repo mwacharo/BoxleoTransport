@@ -36,6 +36,8 @@ return new class extends Migration
             $table->unsignedBigInteger('agent_id')->nullable();
             $table->unsignedBigInteger('rider_id')->nullable();
             $table->unsignedBigInteger('driver_id')->nullable();
+            $table->unsignedBigInteger('vehicle_id')->nullable();
+            $table->unsignedBigInteger('branch_id')->nullable();
             $table->decimal('total_price', 10, 2)->nullable();
             $table->decimal('invoice_value', 10, 2)->nullable();
             $table->decimal('amount_paid', 10, 2)->nullable();

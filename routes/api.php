@@ -26,6 +26,10 @@ use App\Http\Controllers\Api\LevelApiController;
 use App\Http\Controllers\Api\BinApiController;
 use App\Http\Controllers\Api\BayApiController;
 use App\Http\Controllers\Api\RowApiController;
+use App\Http\Controllers\Api\AreaApiController;
+use App\Http\Controllers\Api\WarehouseApiController;
+
+
 
 
 

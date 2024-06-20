@@ -11,7 +11,7 @@ class Vendor extends Model
     use HasFactory ,SoftDeletes;
 
     protected $fillable = [
-    
+
         'name',
         'phone',
         'address',
@@ -29,19 +29,19 @@ class Vendor extends Model
         'portal_active',
         'terms',
         'company_id',
-        'ou_id',
+        'branch_id',
         'order_prefix',
         'remember_token',
         'created_at',
         'updated_at',
         'date',
         'last_identifier'
-    
-    
+
+
     ];
 
     // protected $dates = [
-      
+
     // ];
 
 

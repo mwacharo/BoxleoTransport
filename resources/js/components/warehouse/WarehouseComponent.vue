@@ -8,49 +8,54 @@
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
 
-      <v-btn color="primary" @click="receive(item)">
-              Receive
-              <v-icon right>mdi-receive</v-icon>
-            </v-btn>
+            <v-btn color="primary" @click="receive">
+    Receive
+    <v-icon right>mdi-download</v-icon> <!-- Appropriate icon for receiving items -->
+  </v-btn>
 
-      <v-btn color="primary" @click="level(item)">
-        Level
-        <v-icon right>mdi-level</v-icon>
-      </v-btn>
+  <v-btn color="primary" @click="putAway">
+    Put Away
+    <v-icon right>mdi-archive</v-icon> <!-- Icon for putting items away -->
+  </v-btn>
 
-      <v-btn color="primary" @click="bin(item)">
-        Bin
-        <v-icon right>mdi-bin</v-icon>
-      </v-btn>
+  <v-btn color="primary" @click="level">
+    Level
+    <v-icon right>mdi-layers-outline</v-icon> <!-- Icon representing levels or layers -->
+  </v-btn>
 
-      <v-btn color="primary" @click="bay(item)">
-        Bay
-        <v-icon right>mdi-bay</v-icon>
-      </v-btn>
+  <v-btn color="primary" @click="bin">
+    Bin
+    <v-icon right>mdi-package-variant-closed</v-icon> <!-- Icon for a bin or box -->
+  </v-btn>
 
-      <v-btn color="primary" @click="row(item)">
-       Row
-        <v-icon right>mdi-row</v-icon>
-      </v-btn>
+  <v-btn color="primary" @click="bay">
+    Bay
+    <v-icon right>mdi-warehouse</v-icon> <!-- Icon for a warehouse bay -->
+  </v-btn>
 
-            <v-btn color="primary" @click="area(item)">
-             Area
-              <v-icon right>mdi-area</v-icon>
-            </v-btn>
+  <v-btn color="primary" @click="row">
+    Row
+    <v-icon right>mdi-view-sequential-outline</v-icon> <!-- Icon for rows -->
+  </v-btn>
 
+  <v-btn color="primary" @click="area">
+    Area
+    <v-icon right>mdi-map-outline</v-icon> <!-- Icon for an area or map -->
+  </v-btn>
 
-        <v-btn color="primary" @click="addVendor">
-        <v-icon>mdi-plus</v-icon>
-        </v-btn>
-        </v-toolbar>
+  <v-btn color="primary" @click="addWarehouse">
+    <v-icon>mdi-plus</v-icon>
+    </v-btn>
 
-          <v-text-field v-model="search" label="Search" clearable @input="filterVendors" dense></v-text-field>
+          </v-toolbar>
+
+          <v-text-field v-model="search" label="Search" clearable @input="filterWarehouse" dense></v-text-field>
           <v-responsive>
-            <v-data-table :headers="headers" :items="searchVendors">
+            <v-data-table :headers="headers" :items="searchWarehouses">
               <template v-slot:item.actions="{ item }">
                 <div class="d-flex align-center">
-                  <v-icon class="mx-1" color="blue" @click="editVendor(item)">mdi-pencil</v-icon>
-                  <v-icon class="mx-1" color="red" @click="deleteVendor(item)">mdi-delete</v-icon>
+                  <v-icon class="mx-1" color="blue" @click="editWarehouse(item)">mdi-pencil</v-icon>
+                  <v-icon class="mx-1" color="red" @click="deleteWarehouse(item)">mdi-delete</v-icon>
                 </div>
               </template>
             </v-data-table>
@@ -74,18 +79,14 @@
                       <v-text-field v-model="editedItem.address" label="Address" prepend-icon="mdi-web"></v-text-field>
                     </v-col>
                     <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="editedItem.phone"
-                        label="Phone (optional)"
-                        prepend-icon="mdi-phone"
-                      ></v-text-field>
+                      <v-text-field v-model="editedItem.phone" label="Phone (optional)" prepend-icon="mdi-phone"></v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
               </v-card-text>
               <v-card-actions class="justify-end">
                 <v-btn color="red darken-1" text @click.prevent="closeDialog">Close</v-btn>
-                <v-btn color="blue darken-1" text @click.prevent="saveVendor">Save</v-btn>
+                <v-btn color="blue darken-1" text @click.prevent="saveWarehouse">Save</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -93,46 +94,51 @@
           <v-dialog v-model="dialogDelete" max-width="290">
             <v-card>
               <v-card-title class="headline">Warning</v-card-title>
-              <v-card-text>This will permanently delete the vendor. Continue?</v-card-text>
+              <v-card-text>This will permanently delete the warehouse. Continue?</v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="closeDelete">Cancel</v-btn>
-                <v-btn color="primary" text @click="deleteVendorConfirm">OK</v-btn>
+                <v-btn color="primary" text @click="deleteWarehouseConfirm">OK</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
         </v-main>
       </v-app>
     </v-layout>
-    <bay ref="BayComponent"/>
-    <bin ref="BinComponent"/>
-    <level ref="LevelComponent"/>
-    <receive ref="ReceiveComponent"/>
-    <row ref="RowComponent"/>
-              <area ref="AreaComponent"/>
-
-
-
+    <Bay ref="BayComponent"/>
+    <Bin ref="BinComponent"/>
+    <Level ref="LevelComponent"/>
+    <Receive ref="ReceiveComponent"/>
+    <PutAway ref="PutAwayComponent"/>
+    <Row ref="RowComponent"/>
+    <Area ref="AreaComponent"/>
   </v-card>
 </template>
 
 <script>
+
+import { fetchDataMixin } from '@/mixins/fetchDataMixin';
+
 import Bay from '@/components/warehouse/Bay.vue';
 import Level from '@/components/warehouse/Level.vue';
 import Receive from '@/components/warehouse/Receive.vue';
 import Row from '@/components/warehouse/Row.vue';
 import Bin from '@/components/warehouse/Bin.vue';
 import Area from '@/components/warehouse/Area.vue';
+import PutAway from '@/components/warehouse/PutAway.vue';
+
 
 export default {
-components: {
-  Area,
-  Bay,
-  Level,
-  Receive,
-  Row,
-  Bin
-},
+  mixins: [fetchDataMixin],
+  components: {
+    Area,
+    Bay,
+    Level,
+    Receive,
+    Row,
+    Bin,
+    PutAway,
+  },
   props: {
     user_id: {
       type: Number,
@@ -142,7 +148,7 @@ components: {
   data() {
     return {
       search: '',
-      vendors: [],
+      warehouses: [],
       headers: [
         { title: '#', value: 'index' },
         { title: 'Name', value: 'name' },
@@ -170,120 +176,116 @@ components: {
       dialogDelete: false,
     };
   },
-
   computed: {
-    searchVendors() {
-      if (!this.search) return this.vendors;
-      return this.vendors.filter(
-        (vendor) =>
-          vendor.name.toLowerCase().includes(this.search.toLowerCase()) ||
-          vendor.email.toLowerCase().includes(this.search.toLowerCase()) ||
-          vendor.phone.toLowerCase().includes(this.search.toLowerCase())
+    searchWarehouses() {
+      if (!this.search) return this.warehouses;
+      return this.warehouses.filter(
+        (warehouse) =>
+          warehouse.name.toLowerCase().includes(this.search.toLowerCase()) ||
+          warehouse.email.toLowerCase().includes(this.search.toLowerCase()) ||
+          warehouse.phone.toLowerCase().includes(this.search.toLowerCase())
       );
     },
     formTitle() {
       return this.editedIndex === -1 ? 'New Warehouse' : 'Edit Warehouse';
     },
   },
-
   created() {
-    this.fetchVendors();
+    this.fetchWarehouses();
   },
   methods: {
-
-    receive(){
-    this.$refs.ReceiveComponent.show();
+    putAway() {
+      this.$refs.PutAwayComponent.show();
     },
-    level(){
-    this.$refs.LevelComponent.show();
+    receive() {
+      this.$refs.ReceiveComponent.show();
     },
-    bay(){
-    this.$refs.BayComponent.show();
+    level() {
+      this.$refs.LevelComponent.show();
     },
-    bin(){
-    this.$refs.BinComponent.show();
+    bay() {
+      this.$refs.BayComponent.show();
     },
-    area(){
-     // Call the show method on the AreaComponent ref
-     this.$refs.AreaComponent.show();
-   },
-    row(){
-    this.$refs.RowComponent.show();
+    bin() {
+      this.$refs.BinComponent.show();
     },
-    addVendor() {
+    area() {
+      this.$refs.AreaComponent.show();
+    },
+    row() {
+      this.$refs.RowComponent.show();
+    },
+    addWarehouse() {
       this.editedItem = { ...this.defaultItem };
       this.dialog = true;
     },
-    editVendor(vendor) {
-      this.editedIndex = this.vendors.indexOf(vendor);
-      this.editedItem = { ...vendor };
+    editWarehouse(warehouse) {
+      this.editedIndex = this.warehouses.indexOf(warehouse);
+      this.editedItem = { ...warehouse };
       this.dialog = true;
     },
-    deleteVendor(vendor) {
-      this.editedIndex = this.vendors.indexOf(vendor);
-      this.editedItem = { ...vendor };
+    deleteWarehouse(warehouse) {
+      this.editedIndex = this.warehouses.indexOf(warehouse);
+      this.editedItem = { ...warehouse };
       this.dialogDelete = true;
     },
-    deleteVendorConfirm() {
+    deleteWarehouseConfirm() {
       axios
-        .delete(`/api/v1/vendors/${this.editedItem.id}`)
+        .delete(`/api/v1/warehouses/${this.editedItem.id}`)
         .then((response) => {
           this.$toastr.success(response.data.message);
-          this.fetchVendors();
+          this.fetchWarehouses();
           this.closeDelete();
         })
         .catch((error) => {
-          console.error('Error deleting vendor:', error);
-          this.$toastr.error('Failed to delete the vendor!');
+          console.error('Error deleting warehouse:', error);
+          this.$toastr.error('Failed to delete the warehouse!');
         });
     },
-    saveVendor() {
+    saveWarehouse() {
       this.editedItem.user_id = this.user_id;
 
       if (this.editedIndex > -1) {
         axios
-          .put(`/api/v1/vendors/${this.editedItem.id}`, this.editedItem)
+          .put(`/api/v1/warehouses/${this.editedItem.id}`, this.editedItem)
           .then((response) => {
-            this.$toastr.success('Vendor updated successfully');
-            this.fetchVendors();
+            this.$toastr.success('Warehouse updated successfully');
+            this.fetchWarehouses();
             this.closeDialog();
           })
           .catch((error) => {
-            this.$toastr.error('Error updating vendor');
-            console.error('Error updating vendor:', error);
+            this.$toastr.error('Error updating warehouse');
+            console.error('Error updating warehouse:', error);
           });
       } else {
         axios
-          .post('/api/v1/vendors', this.editedItem)
+          .post('/api/v1/warehouses', this.editedItem)
           .then((response) => {
             this.$toastr.success(response.data.message);
-            this.fetchVendors();
+            this.fetchWarehouses();
             this.closeDialog();
           })
           .catch((error) => {
-            this.$toastr.error('Error adding vendor');
-            console.error('Error adding vendor:', error);
+            this.$toastr.error('Error adding warehouse');
+            console.error('Error adding warehouse:', error);
           });
       }
     },
-
-    fetchVendors() {
+    fetchWarehouses() {
       axios
-        .get('/api/v1/vendors')
+        .get('/api/v1/warehouses')
         .then((response) => {
-          this.vendors = response.data;
+          this.warehouses = response.data;
         })
         .catch((error) => {
-          console.error('Error fetching vendors:', error);
+          console.error('Error fetching warehouse:', error);
         });
     },
-
     closeDialog() {
       this.dialog = false;
       this.editedItem = { ...this.defaultItem };
       this.editedIndex = -1;
     },
-
     closeDelete() {
       this.dialogDelete = false;
       this.editedItem = { ...this.defaultItem };

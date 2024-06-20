@@ -16,8 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('branch_id')->constrained()->onDelete('cascade');
             $table->string('name', 191)->nullable();
+            $table->string('email', 191)->nullable();
             $table->longText('phone')->nullable();
-            $table->longText('location')->nullable();
+            $table->longText('address')->nullable();
             $table->string('length', 191)->default('0');
             $table->string('width', 191)->default('0');
             $table->string('height', 191)->default('0');
@@ -25,7 +26,7 @@ return new class extends Migration
             $table->string('capacity', 191)->default('0');
             $table->string('code', 191);
             $table->softDeletes();
-        
+
             $table->timestamps();
         });
     }

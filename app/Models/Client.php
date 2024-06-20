@@ -13,7 +13,7 @@ class Client extends Model
 
     protected $fillable = [
         // 'user_id',
-        'ou_id',
+        'branch_id',
         'name',
         'email',
         'phone',
@@ -23,7 +23,7 @@ class Client extends Model
         'city',
         // 'group_id',
         'payment_type',
-        'seller_id',
+        'vendor_id',
     ];
 
     protected $dates = ['deleted_at'];

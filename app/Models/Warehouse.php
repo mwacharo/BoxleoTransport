@@ -12,12 +12,18 @@ class Warehouse extends Model
 
 
     protected $fillable = [
-        'user_id', 'ou_id', 'name', 'phone', 'location', 
-        'length', 'width', 'height', 'non_storage', 'capacity', 'code'
+        'user_id', 'branch_id', 'name', 'phone', 'address',
+        'length', 'width', 'height', 'non_storage', 'capacity', 'code','email'
     ];
 
     public function bins()
     {
         return $this->hasMany(Bin::class);
     }
+
+    public static $rules = [
+        'name' => 'required|string|max:255',
+
+
+    ];
 }

@@ -31,7 +31,7 @@ return new class extends Migration
             $table->text('terms')->nullable();
             $table->bigInteger('company_id')->nullable();
             $table->bigInteger('last_identifier')->default(1);
-            $table->bigInteger('ou_id')->nullable();
+            $table->bigInteger('branch_id')->nullable();
             $table->string('order_prefix')->nullable();
             $table->string('remember_token')->nullable();
             $table->timestamps();

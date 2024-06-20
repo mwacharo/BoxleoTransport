@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('sku')->unique();
             $table->string('name');
             $table->foreignId('vendor_id')->constrained()->onDeletedelete('cascade');
-            // $table->foreignId('warehouse_id')->constrained()->onDeletedelete('cascade');
-            // $table->foreignId('ou_id')->constrained()->onDeletedelete('cascade');
+            $table->foreignId('warehouse_id')->constrained()->onDeletedelete('cascade');
+            $table->foreignId('branch_id')->constrained()->onDeletedelete('cascade');
             $table->string('quantity');
-            $table->integer('reorder_point')->nullable();           
+            $table->integer('reorder_point')->nullable();
              // $table->string('image');
             $table->text('description')->nullable();
             $table->decimal('buying_price', 8, 2)->nullable();

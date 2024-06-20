@@ -1,18 +1,18 @@
 <template>
   <v-dialog v-model="dialog" max-width="800">
     <v-card>
-      <v-card-title class="headline">Row</v-card-title>
+      <v-card-title class="headline">Area</v-card-title>
       <v-toolbar flat>
-        <v-btn color="primary" @click="addRow">
+        <v-btn color="primary" @click="addArea">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
       </v-toolbar>
 
-      <v-data-table :headers="headers" :items="rows" show-select>
+      <v-data-table :headers="headers" :items="areas" show-select>
         <template v-slot:item.actions="{ item }">
           <div class="d-flex align-center">
-            <v-icon class="mx-1" color="blue" @click="editRow(item)">mdi-pencil</v-icon>
-            <v-icon class="mx-1" color="red" @click="deleteRow(item)">mdi-delete</v-icon>
+            <v-icon class="mx-1" color="blue" @click="editArea(item)">mdi-pencil</v-icon>
+            <v-icon class="mx-1" color="red" @click="deleteArea(item)">mdi-delete</v-icon>
           </div>
         </template>
       </v-data-table>
@@ -39,7 +39,7 @@
           </v-card-text>
           <v-card-actions class="justify-end">
             <v-btn color="red darken-1" text @click.prevent="closeDialog">Close</v-btn>
-            <v-btn color="blue darken-1" text @click.prevent="saveRow">Save</v-btn>
+            <v-btn color="blue darken-1" text @click.prevent="saveArea">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -47,11 +47,11 @@
       <v-dialog v-model="dialogDelete" max-width="290">
         <v-card>
           <v-card-title class="headline">Warning</v-card-title>
-          <v-card-text>This will permanently delete the row. Continue?</v-card-text>
+          <v-card-text>This will permanently delete the area. Continue?</v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="primary" text @click="closeDeleteDialog">Cancel</v-btn>
-            <v-btn color="primary" text @click="deleteRowConfirm">OK</v-btn>
+            <v-btn color="primary" text @click="deleteAreaConfirm">OK</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -72,7 +72,7 @@ export default {
     return {
       dialog: false,
       dialog1: false,
-      rows: [],
+      areas: [],
       dialogDelete: false,
       editedIndex: -1,
       editedItem: {
@@ -96,47 +96,47 @@ export default {
   },
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Row' : 'Edit Row';
+      return this.editedIndex === -1 ? 'New Area' : 'Edit Area';
     },
   },
   created() {
-    this.fetchRows();
+    this.fetchAreas();
   },
   methods: {
-    saveRow() {
+    saveArea() {
       this.editedItem.user_id = this.user_id;
 
       if (this.editedIndex > -1) {
         axios
-          .put(`/api/v1/rows/${this.editedItem.id}`, this.editedItem)
+          .put(`/api/v1/areas/${this.editedItem.id}`, this.editedItem)
           .then((response) => {
-            this.$toastr.success('Row updated successfully');
-            this.fetchRows();
+            this.$toastr.success('Area updated successfully');
+            this.fetchAreas();
             this.closeDialog();
           })
           .catch((error) => {
-            this.$toastr.error('Error updating row');
-            console.error('Error updating row:', error);
+            this.$toastr.error('Error updating area');
+            console.error('Error updating area:', error);
           });
       } else {
         axios
-          .post('/api/v1/rows', this.editedItem)
+          .post('/api/v1/areas', this.editedItem)
           .then((response) => {
             this.$toastr.success(response.data.message);
-            this.fetchRows();
+            this.fetchAreas();
             this.closeDialog();
           })
           .catch((error) => {
-            this.$toastr.error('Error adding row');
-            console.error('Error adding row:', error);
+            this.$toastr.error('Error adding area');
+            console.error('Error adding area:', error);
           });
       }
     },
-    fetchRows() {
+    fetchAreas() {
       axios
-        .get('/api/v1/rows')
+        .get('/api/v1/areas')
         .then((response) => {
-          this.rows = response.data;
+          this.areas = response.data;
         })
         .catch((error) => {
           console.error('Error fetching rows:', error);
@@ -148,17 +148,17 @@ export default {
     close() {
       this.dialog = false;
     },
-    editRow(row) {
-      this.editedIndex = this.rows.indexOf(row);
-      this.editedItem = { ...row };
+    editArea(area) {
+      this.editedIndex = this.areas.indexOf(area);
+      this.editedItem = { ...area };
       this.dialog1 = true;
     },
-    deleteRow(row) {
-      this.editedIndex = this.rows.indexOf(row);
-      this.editedItem = { ...row };
+    deleteArea(area) {
+      this.editedIndex = this.areas.indexOf(area);
+      this.editedItem = { ...area };
       this.dialogDelete = true;
     },
-    addRow() {
+    addArea() {
       this.editedItem = { ...this.defaultItem };
       this.dialog1 = true;
     },
@@ -167,12 +167,12 @@ export default {
       this.editedItem = { ...this.defaultItem };
       this.editedIndex = -1;
     },
-    async deleteRowConfirm() {
+    async deleteAreaConfirm() {
       try {
-        const response = await axios.delete(`/api/v1/rows/${this.editedItem.id}`);
+        const response = await axios.delete(`/api/v1/areas/${this.editedItem.id}`);
         console.log('Items deleted:', response.data);
         this.$toastr.success(response.data.message);
-        this.fetchRows();
+        this.fetchAreas();
         this.dialogDelete = false;
       } catch (error) {
         console.error('Error deleting items:', error);

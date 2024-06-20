@@ -31,6 +31,9 @@
                 <v-col cols="12" md="6">
                   <v-text-field v-model="editedItem.code" label="Code" prepend-icon="mdi-email"></v-text-field>
                 </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field v-model="editedItem.bay_id" label="Code" prepend-icon="mdi-email"></v-text-field>
+                </v-col>
               </v-row>
             </v-container>
           </v-card-text>
@@ -76,11 +79,13 @@ export default {
       editedItem: {
         name: '',
         code: '',
+        bay_id:'',
         user_id: this.user_id,
       },
       defaultItem: {
         name: '',
         code: '',
+        bay_id:'',
         user_id: this.user_id,
       },
       headers: [

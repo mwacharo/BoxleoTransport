@@ -71,6 +71,8 @@
                         v-model="editedItem.quantity"
                         label="Quantity"
                         prepend-icon="mdi-phone"
+                        disabled
+                       readonly
                       ></v-text-field>
                     </v-col>
                   </v-row>
@@ -130,7 +132,6 @@ export default {
         { title: 'Name', value: 'name' },
         { title: 'SKU', value: 'sku' },
         { title: 'Description', value: 'description' },
-        { title: 'Price', value: 'price' },
         { title: 'Quantity Available', value: 'quantity' },
         // { title: 'Committed stock', value: 'quantity' },
         { title: 'Total price', value: 'total_price' },

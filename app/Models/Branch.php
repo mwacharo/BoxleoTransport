@@ -17,8 +17,9 @@ class Branch extends Model
         'phone',
         'alt_phone',
         'address',
-      
+        'headquarters'
+
     ];
 
-    protected $dates = ['deleted_at'];   
+    protected $dates = ['deleted_at'];
 }

@@ -29,19 +29,24 @@
                   <v-text-field v-model="editedItem.name" label="Name" prepend-icon="mdi-account"></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field v-model="editedItem.warehouse_id" label="Warehouse ID" prepend-icon="mdi-warehouse"></v-text-field>
+                  <v-select :items="warehouses"
+                  v-model="editedItem.warehouse_id"
+                  label="Warehouse"
+                  item-title="name"
+                   item-value="id"
+                   prepend-icon="mdi-warehouse"></v-select>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field v-model="editedItem.area_id" label="Area ID" prepend-icon="mdi-map-marker"></v-text-field>
+                  <v-select :items="areas" v-model="editedItem.area_id" label="Area" item-title="name" item-value="id" prepend-icon="mdi-map-marker"></v-select>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field v-model="editedItem.row_id" label="Row ID" prepend-icon="mdi-table-row"></v-text-field>
+                  <v-select :items="rows" v-model="editedItem.row_id" label="Row" item-title="name" item-value="id" prepend-icon="mdi-table-row"></v-select>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field v-model="editedItem.bay_id" label="Bay ID" prepend-icon="mdi-rack"></v-text-field>
+                  <v-select :items="bays" v-model="editedItem.bay_id" label="Bay" item-title="name" item-value="id" prepend-icon="mdi-rack"></v-select>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field v-model="editedItem.level_id" label="Level ID" prepend-icon="mdi-layers"></v-text-field>
+                  <v-select :items="levels" v-model="editedItem.level_id" label="Level" item-title="name" item-value="id" prepend-icon="mdi-layers"></v-select>
                 </v-col>
               </v-row>
             </v-container>
@@ -75,14 +80,22 @@
 
 <script>
 import axios from 'axios';
+import { fetchDataMixin } from '@/mixins/fetchDataMixin';
 
 export default {
+  mixins: [fetchDataMixin],
+
   data() {
     return {
       dialog: false,
       dialog1: false,
-      bins: [],
       dialogDelete: false,
+      bins: [],
+      warehouses: [],
+      areas: [],
+      rows: [],
+      bays: [],
+      levels: [],
       editedIndex: -1,
       editedItem: {
         name: '',
@@ -116,10 +129,15 @@ export default {
   },
   created() {
     this.fetchBins();
+    this.fetchWarehouses();
+    this.fetchAreas();
+    this.fetchRows();
+    this.fetchBays();
+    this.fetchLevels();
   },
   methods: {
     generateCode(item) {
-      return `${item.warehouse_id}-${item.area_id}-${item.row_id}-${item.bay_id}-${item.level_id}-${item.name}`;
+      return `${item.name}-${item.area_id}-${item.row_id}-${item.bay_id}-${item.level_id}-${item.name}`;
     },
     saveBin() {
       this.editedItem.code = this.generateCode(this.editedItem);
@@ -159,6 +177,21 @@ export default {
         .catch((error) => {
           console.error('Error fetching bins:', error);
         });
+    },
+    async fetchWarehouses() {
+      this.warehouses = await this.fetchDataFromApi('/api/v1/warehouses');
+    },
+    async fetchAreas() {
+      this.areas = await this.fetchDataFromApi('/api/v1/areas');
+    },
+    async fetchRows() {
+      this.rows = await this.fetchDataFromApi('/api/v1/rows');
+    },
+    async fetchBays() {
+      this.bays = await this.fetchDataFromApi('/api/v1/bays');
+    },
+    async fetchLevels() {
+      this.levels = await this.fetchDataFromApi('/api/v1/levels');
     },
     show() {
       this.dialog = true;

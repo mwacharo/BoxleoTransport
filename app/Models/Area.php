@@ -21,4 +21,9 @@ class Area extends Model
     {
         return $this->hasMany(Bin::class);
     }
+
+    public static $rules = [
+        'name' => 'required|string|max:255',
+
+    ];
 }

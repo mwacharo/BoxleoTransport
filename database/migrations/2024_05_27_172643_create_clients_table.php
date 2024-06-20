@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
             // $table->integer('user_id');
-            $table->integer('ou_id')->default(1);
+            $table->integer('branch_id')->default(1);
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('gender')->nullable();
             // $table->string('group_id', 191)->nullable();
             $table->string('payment_type')->nullable();
-            $table->integer('seller_id')->nullable();
+            $table->integer('vendor_id')->nullable();
             $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
