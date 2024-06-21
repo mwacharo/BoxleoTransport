@@ -13,33 +13,33 @@
 
       <br>
 
-      <v-sheet border>
-        <v-table>
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th class="text-end">Quantity</th>
-              <th class="text-end">Price</th>
-            </tr>
-          </thead>
+      <v-form>
+      <v-select
+        v-model="selectedWarehouse"
+        :items="warehouses"
+        label="Select Warehouse"
+        item-title="name"
+        item-value="id"
+      ></v-select>
+      <v-select
+        v-model="selectedVendor"
+          :items="vendors"
+          label="Select Vendor"
+          item-title="name"
+        item-value="id"
+          ></v-select>
 
-          <tbody>
-            <tr v-for="(product, index) in products" :key="index">
-              <td v-text="product.name"></td>
-              <td class="text-end" v-text="product.quantity"></td>
-              <td class="text-end" v-text="product.quantity * product.price"></td>
-            </tr>
 
-            <tr>
-              <th>Total</th>
-              <th></th>
-              <th class="text-end">
-                ${{ subtotal }}
-              </th>
-            </tr>
-          </tbody>
-        </v-table>
-      </v-sheet>
+          <v-select
+            v-model="selectedProductIds"
+              :items="products"
+              label="Select Product"
+              item-title="name"
+            item-value="id"
+            multiple
+              ></v-select>
+
+          </v-form>
     </template>
 
     <template v-slot:item.2>
@@ -47,51 +47,58 @@
 
       <br>
 
-      <v-radio-group v-model="shipping" label="Delivery Method">
-        <v-radio label="Standard Shipping" value="5"></v-radio>
-        <v-radio label="Priority Shipping" value="10"></v-radio>
-        <v-radio label="Express Shipping" value="15"></v-radio>
-      </v-radio-group>
+      <v-radio-group v-model="putawayMode" row>
+           <v-radio label="Assign bins by product" value="product"></v-radio>
+           <v-radio label="Assign bins by product instance" value="instance"></v-radio>
+         </v-radio-group>
     </template>
 
     <template v-slot:item.3>
       <h3 class="text-h6">Confirm</h3>
 
+
+
       <br>
 
-      <v-sheet border>
-        <v-table>
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th class="text-end">Quantity</th>
-              <th class="text-end">Price</th>
-            </tr>
-          </thead>
+      <v-responsive>
 
-          <tbody>
-            <tr v-for="(product, index) in products" :key="index">
-              <td v-text="product.name"></td>
-              <td class="text-end" v-text="product.quantity"></td>
-              <td class="text-end" v-text="product.quantity * product.price"></td>
-            </tr>
+      <v-card>
+      <v-data-table
+    :headers="headers"
+    :items="products"
+    :items-per-page="5"
+    hide-default-footer
+    >
+    <template v-slot:item.quantity="{ item }">
+     <v-text-field
+       v-model.number="item.quantity"
+       type="number"
+       outlined
+       hide-details
+       dense
+     ></v-text-field>
+    </template>
 
-            <tr>
-              <td>Shipping</td>
-              <td></td>
-              <td class="text-end" v-text="shipping"></td>
-            </tr>
 
-            <tr>
-              <th>Total</th>
-              <th></th>
-              <th class="text-end">
-                ${{ total }}
-              </th>
-            </tr>
-          </tbody>
-        </v-table>
-      </v-sheet>
+
+
+    <template v-slot:item.weight_kgs="{ item }">
+     <span>{{ item.weight_kgs }}</span>
+    </template>
+
+
+    <template v-slot:item.actions="{ item }">
+     <v-icon color="red" @click="deleteProduct(item)">mdi-delete</v-icon>
+     <v-icon class="mx-1" color="blue" @click="viewProductInstances(item.id)">mdi-eye</v-icon>
+
+    </template>
+    </v-data-table>
+    </v-card>
+
+
+
+      </v-responsive>
+
     </template>
   </v-stepper>
 
@@ -101,44 +108,74 @@
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" text @click="close">Close</v-btn>
       </v-card-actions>
+
+      <instance ref="InstanceComponent" :productId="selectedProductId"/>
+
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import Instance from '@/components/products/Instance.vue';
+
+import { fetchDataMixin } from '@/mixins/fetchDataMixin';
+
   export default {
+
+  components: {
+    Instance
+  },
+  mixins: [fetchDataMixin],
+
     data: () => ({
       shipping: 0,
       step: 1,
       dialog:false,
       items: [
-        'Review Order',
-        'Select Shipping',
-        'Submit',
+        'Select Product',
+        'Select Product or Instance ',
+        'Allocate BIn',
       ],
       products: [
-        {
-          name: 'Product 1',
-          price: 10,
-          quantity: 2,
-        },
-        {
-          name: 'Product 2',
-          price: 15,
-          quantity: 10,
-        },
+
       ],
+      headers: [
+  { title: 'SKU', value: 'sku' },
+  { title: 'Name', value: 'name' },
+  { title: 'Quantity', value: 'quantity' },
+  { title: 'Price', value: 'price' },
+  { title: 'Weight', value: 'weight' },
+  { title: 'Actions', value: 'actions', sortable: false },
+],
+      warehouses:[],
+    vendors:[],
+    selectedWarehouse:'',
+    selectedVendor:'',
+    selectedProductIds:'',
     }),
 
     computed: {
-      subtotal () {
-        return this.products.reduce((acc, product) => acc + product.quantity * product.price, 0)
-      },
-      total () {
-        return this.subtotal + Number(this.shipping ?? 0)
-      },
+
+    },
+
+    created() {
+
+      // fetch vendors ,warehouses, products
+      this.fetchBulkData();
     },
     methods:{
+
+    async fetchBulkData() {
+      this.vendors = await this.fetchDataFromApi('/api/v1/vendors');
+      this.warehouses = await this.fetchDataFromApi('/api/v1/warehouses');
+      this.products = await this.fetchDataFromApi('/api/v1/products');
+    },
+
+
+        viewProductInstances(id) {
+          this.selectedProductId = id;
+          this.$refs.InstanceComponent.show();
+        },
     show() {
       // console.log(item);
       this.dialog = true;
