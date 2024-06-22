@@ -17,6 +17,10 @@
     Put Away
     <v-icon right>mdi-archive</v-icon> <!-- Icon for putting items away -->
   </v-btn>
+  <v-btn color="primary" @click="stockTransfer">
+  Stock Transfer
+  <v-icon right>mdi-swap-horizontal</v-icon> <!-- Icon for stock transfer -->
+</v-btn>
 
   <v-btn color="primary" @click="level">
     Level
@@ -112,6 +116,7 @@
     <PutAway ref="PutAwayComponent"/>
     <Row ref="RowComponent"/>
     <Area ref="AreaComponent"/>
+    <StockTransfer ref="StockTransferComponent"/>
   </v-card>
 </template>
 
@@ -126,6 +131,8 @@ import Row from '@/components/warehouse/Row.vue';
 import Bin from '@/components/warehouse/Bin.vue';
 import Area from '@/components/warehouse/Area.vue';
 import PutAway from '@/components/warehouse/PutAway.vue';
+import StockTransfer from '@/components/warehouse/StockTransfer.vue';
+
 
 
 export default {
@@ -138,6 +145,7 @@ export default {
     Row,
     Bin,
     PutAway,
+    StockTransfer
   },
   props: {
     user_id: {
@@ -194,6 +202,9 @@ export default {
     this.fetchWarehouses();
   },
   methods: {
+  stockTransfer(){
+  this.$refs.StockTransferComponent.show();
+  },
     putAway() {
       this.$refs.PutAwayComponent.show();
     },

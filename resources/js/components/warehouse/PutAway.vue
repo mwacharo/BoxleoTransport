@@ -94,9 +94,6 @@
     </template>
     </v-data-table>
     </v-card>
-
-
-
       </v-responsive>
 
     </template>
