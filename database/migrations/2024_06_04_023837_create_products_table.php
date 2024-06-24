@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('sku')->unique();
             $table->string('name');
             $table->foreignId('vendor_id')->constrained()->onDeletedelete('cascade');
-            $table->foreignId('warehouse_id')->constrained()->onDeletedelete('cascade');
+            // $table->foreignId('warehouse_id')->constrained()->onDeletedelete('cascade');
+            $table->foreignId('warehouse_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('branch_id')->constrained()->onDeletedelete('cascade');
             $table->string('quantity');
             $table->integer('reorder_point')->nullable();
