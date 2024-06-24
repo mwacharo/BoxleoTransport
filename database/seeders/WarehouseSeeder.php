@@ -28,7 +28,7 @@ class WarehouseSeeder extends Seeder
 
                  'phone' => '555-555-1212',
 
-                 'location' => '123 Main St',
+                 'address' => '123 Main St',
 
                  'length' => 100,
 
@@ -56,7 +56,7 @@ class WarehouseSeeder extends Seeder
 
                  'phone' => '555-555-1213',
 
-                 'location' => '456 Elm St',
+                 'address' => '456 Elm St',
 
                  'length' => 150,
 
