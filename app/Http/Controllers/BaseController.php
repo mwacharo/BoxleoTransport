@@ -20,7 +20,7 @@ use Illuminate\Http\Request;
         $this->validate($request, $this->model::$rules);
         $item = $this->model::firstorcreate($request->all());
 
-        dd($item);
+        // dd($item);
 
         return response()->json( ['item' => $item,
         'message' => 'Item created successfully']);
