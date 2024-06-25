@@ -15,7 +15,18 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class ProductApiController extends BaseController
 {
 
+
+
     protected $model = Product::class;
+
+    //
+    // public function index()
+    // {
+    //     // Fetch product instances with their bin details
+    //     $productInstances = ProductInstance::with('bin')->get();
+    //
+    //     return response()->json(['instances' => $productInstances]);
+    // }
 
     public function store(Request $request)
     {
@@ -77,7 +88,9 @@ class ProductApiController extends BaseController
         // return dd($product);
 
         // Fetch product instances
-        $productInstances = ProductInstance::where('product_id', $id)->get();
+        $productInstances = ProductInstance::where('product_id', $id)
+         ->with('bin')
+        ->get();
 
         // Return the product instances as JSON
         return response()->json([
@@ -126,19 +139,19 @@ class ProductApiController extends BaseController
     }
 
     // Assign bin to single product instance
-    public function assignBin(Request $request)
-    {
-        $request->validate([
-            'product_instance_id' => 'required|exists:product_instances,id',
-            'bin_location' => 'required|string',
-        ]);
-
-        $productInstance = ProductInstance::findOrFail($request->product_instance_id);
-        $productInstance->bin_location = $request->bin_location;
-        $productInstance->save();
-
-        return response()->json(['success' => true, 'message' => 'Bin assigned to product instance']);
-    }
+    // public function bulkAssignBin(Request $request)
+    // {
+    //     $request->validate([
+    //         'product_instance_id' => 'required|exists:product_instances,id',
+    //         'bin_location' => 'required|string',
+    //     ]);
+    //
+    //     $productInstance = ProductInstance::findOrFail($request->product_instance_id);
+    //     $productInstance->bin_location = $request->bin_location;
+    //     $productInstance->save();
+    //
+    //     return response()->json(['success' => true, 'message' => 'Bin assigned to product instance']);
+    // }
 
     // Relocate single product instance
     public function relocate(Request $request)
@@ -161,11 +174,11 @@ class ProductApiController extends BaseController
         $request->validate([
             'product_instance_ids' => 'required|array',
             'product_instance_ids.*' => 'exists:product_instances,id',
-            'bin_location' => 'required|string',
+            'bin_id' => 'required',
         ]);
 
         ProductInstance::whereIn('id', $request->product_instance_ids)
-            ->update(['bin_location' => $request->bin_location]);
+            ->update(['bin_location' => $request->bin_id]);
 
         return response()->json(['success' => true, 'message' => 'Bin assigned to product instances']);
     }

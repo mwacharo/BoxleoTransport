@@ -118,6 +118,7 @@ export default {
       headers: [
         { title: 'Code', value: 'code' },
         { title: 'Name', value: 'name' },
+        { title: 'Quantity', value: 'quantity' },
         { title: 'Actions', value: 'actions', sortable: false },
       ],
     };
