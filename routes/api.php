@@ -100,6 +100,9 @@ Route::post('/v1/orders/bulk-categorize', [OrderApiController::class, 'bulkCateg
 Route::post('/v1/orders/bulk-auto-allocate', [OrderApiController::class, 'bulkAutoAllocate']);
 Route::post('/v1/orders/bulk-print', [OrderApiController::class, 'bulkPrint']);
 
+// geocode order
+Route::post('v1/geocodeAddress', [OrderApiController::class, 'geocodeAddress']);
+
 
 Route::apiResource('/v1/riders', RiderApiContoller::class);
 Route::apiResource('/v1/drivers', DriverApiContoller::class);
@@ -126,15 +129,15 @@ Route::post('/v1/bulk-assign-to-order', [ProductApiController::class, 'bulkAssig
 Route::post('/v1/bulk-return', [ProductApiController::class, 'bulkReturn']);
 Route::post('/v1/bulk-update-status', [ProductApiController::class, 'bulkUpdateStatus']);
 Route::post('/v1/bulk-print', [ProductApiController::class, 'bulkPrint']);
-Route::post('/v1/bulk-delete', [ProductApiController::class, 'bulkDelete']);
+Route::post('/v1/bulkDelete', [ProductApiController::class, 'bulkDelete']);
 
 
 
 //
 // // Receiving Inventory
 // Route::post('/api/receive-single', [ProductApiController::class, 'receiveSingle']);
-// Route::post('/api/receive-bulk', [ProductApiController::class, 'receiveBulk']);
-//
+Route::post('/v1/receiveBulk', [ProductApiController::class, 'receiveBulk']);
+
 // // Storage and Binning
 // Route::post('/api/assign-bin', [ProductApiController::class, 'assignBin']);
 // Route::post('/api/relocate', [ProductApiController::class, 'relocate']);

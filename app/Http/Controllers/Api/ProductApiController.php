@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\BaseController;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Validator;
 
 class ProductApiController extends BaseController
 {
@@ -27,6 +28,74 @@ class ProductApiController extends BaseController
     //
     //     return response()->json(['instances' => $productInstances]);
     // }
+
+
+    public function bulkDelete(Request $request)
+  {
+      $this->validate($request,[
+          'product_instance_ids' => 'required|array',
+          'product_instance_ids.*' => 'exists:product_instances,id'
+      ]);
+
+
+
+
+      $productInstanceIds = $request->product_instance_ids;
+
+      try {
+          ProductInstance::whereIn('id', $productInstanceIds)->delete();
+
+          return response()->json(['success' => true, 'message' => 'Selected product instances have been deleted']);
+      } catch (\Exception $e) {
+          return response()->json(['success' => false, 'message' => 'There was an error deleting the product instances'], 500);
+      }
+  }
+
+  // Receive bulk product instances
+  public function receiveBulk(Request $request)
+      {
+          $validator = Validator::make($request->all(), [
+              'products' => 'required|array',
+              'products.*.product_id' => 'required|exists:products,id',
+              'products.*.quantity' => 'required|integer|min:1',
+          ]);
+
+          if ($validator->fails()) {
+              return response()->json(['success' => false, 'message' => $validator->errors()], 400);
+          }
+
+          foreach ($request->products as $productData) {
+              $product = Product::find($productData['product_id']);
+              $vendor = Vendor::find($product->vendor_id);
+              $vendorPrefix = strtoupper(substr($vendor->name, 0, 2)); // Example vendor prefix logic
+              $skuPrefix = strtoupper(substr($product->sku, 0, 3)); // Example SKU prefix logic
+              $lastIdentifier = $vendor->last_identifier;
+
+              for ($i = 0; $i < $productData['quantity']; $i++) {
+                  $lastIdentifier++;
+                  $uniqueId = sprintf('%05d', $lastIdentifier); // Pads with leading zeros
+                  $uniqueIdentifier = "{$vendorPrefix}-{$skuPrefix}-{$uniqueId}";
+
+                  // Create product instance
+                  ProductInstance::create([
+                      'product_id' => $product->id,
+                      'status' => 'available',
+                      'barcode' => $uniqueIdentifier,
+                      'unique_identifier' => $uniqueIdentifier, // Assuming you have this column
+                  ]);
+              }
+
+              // Update the vendor's last identifier
+              $vendor->last_identifier = $lastIdentifier;
+              $vendor->save();
+
+              // Optionally, update the product's quantity if it's tracked at the product level
+              $product->quantity += $productData['quantity'];  // Optionally, update the product's quantity if it's tracked at the product level
+              $product->save();
+          }
+
+          return response()->json(['success' => true, 'message' => 'Received']);
+      }
 
     public function store(Request $request)
     {
@@ -118,25 +187,7 @@ class ProductApiController extends BaseController
         return response()->json(['success' => true, 'message' => 'Product instance received and assigned to bin']);
     }
 
-    // Receive bulk product instances
-    public function receiveBulk(Request $request)
-    {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-            'bin_location' => 'required|string',
-        ]);
 
-        for ($i = 0; $i < $request->quantity; $i++) {
-            ProductInstance::create([
-                'product_id' => $request->product_id,
-                'bin_location' => $request->bin_location,
-                'status' => 'in_stock',
-            ]);
-        }
-
-        return response()->json(['success' => true, 'message' => 'Product instances received and assigned to bin']);
-    }
 
     // Assign bin to single product instance
     // public function bulkAssignBin(Request $request)

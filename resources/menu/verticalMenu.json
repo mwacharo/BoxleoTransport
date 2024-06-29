@@ -12,12 +12,7 @@
       "icon": "menu-icon tf-icons bx bx-cart",
       "slug": "orders"
     },
-    {
-      "name": "map",
-      "url": "mappedOrders",
-      "icon": "menu-icon tf-icons bx bx-map",
-      "slug": "map"
-    },
+
     {
       "url": "orderstatus",
       "name": "Order Status",
@@ -37,6 +32,12 @@
       "icon": "menu-icon tf-icons bx bx-building",
       "slug": "industries"
     },
+    {
+  "name": "vehicle",
+  "url": "vehicles",
+  "icon": "menu-icon tf-icons bx bx-car",
+  "slug": "vehicle"
+},
     {
       "url": "drivers",
       "name": "Drivers",

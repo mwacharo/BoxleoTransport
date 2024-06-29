@@ -20,6 +20,8 @@
 
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzbYZ78miZi3hAUmj_HCvpW0mG2VGgxD8"></script>
+
 </head>
 
 <body>

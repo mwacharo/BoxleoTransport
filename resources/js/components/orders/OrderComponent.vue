@@ -42,6 +42,7 @@
             >
               <template v-slot:item.actions="{ item }">
                 <div class="d-flex align-center">
+                <v-icon class="mx-1" color="error" @click="mapOrder(item.id)">mdi-map-marker</v-icon>
                   <v-icon class="mx-1" color="blue" @click="editEntity(item)">mdi-pencil</v-icon>
                   <v-icon class="mx-1" color="red" @click="deleteEntity(item)">mdi-delete</v-icon>
                 </div>
@@ -203,6 +204,10 @@
         </v-main>
       </v-app>
     </v-layout>
+    <>
+
+        <MapOrder ref="MapOrderComponent" :orderId="selectedOrderId" :branchAddress="branchAddress" />
+
   </v-card>
 </template>
 
@@ -210,7 +215,13 @@
 import axios from 'axios';
 import { fetchDataMixin } from '@/mixins/fetchDataMixin';
 
+import MapOrder from '@/components/orders/MapOrder.vue';
+
+
 export default {
+components: {
+  MapOrder
+},
   mixins: [fetchDataMixin],
   props: {
     entityName: {
@@ -240,6 +251,8 @@ export default {
   },
   data() {
     return {
+      selectedOrderId: null,
+      branchAddress: { lat: -1.286389, lng: 36.817223 },  // Example branch coordina
       dialog: false,
       selected: false,
       dialogDelete: false,
@@ -451,6 +464,12 @@ export default {
       } finally {
         this.confirmDeleteDialog = false;
       }
+    },
+    mapOrder(id){
+            this.selectedOrderId = id;
+            this.$nextTick(() => {
+              this.$refs.MapOrderComponent.show();
+              });
     },
     bulkAssignRider() {
       this.bulkAction = 'bulkAssignRider';

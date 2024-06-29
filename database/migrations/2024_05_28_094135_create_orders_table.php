@@ -85,7 +85,7 @@ return new class extends Migration
             $table->timestamp('recall_date')->nullable();
             $table->text('history_comment')->nullable();
             $table->text('return_notes')->nullable();
-            $table->unsignedBigInteger('ou_id')->nullable();
+            $table->unsignedBigInteger('branch_id')->nullable();
             $table->unsignedBigInteger('receiver_id')->nullable();
             $table->string('receiver_name')->nullable();
             $table->string('receiver_phone')->nullable();

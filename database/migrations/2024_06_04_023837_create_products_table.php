@@ -21,7 +21,7 @@ return new class extends Migration
             // $table->foreignId('branch_id')->constrained()->onDeletedelete('cascade');
             $table->foreignId('branch_id')->nullable()->constrained()->onDeletedelete('cascade');
 
-            $table->string('quantity');
+            $table->integer('quantity')->default(0);
             $table->integer('reorder_point')->nullable();
              // $table->string('image');
             $table->text('description')->nullable();

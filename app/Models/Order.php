@@ -85,7 +85,7 @@ class Order extends Model
         'recall_date',
         'history_comment',
         'return_notes',
-        'ou_id',
+        'branch_id',
         'receiver_id',
         'receiver_name',
         'receiver_phone',
@@ -100,6 +100,7 @@ class Order extends Model
         'schedule_date',
         'longitude',
         'latitude',
+        'distance',
         'geocoded',
         'loading_no',
         'branch_id'

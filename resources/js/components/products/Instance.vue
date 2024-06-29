@@ -4,7 +4,7 @@
       <v-card-title class="headline">Product Instances</v-card-title>
 
       <div v-if="selectedItems.length > 0" class="x-actions">
-        <v-icon class="mx-1" color="error" @click="confirmDeleteDialog" title="Delete">mdi-delete</v-icon>
+        <v-icon class="mx-1" color="error" @click="confirmBulkDeleteDialog" title="Delete">mdi-delete</v-icon>
         <v-icon class="mx-1" color="primary" @click="bulkAssignBin" title="Assign Bin">mdi-package-variant-closed</v-icon>
         <v-icon class="mx-1" color="primary" @click="bulkPickItem" title="Pick Item">mdi-hand-pointing-right</v-icon>
         <v-icon class="mx-1" color="primary" @click="bulkTransferItem" title="Transfer Item">mdi-truck</v-icon>
@@ -62,14 +62,14 @@
 
 
       <!-- Delete Bulk Confirmation Dialog -->
-<v-dialog v-model="confirmDeleteDialog" max-width="500">
+<v-dialog v-model="dialog1" max-width="500">
   <v-card>
     <v-card-title class="headline">Confirm Delete</v-card-title>
     <v-card-text> Are you sure you want to delete the selected items? </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="primary" text @click="closeConfirmDeleteDialog">Cancel</v-btn>
-      <v-btn color="error" text @click="confirmDelete">Delete</v-btn>
+      <v-btn color="primary" text @click="closeConfirmBulkDelete">Cancel</v-btn>
+      <v-btn color="error" text @click="confirmBulkDelete">Delete</v-btn>
     </v-card-actions>
   </v-card>
 </v-dialog>
@@ -97,7 +97,7 @@ export default {
   data() {
     return {
       dialog: false,
-      confirmDeleteDialog: false,
+      dialog1: false,
       bulkDialog: false,
       bulkAction: '',
       bulkActionTitle: '',
@@ -152,13 +152,30 @@ export default {
    }
  },
   methods: {
-  closeConfirmDeleteDialog() {
-  this.confirmDeleteDialog = false;
+  closeConfirmBulkDelete() {
+  this.dialog1 = false;
 },
-confirmDeleteDialog() {
-  // Implement your delete logic here
+confirmBulkDelete() {
+     console.log('Deleting selected items');
+
+     axios.post('api/v1/bulkDelete', {
+       product_instance_ids: this.selectedItems
+     })
+     .then(response => {
+       console.log('Delete successful', response.data);
+       this.dialog1 = false;
+       this.$toastr.success(response.data.message);
+     })
+     .catch(error => {
+       console.error('There was an error deleting the items!', error);
+       // Handle the error accordingly
+       this.$toastr.error(response.data);
+
+     });
+   },
+confirmBulkDeleteDialog() {
   console.log('Deleting selected items');
-  this.confirmDeleteDialog = true;
+  this.dialog1 = true;
 },
     show() {
       this.dialog = true;
