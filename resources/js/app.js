@@ -39,9 +39,9 @@ import RiderComponent from './components/riders/RiderComponent.vue';
 import ClientComponent from './components/clients/ClientComponent.vue';
 import CategoryComponent from './components/orders/CategoryComponent.vue';
 import StatusComponent from './components/orders/StatusComponent.vue';
-import OrdermapComponent from './components/orders/OrdermapComponent.vue';
 import ProductComponent from './components/products/ProductComponent.vue';
 import WarehouseComponent from './components/warehouse/WarehouseComponent.vue';
+import VehicleComponent from './components/vehicles/VehicleComponent.vue';
 
 
 
@@ -71,9 +71,10 @@ app.component('rider-component', RiderComponent);
 app.component('client-component', ClientComponent);
 app.component('category-component', CategoryComponent);
 app.component('status-component', StatusComponent);
-app.component('ordermap-component', OrdermapComponent);
 app.component('product-component',ProductComponent);
 app.component('warehouse-component',WarehouseComponent);
+app.component('vehicle-component',VehicleComponent);
+
 
 
 

@@ -28,6 +28,8 @@ use App\Http\Controllers\Api\BayApiController;
 use App\Http\Controllers\Api\RowApiController;
 use App\Http\Controllers\Api\AreaApiController;
 use App\Http\Controllers\Api\WarehouseApiController;
+use App\Http\Controllers\Api\GeofenceApiController;
+use App\Http\Controllers\Api\VehicleApiController;
 
 
 
@@ -103,9 +105,15 @@ Route::post('/v1/orders/bulk-print', [OrderApiController::class, 'bulkPrint']);
 // geocode order
 Route::post('v1/geocodeAddress', [OrderApiController::class, 'geocodeAddress']);
 
+Route::post('v1/geofences', [GeofenceApiController::class, 'store']);
+Route::get('v1/geofences', [GeofenceApiController::class, 'index']);
+
+
 
 Route::apiResource('/v1/riders', RiderApiContoller::class);
 Route::apiResource('/v1/drivers', DriverApiContoller::class);
+Route::apiResource('/v1/vehicles', VehicleApiController::class);
+
 Route::apiResource('/v1/clients', ClientApiContoller::class);
 Route::apiResource('/v1/ordercategories', OrderCategoryApiController::class);
 Route::apiResource('/v1/orderstatus', OrderStatusApiController::class);

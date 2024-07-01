@@ -16,6 +16,7 @@
     "vue": "^3.2.37"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.6",
     "@mdi/font": "^7.4.47",
     "apexcharts": "^3.46.0",
     "leaflet": "^1.9.4",

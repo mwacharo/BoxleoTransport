@@ -28,7 +28,7 @@
             <v-icon class="mx-1" color="primary" @click="bulkAssignDriver" title="Assign Driver">mdi-car</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkUpdateStatus" title="Update Status">mdi-update</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkCategorize" title="Categorize">mdi-label</v-icon>
-            <v-icon class="mx-1" color="primary" @click="bulkAutoAllocate" title="Auto Allocate">mdi-auto-fix</v-icon>
+            <v-icon class="mx-1" color="primary" @click="AutoAllocate" title="Auto Allocate">mdi-auto-fix</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkPrint" title="Print">mdi-printer</v-icon>
           </div>
           <v-responsive>
@@ -204,9 +204,11 @@
         </v-main>
       </v-app>
     </v-layout>
-    <>
+
 
         <MapOrder ref="MapOrderComponent" :orderId="selectedOrderId" :branchAddress="branchAddress" />
+
+          <AutoAllocate ref="AutoAllocateComponent"/>
 
   </v-card>
 </template>
@@ -215,12 +217,15 @@
 import axios from 'axios';
 import { fetchDataMixin } from '@/mixins/fetchDataMixin';
 
+import AutoAllocate from '@/components/orders/AutoAllocate.vue'
 import MapOrder from '@/components/orders/MapOrder.vue';
 
 
 export default {
 components: {
-  MapOrder
+  MapOrder,
+  AutoAllocate,
+
 },
   mixins: [fetchDataMixin],
   props: {
@@ -470,6 +475,10 @@ components: {
             this.$nextTick(() => {
               this.$refs.MapOrderComponent.show();
               });
+    },
+
+    AutoAllocate(){
+    this.$refs.AutoAllocateComponent.show();
     },
     bulkAssignRider() {
       this.bulkAction = 'bulkAssignRider';
