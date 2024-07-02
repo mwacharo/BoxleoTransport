@@ -18,6 +18,12 @@
 import axios from 'axios';
 
 export default {
+  props: {
+    selectedItems: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       map: null,
@@ -25,22 +31,31 @@ export default {
       drawingManager: null,
       geofence: null,
       geofences: [],
-      orders: [],
       vehicles: [],
       agents: [],
+      orders:[],
       googleMapsApiLoaded: false,
+      orderMarkers: [],
     };
   },
   watch: {
     dialog(val) {
       if (val && this.googleMapsApiLoaded) {
         this.initMap();
+        this.loadSelectedOrders();
       }
+    },
+    selectedItems: {
+      handler() {
+        if (this.map && this.dialog) {
+          this.loadSelectedOrders();
+        }
+      },
+      deep: true
     }
   },
   created() {
     this.loadGeofences();
-    this.loadOrders();
     this.loadVehicles();
     this.loadAgents();
   },
@@ -51,22 +66,25 @@ export default {
         this.loadGoogleMapsApi();
       } else {
         this.initMap();
+        this.loadSelectedOrders();
       }
     },
     closeDialog() {
       this.dialog = false;
       this.clearGeofence();
+      this.clearOrderMarkers();
     },
     loadGoogleMapsApi() {
       if (this.googleMapsApiLoaded) {
         return;
       }
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCzbYZ78miZi3hAUmj_HCvpW0mG2VGgxD8&libraries=drawing,geocoding`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCzbYZ78miZi3hAUmj_HCvpW0mG2VGgxD8&libraries=drawing,geometry`;
       script.onload = () => {
         this.googleMapsApiLoaded = true;
         if (this.dialog) {
           this.initMap();
+          this.loadSelectedOrders();
         }
       };
       script.onerror = (error) => {
@@ -84,9 +102,11 @@ export default {
 
       this.initDrawingManager();
       this.loadGeofences();
-      this.loadOrders();
-      this.loadVehicles();
-      this.loadAgents();
+
+      google.maps.event.addListenerOnce(this.map, 'idle', () => {
+        this.loadVehicles();
+        this.loadAgents();
+      });
     },
     initDrawingManager() {
       if (!google.maps.drawing) {
@@ -129,7 +149,6 @@ export default {
         }));
         console.log('Geofence coordinates:', path);
 
-        // Send the geofence coordinates to your backend
         axios.post('/api/v1/geofences', { path })
           .then(response => {
             console.log('Geofence saved:', response);
@@ -139,7 +158,100 @@ export default {
       }
     },
     autoAssign() {
-      // Implement your auto-assign logic here
+      if (!this.geofences || this.geofences.length === 0) {
+        console.error('No geofences defined.');
+        return;
+      }
+
+      this.fetchOrderDetails(this.selectedItems)
+        .then(fetchedOrders => {
+          if (!fetchedOrders || fetchedOrders.length === 0) {
+            console.warn('No orders found.');
+            return;
+          }
+
+          this.orders = fetchedOrders;
+
+          const ordersByGeofence = this.groupOrdersByGeofence(this.orders);
+          console.log('Orders grouped by geofence:', ordersByGeofence);
+
+          Object.entries(ordersByGeofence).forEach(([geofenceId, ordersInGeofence]) => {
+            if (ordersInGeofence.length === 0) return;
+
+            const agent = this.findAvailableAgentForGeofence(geofenceId);
+
+            if (!agent) {
+              console.error(`No available agent found for geofence ${geofenceId}`);
+              return;
+            }
+
+            const orderIds = ordersInGeofence.map(order => order.id);
+            console.log(`Assigning orders ${orderIds} to agent ${agent.id}`);
+            this.assignOrdersToAgent(orderIds, agent.id);
+          });
+        })
+        .catch(error => console.error('Error fetching order details:', error));
+    },
+
+    fetchOrderDetails(orderIds) {
+      return axios.post('/api/v1/orders/details', { orderIds })
+        .then(response => response.data)
+        .catch(error => {
+          console.error('Error fetching order details:', error);
+          throw error;
+        });
+    },
+
+    groupOrdersByGeofence(orders) {
+      const ordersByGeofence = {};
+      orders.forEach(order => {
+        const geofence = this.findGeofenceForOrder(order);
+        if (geofence) {
+          if (!ordersByGeofence[geofence.id]) {
+            ordersByGeofence[geofence.id] = [];
+          }
+          ordersByGeofence[geofence.id].push(order);
+        } else {
+          console.warn(`Order ${order.id} is not inside any geofence`);
+        }
+      });
+      return ordersByGeofence;
+    },
+
+    findGeofenceForOrder(order) {
+      return this.geofences.find(geofence => {
+        const point = new google.maps.LatLng(order.latitude, order.longitude);
+        return google.maps.geometry.poly.containsLocation(point, geofence);
+      });
+    },
+
+    findAvailableAgentForGeofence(geofenceId) {
+      const availableAgent = this.agents.find(agent =>
+        this.isAgentInGeofence(agent, geofenceId) && agent.available
+      );
+      if (!availableAgent) {
+        console.warn(`No available agent found for geofence ${geofenceId}`);
+      }
+      return availableAgent;
+    },
+
+    isAgentInGeofence(agent, geofenceId) {
+      const geofence = this.geofences.find(g => g.id === geofenceId);
+      if (!geofence) return false;
+
+      const point = new google.maps.LatLng(agent.latitude, agent.longitude);
+      return google.maps.geometry.poly.containsLocation(point, geofence);
+    },
+
+    assignOrdersToAgent(orderIds, agentId) {
+      axios.post('/api/v1/orders/assign', { order_ids: orderIds, agent_id: agentId })
+        .then(response => {
+          console.log('Orders assigned:', response.data);
+          this.$toastr.success(response.data.message);
+        })
+        .catch(error => {
+          console.error('Error assigning orders:', error);
+        });
     },
     loadGeofences() {
       axios.get('/api/v1/geofences')
@@ -167,22 +279,39 @@ export default {
         })
         .catch(error => console.error('Error loading geofences:', error));
     },
-    loadOrders() {
-    axios.get('/api/v1/orders')
-      .then(response => {
-        this.orders = response.data;
-        this.orders.forEach(order => {
-          this.geocodeAddress(order.address, (latLng) => {
-            const marker = new google.maps.Marker({
-              position: latLng,
-              map: this.map,
-              title: `Order: ${order.order_no}`
-            });
+    loadSelectedOrders() {
+      console.log('Loading selected orders:', this.selectedItems);
+      if (!this.selectedItems || this.selectedItems.length === 0) {
+        console.warn('No selected items to display');
+        return;
+      }
+      axios.post('/api/v1/orders/details', { orderIds: this.selectedItems })
+        .then(response => {
+          const orders = response.data;
+          console.log('Fetched order details:', orders);
+
+          orders.forEach(order => {
+            if (order.address) {
+              console.log('Geocoding address:', order.address);
+              this.geocodeAddress(order.address, (latLng) => {
+                console.log('Geocoded result:', latLng);
+                const marker = new google.maps.Marker({
+                  position: latLng,
+                  map: this.map,
+                  title: `Order: ${order.order_no}`
+                });
+                this.orderMarkers.push(marker);
+                console.log('Marker added:', marker);
+              });
+            } else {
+              console.warn('Order has no address:', order);
+            }
           });
+        })
+        .catch(error => {
+          console.erraor('Error fetching order details:', error);
         });
-      })
-      .catch(error => console.error('Error loading orders:', error));
-  },
+    },
     loadVehicles() {
       axios.get('/api/v1/vehicles')
         .then(response => {
@@ -194,8 +323,8 @@ export default {
                 map: this.map,
                 icon: {
                   url: '/icons/truck.png',
-                  scaledSize: new google.maps.Size(30, 30), // Resize icon here
-                  anchor: new google.maps.Point(15, 30) // Adjust anchor point to position the icon correctly
+                  scaledSize: new google.maps.Size(30, 30),
+                  anchor: new google.maps.Point(15, 30)
                 },
                 title: `Vehicle: ${vehicle.name}`
               });
@@ -215,8 +344,8 @@ export default {
                 map: this.map,
                 icon: {
                   url: '/icons/motorcycle.png',
-                  scaledSize: new google.maps.Size(30, 30), // Resize icon here
-                  anchor: new google.maps.Point(15, 30) // Adjust anchor point to position the icon correctly
+                  scaledSize: new google.maps.Size(30, 30),
+                  anchor: new google.maps.Point(15, 30)
                 },
                 title: `Agent: ${agent.name}`
               });
@@ -232,7 +361,9 @@ export default {
           const latLng = results[0].geometry.location;
           callback(latLng);
         } else {
-          console.error('Geocode was not successful for the following reason: ' + status);
+          console.error('Geocode was not successful for the following reason:', status);
+          console.error('Address that failed:', address);
+          callback(this.map.getCenter());
         }
       });
     },
@@ -242,6 +373,10 @@ export default {
         this.geofence = null;
       }
     },
+    clearOrderMarkers() {
+      this.orderMarkers.forEach(marker => marker.setMap(null));
+      this.orderMarkers = [];
+    },
     isLocationWithinGeofence(latitude, longitude) {
       if (!this.geofence) {
         return false;
@@ -250,7 +385,6 @@ export default {
       const polygon = new google.maps.Polygon({
         paths: this.geofence.getPath().getArray()
       });
-
       const point = new google.maps.LatLng(latitude, longitude);
       return google.maps.geometry.poly.containsLocation(point, polygon);
     }

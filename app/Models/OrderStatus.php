@@ -13,4 +13,12 @@ class OrderStatus extends Model
         'name',
         'description',
     ];
+
+
+
+
+        public static $rules = [
+            'name' => 'required|string|max:255',
+          
+        ];
 }

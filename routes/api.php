@@ -93,6 +93,9 @@ Route::post('v1/sheets/{id}/sync', [SheetApiController::class, 'sync']);
 Route::apiResource('/v1/vendors', VendorApiController::class);
 
 Route::apiResource('/v1/orders', OrderApiController::class);
+Route::post('/v1/orders/details', [OrderApiController::class, 'details']);
+Route::post('/v1/orders/by-ids', [OrderApiController::class, 'by-ids']);
+
 
 Route::post('/v1/orders/bulk-delete', [OrderApiController::class, 'bulkDelete']);
 Route::post('/v1/orders/bulk-assign-rider', [OrderApiController::class, 'bulkAssignRider']);

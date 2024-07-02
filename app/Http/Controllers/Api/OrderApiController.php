@@ -136,6 +136,28 @@ class OrderApiController extends BaseController
         return response()->json($orders);
     }
 
+    public function show($id)
+    {
+        $order = Order::findOrFail($id);
+        return response()->json($order);
+      }
+
+    public function details(Request $request)
+   {
+
+       $ids = $request->input('orderIds');
+
+       if (empty($ids)) {
+           return response()->json([
+               'message' => 'No IDs provided'
+           ], 400);
+       }
+
+       $orders = Order::whereIn('id', $ids)->get();
+
+       return response()->json($orders);
+   }
+
 
       public function bulkDelete(Request $request)
     {

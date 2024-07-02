@@ -208,7 +208,7 @@
 
         <MapOrder ref="MapOrderComponent" :orderId="selectedOrderId" :branchAddress="branchAddress" />
 
-          <AutoAllocate ref="AutoAllocateComponent"/>
+          <AutoAllocate ref="AutoAllocateComponent"  :selectedItems="selectedItems" />
 
   </v-card>
 </template>
@@ -477,9 +477,9 @@ components: {
               });
     },
 
-    AutoAllocate(){
-    this.$refs.AutoAllocateComponent.show();
-    },
+    AutoAllocate() {
+    this.$refs.AutoAllocateComponent.show(this.selectedItems);
+},
     bulkAssignRider() {
       this.bulkAction = 'bulkAssignRider';
       this.bulkActionTitle = 'Assign Rider';
