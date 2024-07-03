@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BaseController;
+
 
 use App\Models\Geofence;
 
-class GeofenceApiController extends Controller
+class GeofenceApiController extends BaseController
 {
     //
+      protected $model =Geofence::class;
 
 
         public function index()

@@ -80,6 +80,9 @@ Route::get('v1/service-statistics',[ServicesApiController::class,'statistics']);
 Route::get('v1/dealsAnnually', [DashboardApiContoller::class, 'dealsAnnually']);
 Route::get('v1/dealStatusCounts', [DashboardApiContoller::class, 'dealStatusCounts']);
 
+// Route::get('v1/dashoboad', [DashboardApiContoller::class, 'dashoboad']);
+Route::get('/v1/fetchDashboardData', [DashboardApiContoller::class, 'fetchDashboardData']);
+
 
 Route::get('v1/statistics', [DashboardApiContoller::class, 'statistics']);
 
@@ -94,7 +97,7 @@ Route::apiResource('/v1/vendors', VendorApiController::class);
 
 Route::apiResource('/v1/orders', OrderApiController::class);
 Route::post('/v1/orders/details', [OrderApiController::class, 'details']);
-Route::post('/v1/orders/by-ids', [OrderApiController::class, 'by-ids']);
+// Route::post('/v1/orders/by-ids', [OrderApiController::class, 'by-ids']);
 
 
 Route::post('/v1/orders/bulk-delete', [OrderApiController::class, 'bulkDelete']);
@@ -108,12 +111,15 @@ Route::post('/v1/orders/bulk-print', [OrderApiController::class, 'bulkPrint']);
 // geocode order
 Route::post('v1/geocodeAddress', [OrderApiController::class, 'geocodeAddress']);
 
+Route::apiResource('/v1/geofences', GeofenceApiController::class);
 Route::post('v1/geofences', [GeofenceApiController::class, 'store']);
 Route::get('v1/geofences', [GeofenceApiController::class, 'index']);
 
 
 
-Route::apiResource('/v1/riders', RiderApiContoller::class);
+Route::apiResource('/v1/riders', RiderApiController::class);
+Route::put('riders/{id}/geofence', [RiderApiController::class, 'updateGeofence']);
+
 Route::apiResource('/v1/drivers', DriverApiContoller::class);
 Route::apiResource('/v1/vehicles', VehicleApiController::class);
 

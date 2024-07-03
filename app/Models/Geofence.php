@@ -15,4 +15,11 @@ class Geofence extends Model
     protected $casts = [
         'path' => 'array',
     ];
+
+
+
+        public static $rules = [
+    
+
+        ];
 }

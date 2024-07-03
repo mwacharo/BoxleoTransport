@@ -16,19 +16,17 @@ class Rider extends Model
         'email',
         'phone',
         'address',
-        'ou_id',
+        'branch_id',
         'email_verified_at',
         'password ',
-        'remember_token'
+        'remember_token',
+        'geofence_id',
     ];
 
 
 
     public static $rules = [
-        'name' => 'required|string|max:255',
-        'address' => 'required|string|max:255',
-        'email' => 'required|string|max:255',
-        'phone' => 'required|string|max:255',
+    
 
     ];
     protected $dates = ['deleted_at'];

@@ -42,6 +42,8 @@ import StatusComponent from './components/orders/StatusComponent.vue';
 import ProductComponent from './components/products/ProductComponent.vue';
 import WarehouseComponent from './components/warehouse/WarehouseComponent.vue';
 import VehicleComponent from './components/vehicles/VehicleComponent.vue';
+import ZoneComponent from './components/zone/ZoneComponent.vue';
+
 
 
 
@@ -74,6 +76,8 @@ app.component('status-component', StatusComponent);
 app.component('product-component',ProductComponent);
 app.component('warehouse-component',WarehouseComponent);
 app.component('vehicle-component',VehicleComponent);
+app.component('zone-component',ZoneComponent);
+
 
 
 

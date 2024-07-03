@@ -14,6 +14,10 @@ class GeofenceController extends Controller
     public function index()
     {
         //
+
+        //
+        $user= Auth()->user();
+        return view('zone.index',['user'=>$user]);
     }
 
     /**

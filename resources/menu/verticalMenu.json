@@ -66,6 +66,12 @@
     },
 
     {
+"url": "geofence",
+"name": "zones",
+"icon": "menu-icon tf-icons bx bx-map", 
+"slug": "zones"
+},
+    {
       "url": "market",
       "name": "Google Sheets",
       "icon": "menu-icon tf-icons bx bx-store",

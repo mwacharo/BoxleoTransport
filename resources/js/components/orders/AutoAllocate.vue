@@ -33,7 +33,7 @@ export default {
       geofences: [],
       vehicles: [],
       agents: [],
-      orders:[],
+      orders: [],
       googleMapsApiLoaded: false,
       orderMarkers: [],
     };
@@ -192,7 +192,6 @@ export default {
         })
         .catch(error => console.error('Error fetching order details:', error));
     },
-
     fetchOrderDetails(orderIds) {
       return axios.post('/api/v1/orders/details', { orderIds })
         .then(response => response.data)
@@ -201,7 +200,6 @@ export default {
           throw error;
         });
     },
-
     groupOrdersByGeofence(orders) {
       const ordersByGeofence = {};
       orders.forEach(order => {
@@ -217,14 +215,17 @@ export default {
       });
       return ordersByGeofence;
     },
-
     findGeofenceForOrder(order) {
       return this.geofences.find(geofence => {
         const point = new google.maps.LatLng(order.latitude, order.longitude);
-        return google.maps.geometry.poly.containsLocation(point, geofence);
+        try {
+          return google.maps.geometry.poly.containsLocation(point, geofence);
+        } catch (error) {
+          console.error('Error checking location within geofence:', error);
+          return false;
+        }
       });
     },
-
     findAvailableAgentForGeofence(geofenceId) {
       const availableAgent = this.agents.find(agent =>
         this.isAgentInGeofence(agent, geofenceId) && agent.available
@@ -234,7 +235,6 @@ export default {
       }
       return availableAgent;
     },
-
     isAgentInGeofence(agent, geofenceId) {
       const geofence = this.geofences.find(g => g.id === geofenceId);
       if (!geofence) return false;
@@ -242,7 +242,6 @@ export default {
       const point = new google.maps.LatLng(agent.latitude, agent.longitude);
       return google.maps.geometry.poly.containsLocation(point, geofence);
     },
-
     assignOrdersToAgent(orderIds, agentId) {
       axios.post('/api/v1/orders/assign', { order_ids: orderIds, agent_id: agentId })
         .then(response => {
@@ -257,25 +256,21 @@ export default {
       axios.get('/api/v1/geofences')
         .then(response => {
           console.log('Geofences data:', response.data);
-          this.geofences = response.data;
-          this.geofences.forEach(geofence => {
-            if (geofence.path && geofence.path.length) {
-              const path = geofence.path.map(point => ({ lat: point.lat, lng: point.lng }));
-              const polygon = new google.maps.Polygon({
-                paths: path,
-                editable: false,
-                draggable: false,
-                fillColor: '#FF0000',
-                fillOpacity: 0.2,
-                strokeColor: '#FF0000',
-                strokeOpacity: 0.8,
-                strokeWeight: 2
-              });
-              polygon.setMap(this.map);
-            } else {
-              console.log(`Geofence with ID ${geofence.id} has an invalid path.`);
-            }
+          this.geofences = response.data.map(geofence => {
+            const path = geofence.path.map(point => ({ lat: point.lat, lng: point.lng }));
+            return new google.maps.Polygon({
+              paths: path,
+              editable: false,
+              draggable: false,
+              fillColor: '#FF0000',
+              fillOpacity: 0.2,
+              strokeColor: '#FF0000',
+              strokeOpacity: 0.8,
+              strokeWeight: 2
+            });
           });
+
+          this.geofences.forEach(polygon => polygon.setMap(this.map));
         })
         .catch(error => console.error('Error loading geofences:', error));
     },
@@ -309,7 +304,7 @@ export default {
           });
         })
         .catch(error => {
-          console.erraor('Error fetching order details:', error);
+          console.error('Error fetching order details:', error);
         });
     },
     loadVehicles() {

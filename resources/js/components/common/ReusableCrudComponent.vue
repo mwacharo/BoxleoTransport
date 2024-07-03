@@ -19,6 +19,7 @@
 
           <v-text-field v-model="search" label="Search" clearable @input="filterEntities" dense></v-text-field>
           <v-responsive>
+
             <v-data-table show-select
             :headers="headers" :items="searchEntities">
               <template v-slot:item.actions="{ item }">

@@ -4,10 +4,12 @@
     <div class="col-lg-8 mb-4 order-0">
       <div class="card">
         <div class="d-flex align-items-end row">
+
+
           <div class="col-sm-7">
             <div class="card-body">
               <h5 class="card-title text-primary">Hello, {{ user.firstName }}!</h5>
-              <p class="mb-4">You have <span class="fw-medium">{{ pending_deliveries_count }}</span> pending deliveries today.
+              <p class="mb-4">You have <span class="fw-medium">{{ pending_deliveries_count }}</span> In Transit today.
                 Check them now.</p>
               <router-link to="/deliveries?status=pending" class="btn btn-sm btn-outline-primary">View Deliveries</router-link>
             </div>
@@ -32,11 +34,12 @@
             </div>
           </div>
         </div>
+
         <div class="col-lg-6 col-md-12 col-6 mb-4">
           <div class="card">
             <div class="card-body">
               <span>Completed Deliveries</span>
-              <h3 class="card-title text-nowrap mb-1">{{ completedDeliveries }}</h3>
+              <h3 class="card-title text-nowrap mb-1">{{completed}}</h3>
             </div>
           </div>
         </div>
@@ -47,6 +50,7 @@
               <h3 class="card-title text-nowrap mb-2">{{ pendingDeliveries }}</h3>
             </div>
           </div>
+
         </div>
         <div class="col-lg-6 col-md-12 col-6 mb-4">
           <div class="card">
@@ -69,6 +73,7 @@
               <DeliveriesMonthlyBarGraph />
             </div>
           </div>
+
           <div class="col-md-4">
             <div class="card-body">
               <div class="text-center">
@@ -84,7 +89,7 @@
                 </div>
               </div>
             </div>
-            <div class="text-center fw-medium pt-3 mb-2">{{ companyGrowth }}% Company Growth</div>
+            <div class="text-center fw-medium pt-3 mb-2">{{ companyGrowth }}% Company Total Orders</div>
           </div>
         </div>
       </div>
@@ -171,18 +176,18 @@ export default {
       alerts: []
     }
   },
-  mounted() {
+  created() {
     this.fetchDashboardData();
   },
   methods: {
     fetchDashboardData() {
       // Replace with actual API call
-      axios.get('/api/v1/dashboard')
+      axios.get('/api/v1/fetchDashboardData')
         .then(response => {
           const data = response.data;
           this.pending_deliveries_count = data.pending_deliveries_count;
           this.totalOrdersToday = data.total_orders_today;
-          this.completedDeliveries = data.completed_deliveries;
+          this.completed = data.completed;
           this.pendingDeliveries = data.pending_deliveries;
           this.revenueToday = data.revenue_today;
           this.companyGrowth = data.company_growth;

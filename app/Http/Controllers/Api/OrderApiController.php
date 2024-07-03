@@ -60,6 +60,27 @@ class OrderApiController extends BaseController
    //     return response()->json(['error' => 'Geocoding failed'], 400);
    // }
 
+
+   public function assignOrders(Request $request)
+{
+    $orderIds = $request->input('order_ids');
+    $agentId = $request->input('agent_id');
+
+    if (empty($orderIds) || empty($agentId)) {
+        return response()->json([
+            'message' => 'Order IDs or Agent ID not provided'
+        ], 400);
+    }
+
+    // Update the orders with the agent ID
+    Order::whereIn('id', $orderIds)->update(['agent_id' => $agentId]);
+
+    return response()->json([
+        'message' => 'Orders assigned successfully'
+    ]);
+}
+
+
    public function geocodeAddress(Request $request)
 {
     $orderId = $request->input('orderId');
