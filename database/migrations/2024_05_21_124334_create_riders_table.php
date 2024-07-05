@@ -20,8 +20,10 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('address');
-            $table->unsignedBigInteger('ou_id')->nullable();
-            $table->unsignedBigInteger('geofence_id')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
+            $table->foreignId('branch_id')->constrained()->onDelete('cascade')->nullable();
+            $table->foreignId('geofence_id')->constrained()->onDelete('cascade')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->rememberToken()->nullable();

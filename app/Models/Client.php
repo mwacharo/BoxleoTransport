@@ -19,6 +19,8 @@ class Client extends Model
         'phone',
         'alt_phone',
         'address',
+        'latitude',
+        'longitude',
         'gender',
         'city',
         // 'group_id',

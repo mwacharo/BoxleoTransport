@@ -9,13 +9,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Driver extends Model
 {
     use HasFactory,SoftDeletes;
-     
+
     protected $fillable = [
         'name',
         'email',
         'phone',
         'address',
-        'ou_id',
+        'latitude',
+        'longitude',
+        'branch_id',
         'email_verified_at',
         'password ',
         'remember_token'
@@ -29,6 +31,6 @@ class Driver extends Model
         'phone' => 'string|max:255',
 
     ];
-    
+
     protected $dates = ['deleted_at'];
 }

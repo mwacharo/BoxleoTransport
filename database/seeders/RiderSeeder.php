@@ -24,8 +24,8 @@ class RiderSeeder extends Seeder
 
             'address' => '123 Main St',
 
-            'ou_id' => 1,
-
+            'branch_id' => 1,
+            'geofence_id' => 1,
             'email_verified_at' => now(),
             'password' => bcrypt('password'),
 
@@ -46,7 +46,7 @@ class RiderSeeder extends Seeder
 
             'address' => '456 Elm St',
 
-            'ou_id' => 2,
+            'branch_id' => 2,
 
             'email_verified_at' => now(),
             'password' => bcrypt('password'),

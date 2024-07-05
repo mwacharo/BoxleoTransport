@@ -29,6 +29,7 @@
             <v-icon class="mx-1" color="primary" @click="bulkUpdateStatus" title="Update Status">mdi-update</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkCategorize" title="Categorize">mdi-label</v-icon>
             <v-icon class="mx-1" color="primary" @click="AutoAllocate" title="Auto Allocate">mdi-auto-fix</v-icon>
+            <v-icon class="mx-1" color="primary" @click="optimizeRoute" title="Optimize Route">mdi-map-marker-path</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkPrint" title="Print">mdi-printer</v-icon>
           </div>
           <v-responsive>
@@ -38,6 +39,7 @@
               item-value="id"
               items-per-page="5"
               show-select
+               :loading="isLoading"
               v-model="selectedItems"
             >
               <template v-slot:item.actions="{ item }">
@@ -47,6 +49,13 @@
                   <v-icon class="mx-1" color="red" @click="deleteEntity(item)">mdi-delete</v-icon>
                 </div>
               </template>
+
+              <template v-slot:progress>
+   <v-progress-linear
+     color="blue"
+     indeterminate
+   ></v-progress-linear>
+ </template>
             </v-data-table>
           </v-responsive>
 
@@ -207,8 +216,8 @@
 
 
         <MapOrder ref="MapOrderComponent" :orderId="selectedOrderId" :branchAddress="branchAddress" />
-
           <AutoAllocate ref="AutoAllocateComponent"  :selectedItems="selectedItems" />
+        <OptimizeRoute ref="OptimizeRouteComponent"  :selectedItems="selectedItems" />
 
   </v-card>
 </template>
@@ -217,14 +226,18 @@
 import axios from 'axios';
 import { fetchDataMixin } from '@/mixins/fetchDataMixin';
 
-import AutoAllocate from '@/components/orders/AutoAllocate.vue'
+import AutoAllocate from '@/components/orders/AutoAllocate.vue';
 import MapOrder from '@/components/orders/MapOrder.vue';
+import OptimizeRoute from '@/components/orders/OptimizeRoute.vue';
+
+
 
 
 export default {
 components: {
   MapOrder,
   AutoAllocate,
+  OptimizeRoute,
 
 },
   mixins: [fetchDataMixin],
@@ -399,11 +412,16 @@ components: {
       }
     },
     async fetchEntities() {
+    this.isLoading = true
       try {
+              await new Promise(resolve => setTimeout(resolve, 2000))
         const response = await axios.get(this.apiEndpoint);
+
         this.entities = response.data;
       } catch (error) {
         console.error(`Error fetching ${this.entityName}:`, error);
+      } finally {
+        this.isLoading = false
       }
     },
     async fetchFilterData() {
@@ -480,6 +498,10 @@ components: {
     AutoAllocate() {
     this.$refs.AutoAllocateComponent.show(this.selectedItems);
 },
+optimizeRoute(){
+this.$refs.OptimizeRouteComponent.show(this.selectedItems);
+
+},
     bulkAssignRider() {
       this.bulkAction = 'bulkAssignRider';
       this.bulkActionTitle = 'Assign Rider';
@@ -531,6 +553,7 @@ components: {
 
       this.closeBulkDialog();
     },
+
 
     assignRider() {
       axios

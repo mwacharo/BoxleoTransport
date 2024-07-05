@@ -16,6 +16,9 @@ class Rider extends Model
         'email',
         'phone',
         'address',
+        'latitude',
+        'longitude',
+        'status',
         'branch_id',
         'email_verified_at',
         'password ',
@@ -26,7 +29,7 @@ class Rider extends Model
 
 
     public static $rules = [
-    
+
 
     ];
     protected $dates = ['deleted_at'];

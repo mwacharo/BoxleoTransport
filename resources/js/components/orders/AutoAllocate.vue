@@ -4,7 +4,6 @@
       <v-card-title>Geofence Map</v-card-title>
       <v-card-actions>
         <v-btn color="primary" @click="saveGeofence">Save Geofence</v-btn>
-        <v-btn color="primary" @click="autoAssign">Auto Assign</v-btn>
         <v-btn color="secondary" @click="closeDialog">Close</v-btn>
       </v-card-actions>
       <v-card-text>
@@ -178,10 +177,15 @@ export default {
           Object.entries(ordersByGeofence).forEach(([geofenceId, ordersInGeofence]) => {
             if (ordersInGeofence.length === 0) return;
 
-            const agent = this.findAvailableAgentForGeofence(geofenceId);
+            if (geofenceId === "undefined") {
+              console.error("Geofence ID is undefined.");
+              return;
+            }
+
+            const agent = this.isAgentInGeofence(geofenceId);
 
             if (!agent) {
-              console.error(`No available agent found for geofence ${geofenceId}`);
+              console.error(`No agent found for geofence ${geofenceId}`);
               return;
             }
 
@@ -202,45 +206,22 @@ export default {
     },
     groupOrdersByGeofence(orders) {
       const ordersByGeofence = {};
-      orders.forEach(order => {
-        const geofence = this.findGeofenceForOrder(order);
-        if (geofence) {
-          if (!ordersByGeofence[geofence.id]) {
-            ordersByGeofence[geofence.id] = [];
-          }
-          ordersByGeofence[geofence.id].push(order);
-        } else {
-          console.warn(`Order ${order.id} is not inside any geofence`);
-        }
-      });
+
+      this.geofences.forEach(geofence => {
+      ordersByGeofence[geofence.id] = orders.filter(order =>
+        this.isLocationWithinGeofence(order.latitude, order.longitude, geofence.path)
+      );
+    });
+
+      // Add a debug statement to check the orders and geofences
+      console.log('Geofences:', this.geofences);
+      console.log('Orders:', orders);
+      console.log('Orders grouped by geofence:', ordersByGeofence);
+
       return ordersByGeofence;
     },
-    findGeofenceForOrder(order) {
-      return this.geofences.find(geofence => {
-        const point = new google.maps.LatLng(order.latitude, order.longitude);
-        try {
-          return google.maps.geometry.poly.containsLocation(point, geofence);
-        } catch (error) {
-          console.error('Error checking location within geofence:', error);
-          return false;
-        }
-      });
-    },
-    findAvailableAgentForGeofence(geofenceId) {
-      const availableAgent = this.agents.find(agent =>
-        this.isAgentInGeofence(agent, geofenceId) && agent.available
-      );
-      if (!availableAgent) {
-        console.warn(`No available agent found for geofence ${geofenceId}`);
-      }
-      return availableAgent;
-    },
-    isAgentInGeofence(agent, geofenceId) {
-      const geofence = this.geofences.find(g => g.id === geofenceId);
-      if (!geofence) return false;
-
-      const point = new google.maps.LatLng(agent.latitude, agent.longitude);
-      return google.maps.geometry.poly.containsLocation(point, geofence);
+    isAgentInGeofence(geofenceId) {
+      return this.agents.find(agent => agent.geofence_id === geofenceId);
     },
     assignOrdersToAgent(orderIds, agentId) {
       axios.post('/api/v1/orders/assign', { order_ids: orderIds, agent_id: agentId })
@@ -258,7 +239,7 @@ export default {
           console.log('Geofences data:', response.data);
           this.geofences = response.data.map(geofence => {
             const path = geofence.path.map(point => ({ lat: point.lat, lng: point.lng }));
-            return new google.maps.Polygon({
+            const polygon = new google.maps.Polygon({
               paths: path,
               editable: false,
               draggable: false,
@@ -268,6 +249,8 @@ export default {
               strokeOpacity: 0.8,
               strokeWeight: 2
             });
+            polygon.id = geofence.id;  // Make sure each polygon has an id
+            return polygon;
           });
 
           this.geofences.forEach(polygon => polygon.setMap(this.map));
@@ -289,22 +272,18 @@ export default {
             if (order.address) {
               console.log('Geocoding address:', order.address);
               this.geocodeAddress(order.address, (latLng) => {
-                console.log('Geocoded result:', latLng);
                 const marker = new google.maps.Marker({
                   position: latLng,
                   map: this.map,
-                  title: `Order: ${order.order_no}`
+                  title: `Order: ${order.name}`
                 });
                 this.orderMarkers.push(marker);
-                console.log('Marker added:', marker);
               });
-            } else {
-              console.warn('Order has no address:', order);
             }
           });
         })
         .catch(error => {
-          console.error('Error fetching order details:', error);
+          console.error('Error loading order details:', error);
         });
     },
     loadVehicles() {
@@ -372,13 +351,9 @@ export default {
       this.orderMarkers.forEach(marker => marker.setMap(null));
       this.orderMarkers = [];
     },
-    isLocationWithinGeofence(latitude, longitude) {
-      if (!this.geofence) {
-        return false;
-      }
-
+    isLocationWithinGeofence(latitude, longitude, geofencePath) {
       const polygon = new google.maps.Polygon({
-        paths: this.geofence.getPath().getArray()
+        paths: geofencePath
       });
       const point = new google.maps.LatLng(latitude, longitude);
       return google.maps.geometry.poly.containsLocation(point, polygon);

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('alt_phone')->nullable();
             $table->string('address')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->string('city')->nullable();
             $table->string('gender')->nullable();
             // $table->string('group_id', 191)->nullable();

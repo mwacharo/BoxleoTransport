@@ -17,6 +17,8 @@ class Vehicle extends Model
         'status',
         'current_location',
         'address',
+        'latitude',
+        'longitude',
         'driver_id',
         'depot_id',
     ];

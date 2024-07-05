@@ -19,6 +19,8 @@ return new class extends Migration
             $table->integer('capacity')->nullable();
             $table->string('status')->default('available');
             $table->json('address')->nullable();
+            $table->string('latitude');
+            $table->string('longitude');
             $table->json('current_location')->nullable();
             $table->foreignId('driver_id')->nullable()->constrained()->onDelete('set null');
             // $table->foreignId('depot_id')->nullable()->constrained()->onDelete('set null');

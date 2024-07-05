@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
             // OrderProductSeeder::class,
             // ProductInstanceSeeder::class,
             // ProductSeeder::class,
-            RiderSeeder::class,
+            // RiderSeeder::class,
             // SheetSeeder::class,
 
 

@@ -19,6 +19,7 @@ use App\Http\Controllers\OrderCategoryController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\GeofenceController;
+use App\Http\Controllers\FleetController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -36,6 +37,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses');
     Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles');
     Route::get('/geofence', [GeofenceController::class, 'index'])->name('index');
+    Route::get('/fleet', [FleetController::class, 'index'])->name('index');
 
 
 

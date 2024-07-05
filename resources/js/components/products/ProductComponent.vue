@@ -181,8 +181,6 @@ export default {
   },
 
   methods: {
-
-
     viewProductInstances(id) {
       this.selectedProductId = id;
       this.$refs.InstanceComponent.show();

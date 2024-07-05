@@ -12,13 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('drivers', function (Blueprint $table) {
-    
+
             $table->id();
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('address');
-            $table->unsignedBigInteger('ou_id')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
+            $table->foreignId('branch_id')->constrained()->onDelete('cascade')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->rememberToken()->nullable();
@@ -26,7 +28,7 @@ return new class extends Migration
             $table->softDeletes(); // Add this line for soft deletes
 
 
-        
+
         });
     }
 

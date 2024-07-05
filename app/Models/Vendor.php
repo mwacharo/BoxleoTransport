@@ -15,6 +15,8 @@ class Vendor extends Model
         'name',
         'phone',
         'address',
+        'latitude',
+        'longitude',
         'email',
         'email_verified_at',
         'password',
