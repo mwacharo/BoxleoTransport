@@ -36,6 +36,7 @@ class Order extends Model
         'agent_id',
         'rider_id',
         'driver_id',
+        'geofence_id',
         'total_price',
         'invoice_value',
         'amount_paid',
@@ -136,6 +137,12 @@ class Order extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    public function geofence()
+    {
+        return $this->belongsTo(Geofence::class);
+    }
+
 
 
     public static $rules = [

@@ -33,6 +33,7 @@ return new class extends Migration
             $table->integer('distance')->nullable();
             $table->boolean('pod_returned')->default(false);
             $table->foreignId('client_id')->nullable()->constrained();
+            $table->foreignId('geofence_id')->nullable()->constrained();
             $table->unsignedBigInteger('agent_id')->nullable();
             $table->unsignedBigInteger('rider_id')->nullable();
             $table->unsignedBigInteger('driver_id')->nullable();

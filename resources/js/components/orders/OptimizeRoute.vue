@@ -63,16 +63,18 @@ export default {
     return {
       map: null,
       dialog: false,
-      dialogRoute:false,
-      Vehicledialog:false,
-      drawingManager: null,
-      geofence: null,
-      geofences: [],
+      dialogRoute: false,
+      selectedVehicle: null,
       vehicles: [],
-      agents: [],
-      orders: [],
-      googleMapsApiLoaded: false,
       orderMarkers: [],
+      routeDetails: [],
+      directionsService: null,
+      directionsRenderer: null,
+      headers: [
+        { text: 'Order Name', value: 'name' },
+        { text: 'Address', value: 'address' },
+        { text: 'Optimized Order', value: 'optimizedOrder' }
+      ],
     };
   },
   watch: {
@@ -93,16 +95,8 @@ export default {
   },
   created() {
     this.loadVehicles();
-
   },
   methods: {
-
-  showVehicledialog(){
-  Vehicledialog=true;
-  },
-  closeVehicleDialog(){
-    Vehicledialog=false;
-  },
     show() {
       this.dialog = true;
       if (!this.googleMapsApiLoaded) {
@@ -112,17 +106,23 @@ export default {
         this.loadSelectedOrders();
       }
     },
+    ViewRoute(){
+    this.dialogRoute =true;
+
+    },
     closeDialog() {
       this.dialog = false;
-      this.clearGeofence();
-      this.clearOrderMarkers();
+      this.clearMarkers();
+    },
+    closeVehicleDialog() {
+      this.dialogRoute = false;
     },
     loadGoogleMapsApi() {
       if (this.googleMapsApiLoaded) {
         return;
       }
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCzbYZ78miZi3hAUmj_HCvpW0mG2VGgxD8&libraries=drawing,geometry`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCzbYZ78miZi3hAUmj_HCvpW0mG2VGgxD8&libraries&libraries=places`;
       script.onload = () => {
         this.googleMapsApiLoaded = true;
         if (this.dialog) {
@@ -143,61 +143,20 @@ export default {
         zoom: 12
       });
 
-      this.initDrawingManager();
-      this.loadGeofences();
-
-      google.maps.event.addListenerOnce(this.map, 'idle', () => {
-        this.loadVehicles();
-        this.loadAgents();
-      });
-    },
-    initDrawingManager() {
-      if (!google.maps.drawing) {
-        console.error("Google Maps Drawing library not loaded.");
-        return;
-      }
-
-      this.drawingManager = new google.maps.drawing.DrawingManager({
-        drawingMode: google.maps.drawing.OverlayType.POLYGON,
-        drawingControl: true,
-        drawingControlOptions: {
-          position: google.maps.ControlPosition.TOP_CENTER,
-          drawingModes: [google.maps.drawing.OverlayType.POLYGON]
-        },
-        polygonOptions: {
-          editable: true,
-          draggable: true,
-          fillColor: '#FF0000',
-          fillOpacity: 0.2,
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 2
-        }
-      });
-
-      this.drawingManager.setMap(this.map);
-
-      google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event) => {
-        if (event.type === google.maps.drawing.OverlayType.POLYGON) {
-          this.clearGeofence();
-          this.geofence = event.overlay;
-        }
-      });
+      this.directionsService = new google.maps.DirectionsService();
+      this.directionsRenderer = new google.maps.DirectionsRenderer();
+      this.directionsRenderer.setMap(this.map);
     },
     loadSelectedOrders() {
-      console.log('Loading selected orders:', this.selectedItems);
       if (!this.selectedItems || this.selectedItems.length === 0) {
-        console.warn('No selected items to display');
         return;
       }
       axios.post('/api/v1/orders/details', { orderIds: this.selectedItems })
         .then(response => {
           const orders = response.data;
-          console.log('Fetched order details:', orders);
-
+          this.clearMarkers();
           orders.forEach(order => {
             if (order.address) {
-              console.log('Geocoding address:', order.address);
               this.geocodeAddress(order.address, (latLng) => {
                 const marker = new google.maps.Marker({
                   position: latLng,
@@ -217,42 +176,74 @@ export default {
       axios.get('/api/v1/vehicles')
         .then(response => {
           this.vehicles = response.data;
-          this.vehicles.forEach(vehicle => {
-            this.geocodeAddress(vehicle.address, (latLng) => {
-              const marker = new google.maps.Marker({
-                position: latLng,
-                map: this.map,
-                icon: {
-                  url: '/icons/truck.png',
-                  scaledSize: new google.maps.Size(30, 30),
-                  anchor: new google.maps.Point(15, 30)
-                },
-                title: `Vehicle: ${vehicle.name}`
-              });
-            });
-          });
         })
         .catch(error => console.error('Error loading vehicles:', error));
     },
-
-    ViewRoute(){
-      this.dialogRoute = true;
-
+    geocodeAddress(address, callback) {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ address: address }, (results, status) => {
+        if (status === 'OK') {
+          callback(results[0].geometry.location);
+        } else {
+          console.error('Geocode was not successful for the following reason: ' + status);
+        }
+      });
     },
-
-    clearGeofence() {
-      if (this.geofence) {
-        this.geofence.setMap(null);
-        this.geofence = null;
+    optimizeRoute() {
+      if (this.orderMarkers.length < 2) {
+        return;
       }
+
+      const waypoints = this.orderMarkers.slice(1, -1).map(marker => ({
+        location: marker.getPosition(),
+        stopover: true
+      }));
+
+      this.directionsService.route({
+        origin: this.orderMarkers[0].getPosition(),
+        destination: this.orderMarkers[this.orderMarkers.length - 1].getPosition(),
+        waypoints: waypoints,
+        optimizeWaypoints: true,
+        travelMode: google.maps.TravelMode.DRIVING
+      }, (response, status) => {
+        if (status === 'OK') {
+          this.directionsRenderer.setDirections(response);
+          const route = response.routes[0];
+          this.routeDetails = route.legs.map((leg, index) => ({
+            name: this.selectedItems[index].name,
+            address: leg.start_address,
+            optimizedOrder: index + 1
+          }));
+          this.dialogRoute = true;
+        } else {
+          console.error('Directions request failed due to ' + status);
+        }
+      });
     },
-    clearOrderMarkers() {
+    updateRouteForVehicle() {
+      // Logic to update the route for the selected vehicle
+    },
+    assignRoute() {
+      const payload = {
+        vehicleId: this.selectedVehicle,
+        routeDetails: this.routeDetails
+      };
+      axios.post('/api/v1/assignRoute', payload)
+        .then(response => {
+          console.log('Route assigned successfully:', response.data);
+          this.closeVehicleDialog();
+        })
+        .catch(error => {
+          console.error('Error assigning route:', error);
+        });
+    },
+    clearMarkers() {
       this.orderMarkers.forEach(marker => marker.setMap(null));
       this.orderMarkers = [];
-    },
-
+    }
   }
 };
+
 </script>
 
 <style>
