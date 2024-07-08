@@ -43,6 +43,7 @@ export default {
       if (val && this.googleMapsApiLoaded) {
         this.initMap();
         this.loadSelectedOrders();
+        this.resizeMap(); // Add this line to trigger map resize
       }
     },
     selectedItems: {
@@ -67,6 +68,7 @@ export default {
       } else {
         this.initMap();
         this.loadSelectedOrders();
+      this.resizeMap();
       }
     },
     closeDialog() {
@@ -85,6 +87,7 @@ export default {
         if (this.dialog) {
           this.initMap();
           this.loadSelectedOrders();
+          this.resizeMap();
         }
       };
       script.onerror = (error) => {
@@ -157,6 +160,15 @@ export default {
           .catch(error => console.error('Error saving geofence:', error));
       }
     },
+    resizeMap() {
+    if (this.map) {
+      google.maps.event.trigger(this.map, 'resize');
+      const center = this.map.getCenter();
+      google.maps.event.addListenerOnce(this.map, 'idle', () => {
+        this.map.setCenter(center);
+      });
+    }
+  },
     autoAssign() {
       if (!this.geofences || this.geofences.length === 0) {
         console.error('No geofences defined.');

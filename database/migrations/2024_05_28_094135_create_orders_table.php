@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('pod')->nullable();
             $table->text('special_instruction')->nullable();
             $table->integer('distance')->nullable();
+            $table->integer('duration')->nullable();
             $table->boolean('pod_returned')->default(false);
             $table->foreignId('client_id')->nullable()->constrained();
             $table->foreignId('geofence_id')->nullable()->constrained();

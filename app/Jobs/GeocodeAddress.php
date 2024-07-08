@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Order;
 use Illuminate\Support\Facades\Http;
+use Log;
 
 class GeocodeAddress implements ShouldQueue
 {
@@ -23,27 +24,82 @@ class GeocodeAddress implements ShouldQueue
 
     public function handle()
     {
-        $apiKey = config('services.google.maps_api_key');
-        $address = $this->order->address;
+      try {
 
-        $geocodeResponse = Http::get("https://maps.googleapis.com/maps/api/geocode/json", [
-            'address' => $address,
-            'key' => $apiKey,
-        ]);
 
-        $geocodeData = $geocodeResponse->json();
+        Log::warning('*****************************************');
+          $apiKey = env('GOOGLE_MAPS_API_KEY');
+          $address = $this->order->address;
 
-        if ($geocodeData['status'] === 'OK') {
-            $lat = $geocodeData['results'][0]['geometry']['location']['lat'];
-            $lng = $geocodeData['results'][0]['geometry']['location']['lng'];
+          $geocodeResponse = Http::get("https://maps.googleapis.com/maps/api/geocode/json", [
+              'address' => $address,
+              'key' => $apiKey,
+              'region' => 'ke'
+          ]);
 
-            $this->order->update([
-                'latitude' => $lat,
-                'longitude' => $lng,
-            ]);
+          $geocodeData = $geocodeResponse->json();
 
-            // Dispatch the CalculateDistance job
-            CalculateDistance::dispatch($this->order);
+          if ($geocodeData['status'] === 'OK') {
+              $lat = $geocodeData['results'][0]['geometry']['location']['lat'];
+              $lng = $geocodeData['results'][0]['geometry']['location']['lng'];
+              Log::warning($lat);
+              Log::warning($lng);
+              $distance = $this->calculateDistance($lat,  $lng);
+              Log::info($distance);
+                  Log::info($duration);
+
+              $this->order->update([
+                  'latitude' => $lat,
+                  'longitude' => $lng,
+                  'distance' => $distance,
+                  'duration' => $duration,
+              ]);
+
+              Log::warning($this->order->order_no);
+
         }
+        Log::warning('*****************************************');
+
+      } catch (\Exception $e) {
+        Log::error($e);
+      }
     }
+
+
+      public function calculateDistance($lat,  $lng)
+      {
+        try {
+
+
+          $apiKey = env('GOOGLE_MAPS_API_KEY');
+
+          if (!$lat || !$lng) {
+              return; // Skip if coordinates are not available
+          }
+
+          $storeLatitude = -1.3074432;
+          $storeLongitude = 36.9033216;
+
+          $distanceResponse = Http::get("https://maps.googleapis.com/maps/api/distancematrix/json", [
+              'origins' => "{$storeLatitude},{$storeLongitude}",
+              'destinations' => "{$lat},{$lng}",
+              'key' => $apiKey,
+          ]);
+
+          $distanceData = $distanceResponse->json();
+          Log::alert($distanceData);
+
+          if ($distanceData['status'] === 'OK') {
+
+
+              $distance = $distanceData['rows'][0]['elements'][0]['distance']['value'] / 1000; // Convert meters to kilometers
+              $duration = $distanceData['rows'][0]['elements'][0]['duration']['value'] / 60; // Convert seconds to minutes
+
+            return [$distance, $duration];
+          }
+          return 0;
+        } catch (\Exception $e) {
+          Log::error($e);
+        }
+      }
 }

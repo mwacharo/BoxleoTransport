@@ -1,17 +1,29 @@
 <template>
   <v-container-fluid>
     <v-card class="elevation-2 report-card">
-      <v-card-title class="headline">Generate Sales Report</v-card-title>
+      <v-card-title class="headline">Generate Courier Report</v-card-title>
       <v-form @submit.prevent="generateReport">
         <v-container>
           <v-row>
+
+          <v-col cols="12" md="6">
+            <v-select
+              v-model="selectedReportType"
+              :items="reportTypes"
+              label="Select Report Type"
+              outlined
+              dense
+              prepend-icon="mdi-file-chart"
+            ></v-select>
+          </v-col>
+
             <v-col cols="12" md="6">
               <v-select
-                v-model="selectedSalesPerson"
-                :items="salesPersons"
+                v-model="selectedAgent"
+                :items="agents"
                 item-value="id"
                 item-title="name"
-                label="Select Sales Person"
+                label="Select Agent/Driver"
                 outlined
                 dense
                 multiple
@@ -21,21 +33,34 @@
 
             <v-col cols="12" md="6">
               <v-select
-                v-model="selectedBranchId"
-                :items="branches"
+                v-model="selectedVehicle"
+                :items="vehicles"
                 item-value="id"
                 item-title="name"
-                label="Select a Branch"
+                label="Select Vehicle"
                 outlined
                 dense
                 multiple
-                prepend-icon="mdi-domain"
+                prepend-icon="mdi-truck"
+              ></v-select>
+            </v-col>
+
+
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="selectedCity"
+                :items="cities"
+                item-value="id"
+                item-title="name"
+                label="Select City/Zone"
+                outlined
+                multiple
+                dense
+                prepend-icon="mdi-map-marker"
               ></v-select>
             </v-col>
 
             <v-col cols="12" md="6">
-           
-
               <v-text-field
                 v-model="startSelectedDate"
                 label="Start Date"
@@ -47,61 +72,12 @@
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="endSelectedDate"
-                label="Select End Date"
+                label="End Date"
                 prepend-icon="mdi-calendar"
                 type="date"
               ></v-text-field>
             </v-col>
 
-            <v-col cols="12" md="6">
-              <v-select
-                v-model="selectedStatus"
-                :items="statuses"
-                label="Select Status"
-                outlined
-                dense
-                multiple
-                prepend-icon="mdi-progress-check"
-              ></v-select>
-            </v-col>
-
-            <v-col cols="12" md="6">
-              <v-select
-                v-model="selectedPriority"
-                :items="priority"
-                label="Priority"
-                outlined
-                dense
-                multiple
-                prepend-icon="mdi-flag"
-              ></v-select>
-            </v-col>
-
-            <v-col cols="12" md="6">
-              <v-select
-                v-model="selectedIndustry"
-                :items="industries"
-                item-title="name"
-                label="Select Industry"
-                outlined
-                multiple
-                dense
-                prepend-icon="mdi-domain"
-              ></v-select>
-            </v-col>
-
-            <v-col cols="12" md="6">
-              <v-select
-                v-model="selectedService"
-                :items="services"
-                item-title="name"
-                label="Select Services"
-                outlined
-                multiple
-                dense
-                prepend-icon="mdi-domain"
-              ></v-select>
-            </v-col>
           </v-row>
         </v-container>
         <v-card-actions>
@@ -118,53 +94,35 @@
 <script>
 import axios from 'axios';
 export default {
-  props: {
-    user_id: {
-      type: Number,
-      required: true
-    }
-  },
   data() {
     return {
-      // users:[],
-      selectedSalesPerson: null,
-      selectedBranchId: null,
-      selectedService: null,
-      services: [], // Populate this array with service data
-      salesPersons: [], // Populate this array with sales person data
+      selectedAgent: null,
+      selectedVehicle: null,
       startSelectedDate: null,
       endSelectedDate: null,
-
-      // dateMenu: false,
-      selectedStatus: null,
-      statuses: ['Initiated', 'InProgress', 'Won', 'Lost'], // Add more statuses if needed
-      priority: ['Low', 'High', 'Medium'],
-      selectedIndustry: null,
-      industries: [], // Populate this array with industry data
-      service_ids: [],
-      branch_ids: [],
-      branches: [], // Initialize as an empty array
-      selectedPriority: []
+      selectedReportType: null,
+      selectedCity: null,
+      agents: [], // Populate this array with agent/driver data
+      vehicles: [], // Populate this array with vehicle data
+      reportTypes: ['Order Report', 'Delivery Performance Report', 'Agent/Driver Report', 'Financial Report', 'Vehicle Report', 'Client Report', 'Geographical Report'], // Add more report types if needed
+      cities: [], // Populate this array with city/zone data
     };
   },
   created() {
-    this.fetchUsers();
-    this.fetchBranches();
-    this.fetchServices();
-    this.fetchIndustries();
+    this.fetchAgents();
+    this.fetchVehicles();
+    this.fetchCities();
   },
   methods: {
     generateReport() {
       axios
         .post('/api/reports/generate', {
-          sales_person_id: this.selectedSalesPerson,
-          branch_id: this.selectedBranchId,
-          status: this.selectedStatus,
-          industry_id: this.selectedIndustry,
-          service_id: this.selectedService,
+          agent_id: this.selectedAgent,
+          vehicle_id: this.selectedVehicle,
           start_date: this.startSelectedDate,
           end_date: this.endSelectedDate,
-          priority: this.selectedPriority
+          report_type: this.selectedReportType,
+          city_id: this.selectedCity,
         })
         .then(response => {
           console.log(response);
@@ -177,62 +135,40 @@ export default {
           console.error('Error:', error);
         });
     },
-
-    fetchBranches() {
-      const url = '/api/v1/branches';
+    fetchAgents() {
+      const url = '/api/v1/riders';
       axios
         .get(url)
         .then(response => {
-          this.branches = response.data.branches;
+          this.agents = response.data.agents;
         })
         .catch(error => {
           console.log(error);
         });
     },
-    fetchIndustries() {
-      const url = '/api/v1/industries';
+    fetchVehicles() {
+      const url = '/api/v1/vehicles';
       axios
         .get(url)
         .then(response => {
-          this.industries = response.data.industries;
+          this.vehicles = response.data.vehicles;
         })
         .catch(error => {
           console.log(error);
         });
     },
-    fetchServices() {
-      const url = '/api/v1/services';
+    fetchCities() {
+      const url = '/api/v1/geofences';
       axios
         .get(url)
         .then(response => {
-          this.services = response.data.services;
+          this.cities = response.data.cities;
         })
         .catch(error => {
           console.log(error);
         });
     },
-
-    fetchUsers() {
-      const url = '/api/v1/users';
-      axios
-        .get(url)
-        .then(response => {
-          // Assuming the response data structure matches the provided example
-          if (response.data.message === 'Users fetched successfully') {
-            this.salesPersons = response.data.data.map(user => ({
-              id: user.id,
-              name: user.name
-            }));
-            console.log('Users fetched successfully:', this.salesPersons);
-          } else {
-            console.error('Error fetching users:', response.data.message);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    }
-  }
+  },
 };
 </script>
 

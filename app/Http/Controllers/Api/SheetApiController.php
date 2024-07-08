@@ -9,6 +9,7 @@ use App\Http\Controllers\BaseController;
 use App\Models\Client;
 use App\Models\Sheet;
 use App\Models\Order;
+use App\Jobs\GeocodeAddress;
 
 class SheetApiController extends BaseController
 {
@@ -247,7 +248,7 @@ class SheetApiController extends BaseController
             ]);
         }
 
-        Order::updateOrCreate(
+        $order=Order::updateOrCreate(
             ['order_no' => $orderNo],
             [
                 'client_id' => $client->id,
