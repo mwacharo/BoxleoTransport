@@ -95,6 +95,7 @@ export default {
   },
   created() {
     this.loadVehicles();
+  
   },
   methods: {
     show() {
@@ -110,6 +111,7 @@ export default {
     this.dialogRoute =true;
 
     },
+
     closeDialog() {
       this.dialog = false;
       this.clearMarkers();

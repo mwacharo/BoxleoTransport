@@ -209,10 +209,10 @@ export default {
       const ordersByGeofence = {};
 
       this.geofences.forEach(geofence => {
-      ordersByGeofence[geofence.id] = orders.filter(order =>
-        this.isLocationWithinGeofence(order.latitude, order.longitude, geofence.path)
-      );
-    });
+        ordersByGeofence[geofence.id] = orders.filter(order =>
+          this.isLocationWithinGeofence(order.latitude, order.longitude, geofence.getPath().getArray())
+        );
+      });
 
       // Add a debug statement to check the orders and geofences
       console.log('Geofences:', this.geofences);
@@ -222,10 +222,34 @@ export default {
       return ordersByGeofence;
     },
     isAgentInGeofence(geofenceId) {
-      return this.agents.find(agent => agent.geofence_id === geofenceId);
+      // Ensure the geofenceId is a number
+      const id = parseInt(geofenceId, 10);
+      if (isNaN(id)) {
+        console.error(`Invalid geofenceId provided: ${geofenceId}`);
+        return null;
+      }
+
+      console.log(`Checking for agents in geofence ${id}`);
+
+      // Ensure the agents array is valid
+      if (!Array.isArray(this.agents)) {
+        console.error('Agents data is not an array:', this.agents);
+        return null;
+      }
+
+      // Find the agent associated with the given geofence ID
+      const agent = this.agents.find(agent => {
+        // Ensure agent.geofence_id is a number
+        const agentGeofenceId = parseInt(agent.geofence_id, 10);
+        console.log(`Comparing with agent ${agent.id} having geofence_id ${agentGeofenceId}`);
+        return agentGeofenceId === id;
+      });
+
+      console.log(`Agent found for geofence ${id}:`, agent);
+      return agent || null;  // Return null if no agent is found
     },
     assignOrdersToAgent(orderIds, agentId) {
-      axios.post('/api/v1/orders/assign', { order_ids: orderIds, agent_id: agentId })
+      axios.post('/api/v1/orders/assignOrders', { order_ids: orderIds, agent_id: agentId })
         .then(response => {
           console.log('Orders assigned:', response.data);
           this.$toastr.success(response.data.message);
@@ -259,57 +283,54 @@ export default {
         .catch(error => console.error('Error loading geofences:', error));
     },
     loadSelectedOrders() {
-     console.log('Loading selected orders:', this.selectedItems);
-     if (!this.selectedItems || this.selectedItems.length === 0) {
-       console.warn('No selected items to display');
-       return;
-     }
-     axios.post('/api/v1/orders/details', { orderIds: this.selectedItems })
-       .then(response => {
-         const orders = this.sanitizeOrderData(response.data);
-         console.log('Fetched and sanitized order details:', orders);
+      console.log('Loading selected orders:', this.selectedItems);
+      if (!this.selectedItems || this.selectedItems.length === 0) {
+        console.warn('No selected items to display');
+        return;
+      }
+      axios.post('/api/v1/orders/details', { orderIds: this.selectedItems })
+        .then(response => {
+          const orders = this.sanitizeOrderData(response.data);
+          console.log('Fetched and sanitized order details:', orders);
 
-         orders.forEach(order => {
-           if (this.isValidLatLng(order.latitude, order.longitude)) {
-             const marker = new google.maps.Marker({
-               position: { lat: order.latitude, lng: order.longitude },
-               map: this.map,
-               title: `Order: ${order.order_no || order.id}`
-             });
-             this.orderMarkers.push(marker);
-           } else {
-             console.warn(`Invalid or missing coordinates for order ${order.id}: ${order.latitude}, ${order.longitude}`);
-           }
-         });
-       })
-       .catch(error => {
-         console.error('Error loading order details:', error);
-         this.$toastr.error('Failed to load order details. Please try again.');
-       });
-   },
-
-   sanitizeOrderData(orders) {
-     if (!Array.isArray(orders)) {
-       console.warn('Invalid orders data format. Expected array, got:', typeof orders);
-       return [];
-     }
-     return orders.map(order => ({
-       ...order,
-       latitude: this.parseCoordinate(order.latitude),
-       longitude: this.parseCoordinate(order.longitude)
-     }));
-   },
-
-   parseCoordinate(value) {
-     const parsed = parseFloat(value);
-     return isNaN(parsed) ? null : parsed;
-   },
-
-   isValidLatLng(lat, lng) {
-     return typeof lat === 'number' && typeof lng === 'number' &&
-            isFinite(lat) && isFinite(lng) &&
-            Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
-   },
+          orders.forEach(order => {
+            if (this.isValidLatLng(order.latitude, order.longitude)) {
+              const marker = new google.maps.Marker({
+                position: { lat: order.latitude, lng: order.longitude },
+                map: this.map,
+                title: `Order: ${order.order_no || order.id}`
+              });
+              this.orderMarkers.push(marker);
+            } else {
+              console.warn(`Invalid or missing coordinates for order ${order.id}: ${order.latitude}, ${order.longitude}`);
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error loading order details:', error);
+          this.$toastr.error('Failed to load order details. Please try again.');
+        });
+    },
+    sanitizeOrderData(orders) {
+      if (!Array.isArray(orders)) {
+        console.warn('Invalid orders data format. Expected array, got:', typeof orders);
+        return [];
+      }
+      return orders.map(order => ({
+        ...order,
+        latitude: this.parseCoordinate(order.latitude),
+        longitude: this.parseCoordinate(order.longitude)
+      }));
+    },
+    parseCoordinate(value) {
+      const parsed = parseFloat(value);
+      return isNaN(parsed) ? null : parsed;
+    },
+    isValidLatLng(lat, lng) {
+      return typeof lat === 'number' && typeof lng === 'number' &&
+        isFinite(lat) && isFinite(lng) &&
+        Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+    },
     loadVehicles() {
       axios.get('/api/v1/vehicles')
         .then(response => {

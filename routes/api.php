@@ -97,6 +97,9 @@ Route::apiResource('/v1/vendors', VendorApiController::class);
 
 Route::apiResource('/v1/orders', OrderApiController::class);
 Route::post('/v1/orders/details', [OrderApiController::class, 'details']);
+// orders assign to rider through gecoding
+Route::post('/v1/orders/assignOrders', [OrderApiController::class, 'assignOrders']);
+
 // Route::post('/v1/orders/by-ids', [OrderApiController::class, 'by-ids']);
 
 
