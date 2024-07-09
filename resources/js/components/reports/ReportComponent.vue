@@ -1,7 +1,7 @@
 <template>
   <v-container-fluid>
     <v-card class="elevation-2 report-card">
-      <v-card-title class="headline">Generate Courier Report</v-card-title>
+      <v-card-title class="headline">Reports</v-card-title>
       <v-form @submit.prevent="generateReport">
         <v-container>
           <v-row>
@@ -102,10 +102,10 @@ export default {
       endSelectedDate: null,
       selectedReportType: null,
       selectedCity: null,
-      agents: [], // Populate this array with agent/driver data
-      vehicles: [], // Populate this array with vehicle data
-      reportTypes: ['Order Report', 'Delivery Performance Report', 'Agent/Driver Report', 'Financial Report', 'Vehicle Report', 'Client Report', 'Geographical Report'], // Add more report types if needed
-      cities: [], // Populate this array with city/zone data
+      agents: [], 
+      vehicles: [],
+      reportTypes: ['Order Report', 'Merchant Report','Delivery Performance Report', 'Agent/Driver Report', 'Financial Report', 'Vehicle Report', 'Client Report', 'Geographical Report'], // Add more report types if needed
+      cities: [], 
     };
   },
   created() {
@@ -140,7 +140,7 @@ export default {
       axios
         .get(url)
         .then(response => {
-          this.agents = response.data.agents;
+          this.agents = response.data;
         })
         .catch(error => {
           console.log(error);
@@ -162,7 +162,7 @@ export default {
       axios
         .get(url)
         .then(response => {
-          this.cities = response.data.cities;
+          this.cities = response.data.geofences;
         })
         .catch(error => {
           console.log(error);

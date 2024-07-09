@@ -46,7 +46,7 @@ class GeocodeAddress implements ShouldQueue
               Log::warning($lng);
               $distance = $this->calculateDistance($lat,  $lng);
               Log::info($distance);
-                  Log::info($duration);
+              Log::info($duration);
 
               $this->order->update([
                   'latitude' => $lat,
