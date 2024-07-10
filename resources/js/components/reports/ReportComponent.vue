@@ -17,13 +17,73 @@
             ></v-select>
           </v-col>
 
+
+          <v-col cols="12" md="6">
+            <v-select
+              v-model="selectedOrderType"
+              :items="OrderCategory"
+                 item-value="id"
+              item-title="name"
+              label="Select Order Type"
+              
+              outlined
+              dense
+              prepend-icon="mdi-file-chart"
+            ></v-select>
+          </v-col>
+
+
+          <v-col cols="12" md="6">
+            <v-select
+              v-model="selectedOrderStatus"
+              :items="OrderStatus"
+              label="Select Status"
+              item-value="id"
+              item-title="name"
+              outlined
+              dense
+              prepend-icon="mdi-file-chart"
+            ></v-select>
+          </v-col>
+
             <v-col cols="12" md="6">
               <v-select
                 v-model="selectedAgent"
                 :items="agents"
                 item-value="id"
                 item-title="name"
-                label="Select Agent/Driver"
+                label="Select Agent"
+                outlined
+                dense
+                multiple
+                prepend-icon="mdi-account"
+              ></v-select>
+            </v-col>
+
+
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="selectedDriver"
+                :items="drivers"
+                item-value="id"
+                item-title="name"
+                label="Select Driver"
+                outlined
+                dense
+                multiple
+                prepend-icon="mdi-account"
+              ></v-select>
+            </v-col>
+
+
+
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="selectedVendor"
+                :items="vendors"
+                item-value="id"
+                item-title="name"
+                label="Select Vendor"
                 outlined
                 dense
                 multiple
@@ -36,7 +96,7 @@
                 v-model="selectedVehicle"
                 :items="vehicles"
                 item-value="id"
-                item-title="name"
+                item-title="license_plate"
                 label="Select Vehicle"
                 outlined
                 dense
@@ -52,7 +112,7 @@
                 :items="cities"
                 item-value="id"
                 item-title="name"
-                label="Select City/Zone"
+                label="Select Zone"
                 outlined
                 multiple
                 dense
@@ -97,14 +157,22 @@ export default {
   data() {
     return {
       selectedAgent: null,
+      selectedDriver: null,
+      selectedVendor: null,
       selectedVehicle: null,
       startSelectedDate: null,
       endSelectedDate: null,
       selectedReportType: null,
       selectedCity: null,
+      selectedOrderStatus: null,
+      selectedOrderCategory: null,
       agents: [], 
+      OrderStatus:[],
       vehicles: [],
-      reportTypes: ['Order Report', 'Merchant Report','Delivery Performance Report', 'Agent/Driver Report', 'Financial Report', 'Vehicle Report', 'Client Report', 'Geographical Report'], // Add more report types if needed
+      vendors:[],
+      drivers:[],
+      OrderCategory:[],
+      reportTypes: ['Order Report', 'Product Report','Merchant Report','Delivery Performance Report', 'Agent/Driver Report', 'Financial Report', 'Vehicle Report', 'Client Report', 'Zone Report'], 
       cities: [], 
     };
   },
@@ -112,6 +180,10 @@ export default {
     this.fetchAgents();
     this.fetchVehicles();
     this.fetchCities();
+    this.fetchVendors();
+    this.fetchDrivers();
+    this.fetchOrderStatus();
+    this.fetchOrderCategory();
   },
   methods: {
     generateReport() {
@@ -151,7 +223,7 @@ export default {
       axios
         .get(url)
         .then(response => {
-          this.vehicles = response.data.vehicles;
+          this.vehicles = response.data;
         })
         .catch(error => {
           console.log(error);
@@ -162,13 +234,60 @@ export default {
       axios
         .get(url)
         .then(response => {
-          this.cities = response.data.geofences;
+          this.cities = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    fetchVendors() {
+      const url = '/api/v1/vendors  ';
+      axios
+        .get(url)
+        .then(response => {
+          this.vendors = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    fetchDrivers() {
+      const url = '/api/v1/drivers  ';
+      axios
+        .get(url)
+        .then(response => {
+          this.drivers = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
+    fetchOrderStatus() {
+      const url = '/api/v1/orderstatus  ';
+      axios
+        .get(url)
+        .then(response => {
+          this.OrderStatus = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
+    fetchOrderCategory() {
+      const url = '/api/v1/ordercategories ';
+      axios
+        .get(url)
+        .then(response => {
+          this.OrderCategory = response.data;
         })
         .catch(error => {
           console.log(error);
         });
     },
   },
+
 };
 </script>
 
@@ -179,3 +298,6 @@ export default {
   padding: 24px;
 }
 </style>
+
+
+

@@ -10,15 +10,15 @@
     <ul class="menu-inner py-1">
         @if (isset($menuData[0]) && isset($menuData[0]->menu))
             @foreach ($menuData[0]->menu as $menu)
-                {{-- adding active and open class if child is active --}}
+                {{-- Adding active and open class if child is active --}}
 
-                {{-- menu headers --}}
+                {{-- Menu Headers --}}
                 @if (isset($menu->menuHeader))
                     <li class="menu-header small text-uppercase">
                         <span class="menu-header-text">{{ __($menu->menuHeader) }}</span>
                     </li>
                 @else
-                    {{-- active menu method --}}
+                    {{-- Active Menu Method --}}
                     @php
                         $activeClass = null;
                         $currentRouteName = Route::currentRouteName();
@@ -28,26 +28,24 @@
                         } elseif (isset($menu->submenu)) {
                             if (gettype($menu->slug) === 'array') {
                                 foreach ($menu->slug as $slug) {
-                                    if (str_contains($currentRouteName, $slug) and strpos($currentRouteName, $slug) === 0) {
+                                    if (str_contains($currentRouteName, $slug) && strpos($currentRouteName, $slug) === 0) {
                                         $activeClass = 'active open';
                                     }
                                 }
                             } else {
-                                if (
-                                    str_contains($currentRouteName, $menu->slug) and
-                                    strpos($currentRouteName, $menu->slug) === 0
-                                ) {
+                                if (str_contains($currentRouteName, $menu->slug) && strpos($currentRouteName, $menu->slug) === 0) {
                                     $activeClass = 'active open';
                                 }
                             }
                         }
                     @endphp
 
-                    {{-- main menu --}}
+                    {{-- Main Menu Item --}}
                     <li class="menu-item {{ $activeClass }}">
                         <a href="{{ isset($menu->url) ? url($menu->url) : 'javascript:void(0);' }}"
                             class="{{ isset($menu->submenu) ? 'menu-link menu-toggle' : 'menu-link' }}"
-                            @if (isset($menu->target) and !empty($menu->target)) target="_blank" @endif>
+                            @if (isset($menu->target) && !empty($menu->target)) target="_blank" @endif
+                            @if (isset($menu->submenu)) onclick="toggleDropdown(event)" @endif>
                             @isset($menu->icon)
                                 <i class="{{ $menu->icon }}"></i>
                             @endisset
@@ -57,9 +55,20 @@
                             @endisset
                         </a>
 
-                        {{-- submenu --}}
+                        {{-- Submenu --}}
                         @isset($menu->submenu)
-                            @include('layouts.sections.sidebar.submenu', ['menu' => $menu->submenu])
+                            <ul class="submenu" style="display: none;">
+                                @foreach ($menu->submenu as $submenu)
+                                    <li class="submenu-item {{ $activeClass }}">
+                                        <a href="{{ url($submenu->url) }}" class="menu-link">
+                                            @if (isset($submenu->icon))
+                                                <i class="{{ $submenu->icon }}"></i>
+                                            @endif
+                                            <div>{{ __($submenu->name) }}</div>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
                         @endisset
                     </li>
                 @endif
@@ -71,3 +80,16 @@
         @endif
     </ul>
 </aside>
+
+<script>
+    function toggleDropdown(event) {
+        event.preventDefault();
+        const parentLi = event.currentTarget.parentElement;
+        const submenu = parentLi.querySelector('.submenu');
+
+        if (submenu) {
+            const isVisible = submenu.style.display === 'block';
+            submenu.style.display = isVisible ? 'none' : 'block';
+        }
+    }
+</script>

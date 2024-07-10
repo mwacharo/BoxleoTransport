@@ -10,67 +10,87 @@
       "name": "Orders",
       "url": "orders",
       "icon": "menu-icon tf-icons bx bx-cart",
-      "slug": "orders"
+      "slug": "orders",
+      "submenu": [
+        {
+          "url": "orders",
+          "name": "Orders",
+          "icon": "menu-icon tf-icons bx bx-cart",
+          "slug": "orders"
+        },
+        {
+          "url": "orderstatus",
+          "name": "Order Status",
+          "icon": "menu-icon tf-icons bx bx-info-circle",
+          "slug": "orderstatus"
+        },
+        {
+          "url": "ordercategories",
+          "name": "Order Categories",
+          "icon": "menu-icon tf-icons bx bx-collection",
+          "slug": "ordercategories"
+        },
+        {
+          "url": "dispatch",
+          "name": "Dispatch",
+          "icon": "menu-icon tf-icons bx bx-send",
+          "slug": "dispatch"
+        }
+      ]
     },
-
-    {
-      "url": "orderstatus",
-      "name": "Order Status",
-      "icon": "menu-icon tf-icons bx bx-info-circle",
-      "slug": "orderstatus"
-    },
-    {
-      "url": "ordercategories",
-      "name": "Order Categories",
-      "icon": "menu-icon tf-icons bx bx-collection",
-      "slug": "ordercategories"
-    },
-
     {
       "url": "vendors",
       "name": "Vendors",
       "icon": "menu-icon tf-icons bx bx-building",
       "slug": "industries"
     },
-    {
-  "name": "vehicle",
-  "url": "vehicles",
-  "icon": "menu-icon tf-icons bx bx-car",
-  "slug": "vehicle"
-},
-    {
-      "url": "drivers",
-      "name": "Drivers",
-      "icon": "menu-icon tf-icons bx bx-user",
-      "slug": "services"
-    },
-    {
-      "url": "riders",
-      "name": "Riders",
-      "icon": "menu-icon tf-icons bx bx-cycling",
-      "slug": "branches"
-    },
-
+    
     {
       "url": "clients",
       "name": "Clients",
       "icon": "menu-icon tf-icons bx bx-group",
       "slug": "tasks"
     },
-
     {
       "url": "fleet",
       "name": "Fleet Management",
       "icon": "menu-icon tf-icons bx bx-car",
-      "slug": "tasks"
-    },
+      "slug": "tasks",
+      "submenu":
+      [
 
+        {
+          "url": "fleet",
+          "name": "Fleet Dashboard",
+          "icon": "menu-icon tf-icons bx bx-car",
+          "slug": "tasks"
+        },
+        {
+          "name": "Vehicle",
+          "url": "vehicles",
+          "icon": "menu-icon tf-icons bx bx-car",
+          "slug": "vehicle"
+        },
+        {
+          "url": "drivers",
+          "name": "Drivers",
+          "icon": "menu-icon tf-icons bx bx-user",
+          "slug": "services"
+        },
+        {
+          "url": "riders",
+          "name": "Riders",
+          "icon": "menu-icon tf-icons bx bx-cycling",
+          "slug": "branches"
+        }
+      ]
+    },
     {
-"url": "geofence",
-"name": "zones",
-"icon": "menu-icon tf-icons bx bx-map", 
-"slug": "zones"
-},
+      "url": "geofence",
+      "name": "Zones",
+      "icon": "menu-icon tf-icons bx bx-map",
+      "slug": "zones"
+    },
     {
       "url": "market",
       "name": "Google Sheets",
@@ -83,24 +103,18 @@
       "icon": "menu-icon tf-icons bx bx-building-house",
       "slug": "branches"
     },
-
-
     {
-        "url": "warehouses",
+      "url": "warehouses",
       "name": "WHS Dashboard",
-      "icon": "menu-icon tf-icons bx bx bx-dock-top",
-      "slug": "pages-account-settings",
-        "slug": "branches"
+      "icon": "menu-icon tf-icons bx bx-dock-top",
+      "slug": "pages-account-settings"
     },
-
     {
       "url": "warehouses",
       "name": "Warehouse",
-      "icon": "menu-icon tf-icons bx bx bx-dock-top",
+      "icon": "menu-icon tf-icons bx bx-dock-top",
       "slug": "pages-account-settings"
-
     },
-
     {
       "menuHeader": "Metrics"
     },
@@ -110,14 +124,13 @@
       "icon": "menu-icon tf-icons bx bx-line-chart",
       "slug": "reports"
     },
-
-
     {
       "url": "users",
       "icon": "menu-icon tf-icons bx bx-group",
       "name": "Users",
       "slug": "users"
     },
+    
     {
       "url": "user-roles",
       "icon": "menu-icon tf-icons bx bx-shield",
