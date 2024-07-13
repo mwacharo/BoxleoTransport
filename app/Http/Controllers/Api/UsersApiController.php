@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeUser;
+
+
 class UsersApiController extends Controller
 {
     public function index()
@@ -33,11 +37,18 @@ class UsersApiController extends Controller
 
         $user = User::create($validatedData);
 
+
+        Mail::to($user->email)->send(new WelcomeUser($user->email,$user->name, $password,));
+
+        // dd($validatedData);
+
         return response()->json([
             'message' => 'User created successfully',
             'user' => $user,
             'password' => $password,
         ], 201);
+                 // Send welcome email
+        //  shouldques 
     }
 
     public function update(Request $request, $id)

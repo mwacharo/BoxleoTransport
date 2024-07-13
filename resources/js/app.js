@@ -44,6 +44,7 @@ import WarehouseComponent from './components/warehouse/WarehouseComponent.vue';
 import VehicleComponent from './components/vehicles/VehicleComponent.vue';
 import ZoneComponent from './components/zone/ZoneComponent.vue';
 import FleetComponent from './components/fleet/FleetComponent.vue';
+import DispatchComponent from './components/orders/DispatchComponent.vue';
 
 
 
@@ -80,6 +81,7 @@ app.component('warehouse-component',WarehouseComponent);
 app.component('vehicle-component',VehicleComponent);
 app.component('zone-component',ZoneComponent);
 app.component('fleet-component',FleetComponent);
+app.component('dispatch-component',DispatchComponent);
 
 
 

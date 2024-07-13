@@ -5,6 +5,8 @@
 </template>
 
 <script setup>
+import ApexCharts from 'apexcharts';
+import axios from 'axios';
 import { ref, onMounted } from 'vue';
 const chartCanvas = ref(null);
 

@@ -117,43 +117,79 @@ class DashboardApiContoller extends Controller
     //     return response()->json($chartData);
     // }
     //
-    // public function dealStatusCounts()
-    // {
-    //     $deals = Deal::all();
-    //     // dd($deals);
-    //
-    //     $statusCounts = [
-    //         'Won' => 0,
-    //         'Lost' => 0,
-    //         'InProgress' => 0,
-    //     ];
-    //
-    //     foreach ($deals as $deal) {
-    //         switch ($deal->status) {
-    //             case 'Won':
-    //                 $statusCounts['Won']++;
-    //                 break;
-    //             case 'Lost':
-    //                 $statusCounts['Lost']++;
-    //                 break;
-    //             case 'InProgress':
-    //                 $statusCounts['InProgress']++;
-    //                 break;
-    //             case 'Initiated':
-    //                 $statusCounts['InProgress']++;
-    //                 break;
-    //             default:
-    //                 break;
-    //         }
-    //     }
-    //     // Format data in a way suitable for doughnut chart
-    //     $chartData = [
-    //         ['status' => 'Won', 'value' => $statusCounts['Won']],
-    //         ['status' => 'Lost', 'value' => $statusCounts['Lost']],
-    //         ['status' => 'In Progress', 'value' => $statusCounts['InProgress']],
-    //     ];
-    //
-    //     return response()->json($chartData);
-    //
-    // }
+    public function orderStatusCounts()
+    {
+        // Fetch all orders
+        $orders = Order::all();
+        
+        // Initialize the status counts array with the status names
+        $statusCounts = [
+            'Pending' => 0,
+            'Processing' => 0,
+            'Ready for Pickup' => 0,
+            'Picked Up' => 0,
+            'In Transit' => 0,
+            'Out for Delivery' => 0,
+            'Delivered' => 0,
+            'Failed Delivery' => 0,
+            'Returned' => 0,
+            'Cancelled' => 0,
+            'On Hold' => 0,
+            'Rescheduled' => 0,
+        ];
+        
+        // Count the orders by their status
+        foreach ($orders as $order) {
+            switch ($order->status) {
+                case 'Pending':
+                    $statusCounts['Pending']++;
+                    break;
+                case 'Processing':
+                    $statusCounts['Processing']++;
+                    break;
+                case 'Ready for Pickup':
+                    $statusCounts['Ready for Pickup']++;
+                    break;
+                case 'Picked Up':
+                    $statusCounts['Picked Up']++;
+                    break;
+                case 'In Transit':
+                    $statusCounts['In Transit']++;
+                    break;
+                case 'Out for Delivery':
+                    $statusCounts['Out for Delivery']++;
+                    break;
+                case 'Delivered':
+                    $statusCounts['Delivered']++;
+                    break;
+                case 'Failed Delivery':
+                    $statusCounts['Failed Delivery']++;
+                    break;
+                case 'Returned':
+                    $statusCounts['Returned']++;
+                    break;
+                case 'Cancelled':
+                    $statusCounts['Cancelled']++;
+                    break;
+                case 'On Hold':
+                    $statusCounts['On Hold']++;
+                    break;
+                case 'Rescheduled':
+                    $statusCounts['Rescheduled']++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        // Format data in a way suitable for a chart
+        $chartData = [];
+        foreach ($statusCounts as $status => $count) {
+            $chartData[] = ['status' => $status, 'value' => $count];
+        }
+        
+        // Return the data as JSON
+        return response()->json($chartData);
+    }
+    
 }

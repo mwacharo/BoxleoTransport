@@ -31,6 +31,7 @@ class Order extends Model
         'pod',
         'special_instruction',
         'distance',
+        'duration',
         'pod_returned',
         'client_id',
         'agent_id',

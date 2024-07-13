@@ -163,6 +163,9 @@ class SheetApiController extends BaseController
     $response = $service->spreadsheets_values->get($spreadsheetId, $range);
     $values = $response->getValues();
 
+
+    // dd($values);
+
     if (empty($values)) {
         throw new \Exception('No data found in the spreadsheet.');
     }
@@ -200,8 +203,12 @@ class SheetApiController extends BaseController
                     'country' => $data['receier country*'] ?? null,
                     'phone' => $data['phone'],
                     'city' => $data['city'] ?? null,
-                    'product_names' => [],
-                    'quantity' => 0,
+                    // if  order_no is repetead combine product available 
+                    // 'product_names' => [],
+                    'product_name' =>$data['product name'],
+                    'quantity' =>$data['quantity'],
+
+                    // 'quantity' => 0,
                     'boxes' => 0,
                     'weight' => 0,
                     'status' => $data['status'],
@@ -257,7 +264,8 @@ class SheetApiController extends BaseController
                 'country' => $data['country'],
                 'phone' => $data['phone'],
                 'city' => $data['city'],
-                'product_name' => implode(', ', $data['product_names']),
+                // 'product_name' => implode(', ', $data['product_names']),
+                'product_name' => $data['product_name'],
                 'quantity' => $data['quantity'],
                 'boxes' => $data['boxes'],
                 'weight' => $data['weight'],

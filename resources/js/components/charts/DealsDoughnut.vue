@@ -11,21 +11,21 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      dealStatus: []
+      orderStatus: []
     };
   },
   mounted() {
-    this.fetchDealStatusData();
+    this.fetchOrderStatusData();
   },
   methods: {
-    fetchDealStatusData() {
-      axios.get('/api/v1/dealStatusCounts')
+    fetchOrderStatusData() {
+      axios.get('/api/v1/orderStatusCounts')
         .then(response => {
-          this.dealStatus = response.data;
+          this.orderStatus = response.data;
           this.initDoughnutChart();
         })
         .catch(error => {
-          console.error('Error fetching deal status data:', error);
+          console.error('Error fetching order status data:', error);
         });
     },
     initDoughnutChart() {
@@ -33,8 +33,8 @@ export default {
         chart: {
           type: 'donut'
         },
-        series: this.dealStatus.map(status => status.value),
-        labels: this.dealStatus.map(status => status.status),
+        series: this.orderStatus.map(status => status.value),
+        labels: this.orderStatus.map(status => status.status),
         dataLabels: {
           enabled: false
         },

@@ -27,14 +27,17 @@ class DatabaseSeeder extends Seeder
             LevelSeeder::class,
             BinSeeder::class,
             DriverSeeder::class,
-            // MarketSeeder::class,
             ClientSeeder::class,
+            RolePermissionSeeder::class,
+            // MarketSeeder::class,
             // OrderSeeder::class,
             // OrderProductSeeder::class,
             // ProductInstanceSeeder::class,
             // ProductSeeder::class,
             // RiderSeeder::class,
             // SheetSeeder::class,
+         
+
 
 
         ]);

@@ -71,8 +71,7 @@
                         v-model="editedItem.quantity"
                         label="Quantity"
                         prepend-icon="mdi-phone"
-                        disabled
-                       readonly
+                  
                       ></v-text-field>
                     </v-col>
                   </v-row>

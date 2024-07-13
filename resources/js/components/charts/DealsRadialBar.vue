@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div ref="chart"></div>
   </div>
 </template>
 
 <script>
 import ApexCharts from 'apexcharts';
+import axios from 'axios';
 
 export default {
   data() {

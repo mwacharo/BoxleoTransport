@@ -102,7 +102,7 @@
           <h5 class="card-title">Live Delivery Map</h5>
         </div>
         <div class="card-body">
-          <LiveDeliveryMap />
+          <LiveDeliveryMap /> 
         </div>
       </div>
     </div>
@@ -114,7 +114,8 @@
           <h5 class="card-title">Order Status Distribution</h5>
         </div>
         <div class="card-body">
-          <OrderStatusPieChart />
+          <OrderStatusPieChart/>
+        
         </div>
       </div>
     </div>

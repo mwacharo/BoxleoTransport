@@ -1,55 +1,72 @@
 <template>
-  <div class="chart-container">
-    <canvas ref="chartCanvas"></canvas>
+  <div>
+    <div ref="doughnutChart"></div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue';
+<script>
+import ApexCharts from 'apexcharts';
+import axios from 'axios';
 
-const chartCanvas = ref(null);
-
-onMounted(() => {
-  const ctx = chartCanvas.value.getContext('2d');
-  new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: ['Delivered', 'In Transit', 'Pending', 'Delayed'],
-      datasets: [{
-        data: [300, 50, 100, 20],
-        backgroundColor: [
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(255, 99, 132, 0.6)'
-        ],
-        borderColor: [
-          'rgba(75, 192, 192, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(255, 99, 132, 1)'
-        ],
-        borderWidth: 1
-      }]
+export default {
+  data() {
+    return {
+      orderStatus: [],
+      chart: null
+    };
+  },
+  created() {
+    this.fetchOrderStatusData();
+  },
+  methods: {
+    fetchOrderStatusData() {
+      axios.get('/api/v1/orderStatusCounts')
+        .then(response => {
+          this.orderStatus = response.data;
+          console.log("Order Status Data: ", this.orderStatus); // Debugging line
+          this.initDoughnutChart();
+        })
+        .catch(error => {
+          console.error('Error fetching order status data:', error);
+        });
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
+    initDoughnutChart() {
+      if (!this.orderStatus.length) return;
+
+      const chartOptions = {
+        chart: {
+          type: 'donut'
         },
-        title: {
-          display: true,
-          text: 'Order Status Distribution'
-        }
-      }
+        series: this.orderStatus.map(status => status.value),
+        labels: this.orderStatus.map(status => status.status),
+        dataLabels: {
+          enabled: false
+        },
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+      };
+
+      this.chart = new ApexCharts(this.$refs.doughnutChart, chartOptions);
+      this.chart.render();
     }
-  });
-});
+  },
+  beforeDestroy() {
+    if (this.chart) {
+      this.chart.destroy();
+    }
+  }
+};
 </script>
 
 <style scoped>
-.chart-container {
-  height: 300px;
-}
+/* Add any required styles here */
 </style>

@@ -78,7 +78,8 @@ Route::get('v1/service-statistics',[ServicesApiController::class,'statistics']);
 
 
 Route::get('v1/dealsAnnually', [DashboardApiContoller::class, 'dealsAnnually']);
-Route::get('v1/dealStatusCounts', [DashboardApiContoller::class, 'dealStatusCounts']);
+// orders status by count 
+Route::get('v1/orderStatusCounts', [DashboardApiContoller::class, 'orderStatusCounts']);
 
 // Route::get('v1/dashoboad', [DashboardApiContoller::class, 'dashoboad']);
 Route::get('/v1/fetchDashboardData', [DashboardApiContoller::class, 'fetchDashboardData']);
