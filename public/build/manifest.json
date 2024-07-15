@@ -28,12 +28,12 @@
     "src": "node_modules/leaflet/dist/images/marker-icon.png"
   },
   "resources/js/app.js": {
-    "file": "assets/app-BJnIGTOZ.js",
+    "file": "assets/app-DXUFfxTm.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-CEh-pmYZ.css"
+      "assets/app-D4OYYcT1.css"
     ],
     "assets": [
       "assets/materialdesignicons-webfont-CSr8KVlo.eot",
