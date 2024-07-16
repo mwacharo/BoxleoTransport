@@ -46,23 +46,11 @@ Route::apiResource('v1/branches', BranchesApiController::class)->only([
   'index', 'store', 'update', 'destroy'
 ]);
 
-Route::apiResource('v1/tasks', TasksApiController::class)->only([
-  'index', 'store', 'update', 'destroy'
-]);
 
 Route::apiResource('v1/calendar', CalendarApiController::class)->only([
   'index', 'store', 'update', 'destroy'
 ]);
 
-Route::apiResource('v1/deals', DealsApiController::class)->only([
-  'index', 'store', 'update', 'destroy'
-]);
-
-Route::put('v1/deals/{deal}/update-status', [DealsApiController::class, 'updateStatus'])
-->name('deals.updateStatus');
-// routes/api.php
-Route::post('/deals/search', [DealsApiController::class, 'search']);
-Route::post('/upload', [DealsApiController::class, 'upload']);
 Route::post('/reports/generate', [ApiReportApiController::class, 'generate']);
 
 
@@ -83,6 +71,9 @@ Route::get('v1/orderStatusCounts', [DashboardApiContoller::class, 'orderStatusCo
 
 // Route::get('v1/dashoboad', [DashboardApiContoller::class, 'dashoboad']);
 Route::get('/v1/fetchDashboardData', [DashboardApiContoller::class, 'fetchDashboardData']);
+Route::get('/v1/ordersAnnually', [DashboardApiContoller::class, 'ordersAnnually']);
+
+// ordersAnnually
 
 
 Route::get('v1/statistics', [DashboardApiContoller::class, 'statistics']);
@@ -144,7 +135,7 @@ Route::apiResource('/v1/areas', AreaApiController::class);
 
 // Define the routes for bulk actions
 Route::post('/v1/bulkAssignBin', [ProductApiController::class, 'bulkAssignBin']);
-Route::post('/v1/bulk-transfer', [InventoryController::class, 'bulkTransfer']);
+// Route::post('/v1/bulk-transfer', [InventoryController::class, 'bulkTransfer']);
 Route::post('/v1/bulk-pick', [ProductApiController::class, 'bulkPick']);
 Route::post('/v1/bulk-assign-to-order', [ProductApiController::class, 'bulkAssignToOrder']);
 Route::post('/v1/bulk-return', [ProductApiController::class, 'bulkReturn']);

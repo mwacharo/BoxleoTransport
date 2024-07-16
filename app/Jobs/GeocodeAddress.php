@@ -9,7 +9,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Order;
 use Illuminate\Support\Facades\Http;
-use Log;
+// use Log;
+use Illuminate\Support\Facades\Log; // Add this line
 
 class GeocodeAddress implements ShouldQueue
 {
@@ -42,11 +43,16 @@ class GeocodeAddress implements ShouldQueue
           if ($geocodeData['status'] === 'OK') {
               $lat = $geocodeData['results'][0]['geometry']['location']['lat'];
               $lng = $geocodeData['results'][0]['geometry']['location']['lng'];
+              $lng = $geocodeData['results'][0]['geometry']['duration']['lng'];
               Log::warning($lat);
               Log::warning($lng);
-              $distance = $this->calculateDistance($lat,  $lng);
-              Log::info($distance);
-              Log::info($duration);
+              $geo = $this->calculateDistance($lat,  $lng);
+              if (!empty($geo)) {
+                $distance = $geo[0];
+                $duration = $geo[1];
+                Log::info($distance);
+                Log::info($duration);
+              }
             
 
               $this->order->update([
@@ -94,11 +100,11 @@ class GeocodeAddress implements ShouldQueue
 
 
               $distance = $distanceData['rows'][0]['elements'][0]['distance']['value'] / 1000; // Convert meters to kilometers
-              $duration = $distanceData['rows'][0]['elements'][0]['duration']['value'] / 60; // Convert seconds to minutes
+              $duration = $distanceData['rows'][0]['elements'][0]['duration']['text'] / 60; // Convert seconds to minutes
 
             return [$distance, $duration];
           }
-          return 0;
+          return [];
         } catch (\Exception $e) {
           Log::error($e);
         }

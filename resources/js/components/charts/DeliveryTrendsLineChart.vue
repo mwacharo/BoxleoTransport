@@ -1,45 +1,83 @@
 <template>
-  <div class="chart-container">
-    <canvas ref="chartCanvas"></canvas>
-  </div>
+  <div ref="line"></div>
 </template>
 
-<script setup>
-
+<script>
 import ApexCharts from 'apexcharts';
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
 
-const chartCanvas = ref(null);
+export default {
+  data() {
+    return {
+      chartOptions: {
+        chart: {
+          type: 'line',
+          height: 350,
+        },
+        stroke: {
+          curve: 'smooth',
+        },
+        dataLabels: {
+          enabled: false,
+        },
+        xaxis: {
+          categories: [],
+          title: {
+            text: 'Delivery Time (in minutes)',
+          },
+        },
+        yaxis: {
+          title: {
+            text: 'Number of Orders',
+          },
+        },
+        title: {
+          // text: 'Delivery Time Distribution',
+          // align: 'center',
+        },
+      },
+      series: [],
+    };
+  },
+  mounted() {
+    // Fetch the data from your API or pass it directly
+    this.fetchDeliveryTimeDistribution();
+  },
+  methods: {
+    fetchDeliveryTimeDistribution() {
+      // Use axios to fetch data from the Laravel backend
+      axios.get('/api/v1/fetchDashboardData')
+        .then(response => {
+          const deliveryTimeDistribution = response.data.delivery_time_distribution;
 
-onMounted(() => {
-  const ctx = chartCanvas.value.getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      datasets: [{
-        label: 'Deliveries',
-        data: [65, 59, 80, 81, 56, 55, 40],
-        fill: false,
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1
-      }]
+          const categories = Object.keys(deliveryTimeDistribution);
+          const data = Object.values(deliveryTimeDistribution);
+
+          this.chartOptions.xaxis.categories = categories;
+          this.series = [
+            {
+              name: 'Orders',
+              data: data,
+            },
+          ];
+
+          // Initialize the chart
+          const chart = new ApexCharts(this.$refs.line, {
+            ...this.chartOptions,
+            series: this.series,
+          });
+
+          // Render the chart
+          chart.render();
+        })
+        .catch(error => {
+          console.error('Error fetching delivery time distribution:', error);
+        });
     },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-});
+  },
+};
 </script>
 
-<style scoped>
-.chart-container {
-  height: 300px;
-}
+<style>
+/* Add any necessary styling here */
 </style>
