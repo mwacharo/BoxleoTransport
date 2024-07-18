@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_no')->unique();
             $table->string('order_type')->nullable();
+            $table->integer('cod_amount')->nullable();
             $table->string('client_name')->nullable();;
             $table->string('address')->nullable();;
             $table->string('country')->nullable();;

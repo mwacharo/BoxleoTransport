@@ -33,6 +33,7 @@ class Order extends Model
         'distance',
         'duration',
         'pod_returned',
+        'cod_amount',
         'client_id',
         'agent_id',
         'rider_id',

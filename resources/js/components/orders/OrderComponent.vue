@@ -50,7 +50,7 @@
           </v-responsive>
 
 
-<!-- product details -->
+          <!-- product details -->
           <v-dialog v-model="showProductDetails" max-width="800px">
             <v-card>
               <v-card-title>
@@ -731,4 +731,3 @@ export default {
   }
 };
 </script>
-

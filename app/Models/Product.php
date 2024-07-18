@@ -41,7 +41,7 @@ class Product extends Model
 
     public static $rules = [
         'name' => 'required|string|max:255',
-        'sku' => 'required|string|max:255',
+        // 'sku' => 'required|string|max:255',
         // 'vendor_id' => 'required|string|max:255',
 
 
