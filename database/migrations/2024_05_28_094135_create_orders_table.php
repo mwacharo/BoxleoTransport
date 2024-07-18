@@ -22,11 +22,12 @@ return new class extends Migration
             $table->string('alt_phone')->nullable();
             $table->string('city')->nullable();
             $table->string('sku_no')->nullable();
-            $table->string('product_name')->nullable();
+            // $table->foreignId('product_id')->nullable()->constrained();
+            // $table->string('product_name')->nullable();
             $table->integer('quantity')->nullable();
             $table->integer('boxes')->nullable();
             $table->integer('weight')->nullable();
-            $table->string('status');
+            $table->string('status')->nullable();
             $table->date('delivery_date')->nullable();
             $table->string('pod')->nullable();
             $table->text('special_instruction')->nullable();

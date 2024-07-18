@@ -35,6 +35,13 @@
 import axios from 'axios';
 
 export default {
+
+  props: {
+    user_id: {
+      type: Number,
+      required: true
+    }
+  },
   data() {
     return {
       dialog: false,

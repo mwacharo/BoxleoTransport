@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreMarketRequest;
-use App\Http\Requests\UpdateMarketRequest;
-use App\Models\Market;
+use App\Http\Requests\StoreOrderProductInstanceRequest;
+use App\Http\Requests\UpdateOrderProductInstanceRequest;
+use App\Models\OrderProductInstance;
 
-class MarketController extends Controller
+class OrderProductInstanceController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,12 +14,6 @@ class MarketController extends Controller
     public function index()
     {
         //
-        // $user_id = auth()->user();
-        $user_id = auth()->user()->id;
-
-
-        return view('market.index', ['user_id' => $user_id]);
-     
     }
 
     /**
@@ -33,7 +27,7 @@ class MarketController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMarketRequest $request)
+    public function store(StoreOrderProductInstanceRequest $request)
     {
         //
     }
@@ -41,7 +35,7 @@ class MarketController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Market $market)
+    public function show(OrderProductInstance $orderProductInstance)
     {
         //
     }
@@ -49,7 +43,7 @@ class MarketController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Market $market)
+    public function edit(OrderProductInstance $orderProductInstance)
     {
         //
     }
@@ -57,7 +51,7 @@ class MarketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMarketRequest $request, Market $market)
+    public function update(UpdateOrderProductInstanceRequest $request, OrderProductInstance $orderProductInstance)
     {
         //
     }
@@ -65,7 +59,7 @@ class MarketController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Market $market)
+    public function destroy(OrderProductInstance $orderProductInstance)
     {
         //
     }

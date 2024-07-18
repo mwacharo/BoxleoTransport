@@ -35,6 +35,13 @@ import AddSheet from '@/components/market/AddSheet.vue';
 import { fetchDataMixin } from '@/mixins/fetchDataMixin';
 
 export default {
+
+  props: {
+    user_id: {
+      type: Number,
+      required: true
+    }
+  },
   components: {
     AddSheet
   },
@@ -83,7 +90,12 @@ export default {
 
     async syncSheet(sheet) {
       try {
-        const response = await axios.post(`/api/v1/sheets/${sheet.id}/sync`);
+        // const response = await axios.post(`/api/v1/sheets/${sheet.id}/sync`);
+        const response = await axios.post(`/api/v1/sheets/${sheet.id}/sync`, {
+          user_id: this.user_id
+        });
+
+
         console.log('Sync response:', response.data);
         this.$toastr.success(response.data.message);
         this.loadAllData(); // Reload data after sync
@@ -99,3 +111,6 @@ export default {
   }
 };
 </script>
+
+
+

@@ -93,6 +93,9 @@ Route::post('/v1/orders/details', [OrderApiController::class, 'details']);
 Route::post('/v1/orders/assignOrders', [OrderApiController::class, 'assignOrders']);
 
 // Route::post('/v1/orders/by-ids', [OrderApiController::class, 'by-ids']);
+// details of a specific order_no
+
+Route::get('/orders/{id}', [OrderApiController::class, 'order']);
 
 
 Route::post('/v1/orders/bulk-delete', [OrderApiController::class, 'bulkDelete']);

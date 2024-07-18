@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('sku')->unique();
-            $table->string('name');
+            $table->string('sku')->nullable();
+            $table->string('name')->nullable();
             $table->foreignId('vendor_id')->constrained()->onDeletedelete('cascade');
             // $table->foreignId('warehouse_id')->constrained()->onDeletedelete('cascade');
             $table->foreignId('warehouse_id')->nullable()->constrained()->onDelete('cascade');
@@ -26,7 +26,7 @@ return new class extends Migration
              // $table->string('image');
             $table->text('description')->nullable();
             $table->decimal('buying_price', 8, 2)->nullable();
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 10, 2)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

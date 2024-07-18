@@ -15,13 +15,8 @@
             </v-btn>
           </v-toolbar>
 
-          <v-text-field
-            v-model="search"
-            label="Search by order_no , phone"
-            clearable
-            @input="filterEntities"
-            dense
-          ></v-text-field>
+          <v-text-field v-model="search" label="Search by order_no , phone" clearable @input="filterEntities"
+            dense></v-text-field>
           <div v-if="selectedItems.length > 0" class="x-actions">
             <v-icon class="mx-1" color="error" @click="confirmBulkDeleteDialog" title="Delete">mdi-delete</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkAssignRider" title="Assign Rider">mdi-bicycle</v-icon>
@@ -29,35 +24,97 @@
             <v-icon class="mx-1" color="primary" @click="bulkUpdateStatus" title="Update Status">mdi-update</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkCategorize" title="Categorize">mdi-label</v-icon>
             <v-icon class="mx-1" color="primary" @click="AutoAllocate" title="Auto Allocate">mdi-auto-fix</v-icon>
-            <v-icon class="mx-1" color="primary" @click="optimizeRoute" title="Optimize Route">mdi-map-marker-path</v-icon>
+            <v-icon class="mx-1" color="primary" @click="optimizeRoute"
+              title="Optimize Route">mdi-map-marker-path</v-icon>
             <v-icon class="mx-1" color="primary" @click="bulkPrint" title="Print">mdi-printer</v-icon>
           </div>
           <v-responsive>
-            <v-data-table
-              :headers="headers"
-              :items="filteredEntities"
-              item-value="id"
-              items-per-page="5"
-              show-select
-               :loading="isLoading"
-              v-model="selectedItems"
-            >
+            <v-data-table :headers="headers" :items="filteredEntities" item-value="id" items-per-page="5" show-select
+              :loading="isLoading" v-model="selectedItems">
               <template v-slot:item.actions="{ item }">
                 <div class="d-flex align-center">
-                <v-icon class="mx-1" color="error" @click="mapOrder(item.id)">mdi-map-marker</v-icon>
+                  <v-icon class="mx-1" color="error" @click="mapOrder(item.id)">mdi-map-marker</v-icon>
                   <v-icon class="mx-1" color="blue" @click="editEntity(item)">mdi-pencil</v-icon>
                   <v-icon class="mx-1" color="red" @click="deleteEntity(item)">mdi-delete</v-icon>
                 </div>
               </template>
 
-              <template v-slot:progress>
-   <v-progress-linear
-     color="blue"
-     indeterminate
-   ></v-progress-linear>
- </template>
+
+              <template v-slot:item.product="{ item }">
+                <v-chip @click="openProductDetails(item)">
+                  <v-icon class="mx-1" color="blue">mdi-pencil</v-icon>
+                </v-chip>
+              </template>
+
             </v-data-table>
           </v-responsive>
+
+
+<!-- product details -->
+          <v-dialog v-model="showProductDetails" max-width="800px">
+            <v-card>
+              <v-card-title>
+                <span class="text-h5">Product Details</span>
+              </v-card-title>
+              <v-card-text>
+                <v-form>
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th class="text-left">Product Name</th>
+                        <th class="text-left">Quantity</th>
+                        <th class="text-left">Price</th>
+                        <th class="text-left">Weight</th>
+                        <th class="text-left">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="item in order_products" :key="item.id">
+                        <td>
+                          <v-select v-model="item.product_id" :items="products" item-title="name" item-value="id"
+                            variant="outlined" density="compact" hide-details
+                            @update:modelValue="updateProductName(item)"></v-select>
+                        </td>
+                        <td>
+                          <v-text-field v-model.number="item.quantity" type="number" variant="outlined"
+                            density="compact" hide-details
+                            :rules="[v => v > 0 || 'Quantity must be greater than 0']"></v-text-field>
+                        </td>
+                        <td>
+                          <v-text-field v-model.number="item.price" type="number" variant="outlined" density="compact"
+                            hide-details :rules="[v => v >= 0 || 'Price must be non-negative']"></v-text-field>
+                        </td>
+                        <td>
+                          <v-text-field v-model.number="item.weight" type="number" variant="outlined" density="compact"
+                            hide-details :rules="[v => v >= 0 || 'Weight must be non-negative']"></v-text-field>
+                        </td>
+                        <td>
+                          <v-icon color="error" size="small" class="mr-2" @click="removeProductDetail(item)">
+                            mdi-delete
+                          </v-icon>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="5">
+                          <v-btn color="primary" @click="addProductDetail">Add another</v-btn>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </v-table>
+                </v-form>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue-darken-1" variant="text" @click="closeProductDetails">Close</v-btn>
+                <v-btn color="blue-darken-1" variant="text" @click="updateProductDetails">Update</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+
+          <!-- End Product Details Dialog -->
 
           <v-dialog v-model="dialog" max-width="800">
             <v-card>
@@ -68,11 +125,8 @@
                 <v-container>
                   <v-row>
                     <v-col cols="12" md="6" v-for="field in entityFields" :key="field.name">
-                      <v-text-field
-                        v-model="editedItem[field.name]"
-                        :label="field.label"
-                        :prepend-icon="field.icon"
-                      ></v-text-field>
+                      <v-text-field v-model="editedItem[field.name]" :label="field.label"
+                        :prepend-icon="field.icon"></v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -100,43 +154,15 @@
             <v-card>
               <v-card-title class="headline">{{ bulkActionTitle }}</v-card-title>
               <v-card-text>
-                <v-select
-                  v-if="bulkAction === 'bulkAssignRider'"
-                  :items="riders"
-                  label="Select Rider"
-                  clearable
-                  v-model="selectedRider"
-                  item-title="name"
-                  item-value="id"
-                ></v-select>
-                <v-select
-                  v-if="bulkAction === 'bulkAssignDriver'"
-                  v-model="selectedDriver"
-                  :items="drivers"
-                  label="Select Driver"
-                  item-title="name"
-                  item-value="id"
-                  clearable
-                ></v-select>
-                <v-select
-                  v-if="bulkAction === 'bulkUpdateStatus'"
-                  v-model="selectedStatus"
-                  :items="statuses"
-                  label="Select Status"
-                  item-title="name"
-                  item-value="name"
-                  clearable
-                ></v-select>
+                <v-select v-if="bulkAction === 'bulkAssignRider'" :items="riders" label="Select Rider" clearable
+                  v-model="selectedRider" item-title="name" item-value="id"></v-select>
+                <v-select v-if="bulkAction === 'bulkAssignDriver'" v-model="selectedDriver" :items="drivers"
+                  label="Select Driver" item-title="name" item-value="id" clearable></v-select>
+                <v-select v-if="bulkAction === 'bulkUpdateStatus'" v-model="selectedStatus" :items="statuses"
+                  label="Select Status" item-title="name" item-value="name" clearable></v-select>
 
-                <v-select
-                  v-if="bulkAction === 'bulkCategorize'"
-                  v-model="selectedCategory"
-                  :items="categories"
-                  label="Select Category"
-                  item-title="name"
-                  item-value="name"
-                  clearable
-                ></v-select>
+                <v-select v-if="bulkAction === 'bulkCategorize'" v-model="selectedCategory" :items="categories"
+                  label="Select Category" item-title="name" item-value="name" clearable></v-select>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -170,38 +196,14 @@
               </v-card-title>
 
               <v-card-text>
-                <v-select
-                  v-model="filterType"
-                  :items="typeOptions"
-                  item-title="name"
-                  item-value="id"
-                  label="Filter by Order Type"
-                  clearable
-                ></v-select>
-                <v-select
-                  v-model="filterVendor"
-                  :items="vendorOptions"
-                  item-title="name"
-                  item-value="id"
-                  label="Filter by Vendor"
-                  clearable
-                ></v-select>
-                <v-select
-                  v-model="filterAgent"
-                  :items="agentOptions"
-                  item-title="name"
-                  item-value="id"
-                  label="Filter by Agent"
-                  clearable
-                ></v-select>
-                <v-select
-                  v-model="filterStatus"
-                  :items="statusOptions"
-                  item-title="name"
-                  item-value="id"
-                  label="Filter by Status"
-                  clearable
-                ></v-select>
+                <v-select v-model="filterType" :items="typeOptions" item-title="name" item-value="id"
+                  label="Filter by Order Type" clearable></v-select>
+                <v-select v-model="filterVendor" :items="vendorOptions" item-title="name" item-value="id"
+                  label="Filter by Vendor" clearable></v-select>
+                <v-select v-model="filterAgent" :items="agentOptions" item-title="name" item-value="id"
+                  label="Filter by Agent" clearable></v-select>
+                <v-select v-model="filterStatus" :items="statusOptions" item-title="name" item-value="id"
+                  label="Filter by Status" clearable></v-select>
                 <v-text-field v-model="filterAddress" label="Filter by Address" clearable></v-text-field>
                 <v-text-field v-model="startSelectedDate" label="Start Date" type="date"></v-text-field>
                 <v-text-field v-model="endSelectedDate" label="End Date" type="date"></v-text-field>
@@ -215,9 +217,9 @@
     </v-layout>
 
 
-        <MapOrder ref="MapOrderComponent" :orderId="selectedOrderId" :branchAddress="branchAddress" />
-          <AutoAllocate ref="AutoAllocateComponent"  :selectedItems="selectedItems" />
-        <OptimizeRoute ref="OptimizeRouteComponent"  :selectedItems="selectedItems" />
+    <MapOrder ref="MapOrderComponent" :orderId="selectedOrderId" :branchAddress="branchAddress" />
+    <AutoAllocate ref="AutoAllocateComponent" :selectedItems="selectedItems" />
+    <OptimizeRoute ref="OptimizeRouteComponent" :selectedItems="selectedItems" />
 
   </v-card>
 </template>
@@ -231,15 +233,13 @@ import MapOrder from '@/components/orders/MapOrder.vue';
 import OptimizeRoute from '@/components/orders/OptimizeRoute.vue';
 
 
-
-
 export default {
-components: {
-  MapOrder,
-  AutoAllocate,
-  OptimizeRoute,
+  components: {
+    MapOrder,
+    AutoAllocate,
+    OptimizeRoute,
 
-},
+  },
   mixins: [fetchDataMixin],
   props: {
     entityName: {
@@ -261,7 +261,7 @@ components: {
         { name: 'city', label: 'City', icon: 'mdi-city' },
         { name: 'phone', label: 'Contact', icon: 'mdi-phone' },
         { name: 'alt_phone', label: 'Other', icon: 'mdi-phone-in-talk' },
-        { name: 'product_name', label: 'Product', icon: 'mdi-package-variant' },
+        { name: 'product', label: 'Product Details', icon: 'mdi-package-variant' },
         { name: 'quantity', label: 'Quantity', icon: 'mdi-format-list-numbered' },
         { name: 'status', label: 'Status', icon: 'mdi-information' }
       ]
@@ -270,6 +270,22 @@ components: {
   data() {
     return {
       selectedOrderId: null,
+
+      showProductDetails: false,
+      selectedProductDetails: [],
+      order_products: [],
+      productHeaders: [
+        { title: 'Product Name', value: 'name' },
+        { title: 'Price', value: 'price' },
+        { title: 'Quantity', value: 'quantity' },
+        { title: 'Action', value: 'actions', sortable: false }
+      ],
+      // products: [], 
+      products: [
+        { id: 1, name: 'Product A' },
+        { id: 2, name: 'Product B' },
+        // Add more products as needed
+      ],
       branchAddress: { lat: -1.286389, lng: 36.817223 },  // Example branch coordina
       dialog: false,
       selected: false,
@@ -366,6 +382,59 @@ components: {
     this.fetchBulkData();
   },
   methods: {
+    openProductDetails(item) {
+      // select all products  of the vendor where vendor_id =item.vendor.vendor_id
+      this.products = item.products
+      this.order_products = item.order_products.map(product => {
+        const fullProduct = item.products.find(p => p.id === product.product_id);
+        return {
+          id: product.id,
+          product_id: product.product_id,
+          name: fullProduct ? fullProduct.name : 'Unknown Product',
+          quantity: product.quantity,
+          price: product.price,
+          boxes: product.boxes,
+          weight: product.weight
+        };
+      });
+
+      this.showProductDetails = true;
+    },
+
+
+
+    closeProductDetails() {
+      this.showProductDetails = false;
+    },
+    addProductDetail() {
+      this.order_products.push({
+        id: Date.now(), // Temporary ID
+        product_id: null,
+        // products:[],
+        product_name: '',
+        quantity: null,
+        price: '0.00',
+        boxes: null,
+        weight: 0
+      });
+    },
+    removeProductDetail(item) {
+      const index = this.order_products.findIndex(product => product.id === item.id);
+      if (index !== -1) {
+        this.order_products.splice(index, 1);
+      }
+    },
+    // updateProductDetails() {
+    //   // Implement your update product details logic
+    //   this.showProductDetails = false;
+    // },
+
+    updateProductName(item) {
+      const selectedProduct = this.products.find(p => p.id === item.product_id);
+      if (selectedProduct) {
+        item.product_name = selectedProduct.name;
+      }
+    },
     getDefaultItem() {
       const item = {};
       this.entityFields.forEach(field => {
@@ -412,9 +481,9 @@ components: {
       }
     },
     async fetchEntities() {
-    this.isLoading = true
+      this.isLoading = true
       try {
-              await new Promise(resolve => setTimeout(resolve, 2000))
+        await new Promise(resolve => setTimeout(resolve, 2000))
         const response = await axios.get(this.apiEndpoint);
 
         this.entities = response.data;
@@ -488,20 +557,20 @@ components: {
         this.confirmDeleteDialog = false;
       }
     },
-    mapOrder(id){
-            this.selectedOrderId = id;
-            this.$nextTick(() => {
-              this.$refs.MapOrderComponent.show();
-              });
+    mapOrder(id) {
+      this.selectedOrderId = id;
+      this.$nextTick(() => {
+        this.$refs.MapOrderComponent.show();
+      });
     },
 
     AutoAllocate() {
-    this.$refs.AutoAllocateComponent.show(this.selectedItems);
-},
-optimizeRoute(){
-this.$refs.OptimizeRouteComponent.show(this.selectedItems);
+      this.$refs.AutoAllocateComponent.show(this.selectedItems);
+    },
+    optimizeRoute() {
+      this.$refs.OptimizeRouteComponent.show(this.selectedItems);
 
-},
+    },
     bulkAssignRider() {
       this.bulkAction = 'bulkAssignRider';
       this.bulkActionTitle = 'Assign Rider';
@@ -662,3 +731,4 @@ this.$refs.OptimizeRouteComponent.show(this.selectedItems);
   }
 };
 </script>
+

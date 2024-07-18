@@ -25,7 +25,7 @@ class sheet extends Model
         'order_prefix',
         'vendor_id',
         'lastUpdatedOrderNumber',
-        'ou_id',
+        'branch_id',
         'created_at',
         'updated_at',
     ];

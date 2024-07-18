@@ -109,6 +109,12 @@ class Order extends Model
 
     ];
 
+    public function products()
+    {
+        return $this->hasManyThrough(Product::class, OrderProduct::class, 'order_id', 'id', 'id', 'product_id');
+    }
+    
+
     public function vendor(){
         return $this->belongsTo(Vendor::class);
 
@@ -119,9 +125,14 @@ class Order extends Model
         return $this->belongsTo(Client::class);
     }
 
+ 
     public function orderProducts()
     {
         return $this->hasMany(OrderProduct::class);
+    }
+    public function orderproductinstances()
+    {
+        return $this->hasMany(OrderProductInstance::class);
     }
 
     public function returns()

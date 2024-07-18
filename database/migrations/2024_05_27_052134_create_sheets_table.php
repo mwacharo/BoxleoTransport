@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('order_prefix')->nullable();
             $table->foreignId('vendor_id')->constrained()->onDelete('cascade');
             $table->string('lastUpdatedOrderNumber')->nullable();
-            $table->bigInteger('ou_id')->nullable();
+            $table->bigInteger('branch_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

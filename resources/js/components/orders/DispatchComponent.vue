@@ -170,7 +170,7 @@ export default {
       search: '',
       entities: [],
       product_name: '',
-      productId:'',
+      productId: '',
       selectedBarcode: '',
       barcodes: [],
       headers: [
@@ -244,44 +244,28 @@ export default {
   },
   methods: {
 
-    // OpenDispatchDialog(item) {
-    //   this.productInstanceDialog = true;
-
-    //   const productId = item.id;
-    //        axios.get('/api/v1/products/${this.productId}/instances').then(response => {
-    //       // Assuming the API response structure
-    //       this.barcodes = response.data.instances.map(instance => instance.barcode);
-    //       this.product_name = item.product_name;
-    //     })
-    //     .catch(error => {
-    //       console.error('There was an error fetching the product instances:', error);
-    //     });
-    // },
+    
     OpenDispatchDialog(item) {
-  this.productInstanceDialog = true;
-  const productId = item.id;
-  axios.get(`/api/v1/products/${productId}/instances`).then(response => {
-    // Assuming the API response structure
-    this.barcodes = response.data.instances.map(instance => instance.barcode);
-    this.product_name = item.product_name;
-  })
-  .catch(error => {
-    console.error('There was an error fetching the product instances:', error);
-  });
-}
-,
+      this.productInstanceDialog = true;
+      const orderId = item.id;
+      
+      axios.get(`/api/v1/orders/${orderId}`).then(response => {
+        // extract product_id  from fetched orderdetails
+        this.barcodes = response.data.instances.map(instance => instance.barcode);
+        this.product_name = item.product_name;
+      })
+        .catch(error => {
+          console.error('There was an error fetching the product instances:', error);
+        });
+    }
+    ,
     closeProductInstanceDialog() {
       this.productInstanceDialog = false;
       this.product_name = '';
       this.selectedBarcode = null;
       this.barcodes = [];
     },
-    // OpenDispatchDialog() {
-    //   this.productInstanceDialog = true;
-    // },
-    // closeProductInstanceDialog() {
-    //   this.productInstanceDialog = false;
-    // },
+  
     getDefaultItem() {
       const item = {};
       this.entityFields.forEach(field => {
