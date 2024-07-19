@@ -41,7 +41,10 @@
 
 
               <template v-slot:item.product="{ item }">
-                <v-chip @click="openProductDetails(item)">
+                <v-chip 
+                 v-for="(product, index) in item.order_products" :key="index" class="mr-2"
+                 @click="openProductDetails(item)">
+                 
                   <v-icon class="mx-1" color="blue">mdi-pencil</v-icon>
                 </v-chip>
               </template>
@@ -260,9 +263,9 @@ export default {
         { name: 'address', label: 'Address', icon: 'mdi-home' },
         { name: 'city', label: 'City', icon: 'mdi-city' },
         { name: 'phone', label: 'Contact', icon: 'mdi-phone' },
-        { name: 'alt_phone', label: 'Other', icon: 'mdi-phone-in-talk' },
+        // { name: 'alt_phone', label: 'Alt phone', icon: 'mdi-phone-in-talk' },
         { name: 'product', label: 'Product Details', icon: 'mdi-package-variant' },
-        { name: 'quantity', label: 'Quantity', icon: 'mdi-format-list-numbered' },
+        // { name: 'quantity', label: 'Quantity', icon: 'mdi-format-list-numbered' },
         { name: 'status', label: 'Status', icon: 'mdi-information' }
       ]
     }
@@ -424,10 +427,6 @@ export default {
         this.order_products.splice(index, 1);
       }
     },
-    // updateProductDetails() {
-    //   // Implement your update product details logic
-    //   this.showProductDetails = false;
-    // },
 
     updateProductName(item) {
       const selectedProduct = this.products.find(p => p.id === item.product_id);

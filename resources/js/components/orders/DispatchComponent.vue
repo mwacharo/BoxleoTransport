@@ -22,6 +22,23 @@
 
 
 
+              <!-- <template v-slot:item.order_products="{ item }">
+                  <v-chip v-for="product in item.order_products" :key="product.id" class="mr-2">
+                    {{ product.name }} {{ product.quantity }}
+                  </v-chip>
+                </template> -->
+
+
+              <template v-slot:item.order_products="{ item }">
+                <v-chip v-for="(product, index) in item.order_products" :key="index" class="mr-2">
+                  {{ formatProductDetails(item, product) }}
+                  <!-- <v-icon class="mx-1" color="blue">mdi-pencil</v-icon> -->
+                </v-chip>
+              </template>
+
+
+
+
               <template v-slot:item.actions="{ item }">
                 <div class="d-flex align-center">
                   <v-icon class="mx-1" color="blue" @click="OpenDispatchDialog(item)">mdi-package-variant</v-icon>
@@ -37,30 +54,80 @@
             </v-data-table>
           </v-responsive>
 
-          <!-- attach order items -->
-          <v-dialog v-model="productInstanceDialog" max-width="600">
+          <!--dialog to show details of product  -->
+
+          <v-dialog v-model="showProductDetails" max-width="600px">
             <v-card>
               <v-card-title>
-                <span class="text-h5">Product Instances</span>
-                <v-spacer></v-spacer>
-                <v-btn icon @click="closeProductInstanceDialog">
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
+                <span class="headline">Order Products</span>
               </v-card-title>
               <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12" md="6">
-                      <v-text-field v-model="product_name" label="Product Name"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-combobox v-model="selectedBarcode" :items="barcodes" label="Barcode"
-                        allow-overflow></v-combobox>
-                    </v-col>
-                  </v-row>
-                  <v-btn color="primary" @click="saveProductInstance">Save</v-btn>
-                </v-container>
+                <v-list>
+                  <v-list-item v-for="product in order_products" :key="product.id">
+                    {{ product.name }} {{ product.quantity }}
+                  </v-list-item>
+                </v-list>
               </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="closeProductInstanceDialog">Close</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+          <!-- attach order items -->
+
+          <v-dialog v-model="productInstanceDialog" max-width="800px">
+            <v-card>
+              <v-card-title>
+                <span class="text-h5">Order Items</span>
+              </v-card-title>
+              <v-card-text>
+                <v-form>
+                  <v-table>
+                    <thead>
+                      <tr>
+                        <th class="text-left">Product Name</th>
+                        <th class="text-left">Quantity</th>
+                        <th class="text-left">Barcode</th>
+
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="item in order_products" :key="item.id">
+                        <td>
+                          <v-text-field v-model="item.product_id" :items="products" item-title="name" item-value="id"
+                            hide-details></v-text-field>
+                        </td>
+                        <td>
+                          <v-text-field v-model="item.quantity" type="number" hide-details></v-text-field>
+                        </td>
+                        <td>
+                          <v-select v-model="item.product_instance_id" :items="product_instances" item-title="barcode"
+                            item-value="id" hide-details></v-select>
+                        </td>
+                        <td>
+                          <v-icon color="error" size="small" class="mr-2" @click="removeProductDetail(item)">
+                            mdi-delete
+                          </v-icon>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="5">
+                          <v-btn color="primary" @click="addProductDetail">Add another</v-btn>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </v-table>
+                </v-form>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue-darken-1" variant="text" @click="closeProductDetails">Close</v-btn>
+                <v-btn color="blue-darken-1" variant="text" @click="updateProductDetails">Update</v-btn>
+              </v-card-actions>
             </v-card>
           </v-dialog>
 
@@ -155,9 +222,7 @@ export default {
       default: () => [
         { name: 'created_at', label: 'Created', icon: 'mdi-calendar' },
         { name: 'order_no', label: 'Order', icon: 'mdi-file-document' },
-        { name: 'product_name', label: 'Product Details', icon: 'mdi-package-variant' },
-        { name: 'quantity', label: 'quantity', icon: 'mdi-format-list-numbered' },
-        { name: 'order_items', label: 'Order Items', icon: 'mdi-package-variant' },
+        { name: 'order_products', label: 'Order Details', icon: 'mdi-package-variant' },
         { name: 'status', label: 'Status', icon: 'mdi-information' }
       ]
     }
@@ -169,6 +234,9 @@ export default {
       productInstanceDialog: false,
       search: '',
       entities: [],
+      products: [],
+      order_products: [],
+      selectedItems: [],
       product_name: '',
       productId: '',
       selectedBarcode: '',
@@ -244,11 +312,11 @@ export default {
   },
   methods: {
 
-    
+
     OpenDispatchDialog(item) {
       this.productInstanceDialog = true;
       const orderId = item.id;
-      
+
       axios.get(`/api/v1/orders/${orderId}`).then(response => {
         // extract product_id  from fetched orderdetails
         this.barcodes = response.data.instances.map(instance => instance.barcode);
@@ -257,15 +325,18 @@ export default {
         .catch(error => {
           console.error('There was an error fetching the product instances:', error);
         });
-    }
-    ,
+    },
+    closeProductDetails() {
+      this.productInstanceDialog = false;
+    },
+
     closeProductInstanceDialog() {
       this.productInstanceDialog = false;
       this.product_name = '';
       this.selectedBarcode = null;
       this.barcodes = [];
     },
-  
+
     getDefaultItem() {
       const item = {};
       this.entityFields.forEach(field => {
@@ -309,17 +380,25 @@ export default {
         console.error(`Error saving ${this.entityName}:`, error);
       }
     },
-    async fetchEntities() {
-      this.isLoading = true;
-      try {
-        const response = await axios.get(this.apiEndpoint);
-        this.entities = response.data;
-      } catch (error) {
-        console.error(`Error fetching ${this.entityName}:`, error);
-      } finally {
-        this.isLoading = false;
-      }
+
+    formatProductDetails(order, orderProduct) {
+      const product = order.products.find(p => p.id === orderProduct.product_id);
+      return product ? `${product.name} (${orderProduct.quantity})` : `Unknown Product (${orderProduct.quantity})`;
     },
+
+
+    async fetchEntities() {
+  this.isLoading = true;
+  try {
+    const response = await axios.get(this.apiEndpoint);
+    this.entities = response.data;
+  } catch (error) {
+    console.error(`Error fetching ${this.entityName}:`, error);
+  } finally {
+    this.isLoading = false;
+  }
+},
+
     async fetchFilterData() {
       this.typeOptions = await this.fetchDataFromApi('/api/v1/ordercategories');
       this.vendorOptions = await this.fetchDataFromApi('/api/v1/vendors');
