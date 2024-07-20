@@ -136,6 +136,12 @@ class Order extends Model
         return $this->hasMany(OrderProductInstance::class);
     }
 
+    // public function orderProductInstances()
+    // {
+    //     return $this->hasManyThrough(OrderProductInstance::class, OrderProduct::class, 'order_id', 'order_product_id', 'id', 'id');
+    // }
+
+
     public function returns()
     {
         return $this->hasMany(ReturnProduct::class);

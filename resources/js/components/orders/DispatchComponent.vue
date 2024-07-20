@@ -22,22 +22,12 @@
 
 
 
-              <!-- <template v-slot:item.order_products="{ item }">
-                  <v-chip v-for="product in item.order_products" :key="product.id" class="mr-2">
-                    {{ product.name }} {{ product.quantity }}
-                  </v-chip>
-                </template> -->
-
-
               <template v-slot:item.order_products="{ item }">
                 <v-chip v-for="(product, index) in item.order_products" :key="index" class="mr-2">
                   {{ formatProductDetails(item, product) }}
                   <!-- <v-icon class="mx-1" color="blue">mdi-pencil</v-icon> -->
                 </v-chip>
               </template>
-
-
-
 
               <template v-slot:item.actions="{ item }">
                 <div class="d-flex align-center">
@@ -90,48 +80,40 @@
                         <th class="text-left">Product Name</th>
                         <th class="text-left">Quantity</th>
                         <th class="text-left">Barcode</th>
-
+                        <th class="text-left">Product Instances</th> -
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="item in order_products" :key="item.id">
+                      <tr v-for="(item, index) in orderItems" :key="index">
+                        <td>{{ item.product_name }}</td>
+                        <!-- <td>{{ formatProductDetails(item.product) }}</td> -->
+                        <td>{{ item.quantity }}</td>
+
                         <td>
-                          <v-text-field v-model="item.product_id" :items="products" item-title="name" item-value="id"
-                            hide-details></v-text-field>
+                          <v-combobox v-model="item.barcodes" multiple chips deletable-chips label="Enter barcodes"
+                            placeholder="Enter Key" :delimiter="[' ', ',']"></v-combobox>
                         </td>
                         <td>
-                          <v-text-field v-model="item.quantity" type="number" hide-details></v-text-field>
-                        </td>
-                        <td>
-                          <v-select v-model="item.product_instance_id" :items="product_instances" item-title="barcode"
-                            item-value="id" hide-details></v-select>
-                        </td>
-                        <td>
-                          <v-icon color="error" size="small" class="mr-2" @click="removeProductDetail(item)">
-                            mdi-delete
-                          </v-icon>
+
+                          <v-select v-if="item.selected_instances.length < item.quantity" v-model="selected_instances"
+                            :items="item.available_instances" item-title="barcode" item-value="id" multiple chips
+                            hide-details
+                            >
+                          </v-select>
                         </td>
                       </tr>
                     </tbody>
-                    <tfoot>
-                      <tr>
-                        <td colspan="5">
-                          <v-btn color="primary" @click="addProductDetail">Add another</v-btn>
-                        </td>
-                      </tr>
-                    </tfoot>
+
                   </v-table>
                 </v-form>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue-darken-1" variant="text" @click="closeProductDetails">Close</v-btn>
-                <v-btn color="blue-darken-1" variant="text" @click="updateProductDetails">Update</v-btn>
+                <v-btn color="blue-darken-1" variant="text" @click="closeDispatchDialog">Close</v-btn>
+                <v-btn color="blue-darken-1" variant="text" @click="updateDispatchDetails">Dispatch</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
-
-
           <!-- Edit Dialog -->
           <v-dialog v-model="dialog" max-width="800">
             <v-card>
@@ -229,12 +211,22 @@ export default {
   },
   data() {
     return {
+
+
+
+      orderItems: [],
+      selectedOrder: null,
+
       dialog: false,
       dialogDelete: false,
       productInstanceDialog: false,
       search: '',
       entities: [],
       products: [],
+      product_instances: [],
+      available_instances: [],
+      selected_instances: [],
+      selected_instance: [],
       order_products: [],
       selectedItems: [],
       product_name: '',
@@ -312,22 +304,82 @@ export default {
   },
   methods: {
 
-
     OpenDispatchDialog(item) {
       this.productInstanceDialog = true;
-      const orderId = item.id;
 
-      axios.get(`/api/v1/orders/${orderId}`).then(response => {
-        // extract product_id  from fetched orderdetails
-        this.barcodes = response.data.instances.map(instance => instance.barcode);
-        this.product_name = item.product_name;
-      })
-        .catch(error => {
-          console.error('There was an error fetching the product instances:', error);
-        });
+      this.selectedOrder = item;
+      this.orderItems = item.order_products.map(orderProduct => {
+        const product = item.products.find(p => p.id === orderProduct.product_id);
+        return {
+          ...orderProduct,
+          product_name: product ? product.name : '',
+          selected_instances: [],
+          available_instances: product ? product.product_instances : [],
+          selectedInstance: null,
+        };
+      });
     },
-    closeProductDetails() {
+    addInstance(item) {
+      if (item.selectedInstance && item.selected_instances.length < item.quantity) {
+        const instance = item.available_instances.find(i => i.id === item.selectedInstance);
+        item.selected_instances.push(instance);
+        item.available_instances = item.available_instances.filter(i => i.id !== instance.id);
+        item.selectedInstance = null;
+      }
+    },
+    removeInstance(item, index) {
+      const removedInstance = item.selected_instances.splice(index, 1)[0];
+      item.available_instances.push(removedInstance);
+    },
+    closeDispatchDialog() {
       this.productInstanceDialog = false;
+      this.orderItems = [];
+      this.selectedOrder = null;
+    },
+    async updateDispatchDetails() {
+      // Validate that all items have the correct number of instances selected
+      const isValid = this.orderItems.every(item => {
+        console.log(`Product ID: ${item.product_id}`);
+        console.log(`Selected Instances: ${item.selected_instances.length}`);
+        console.log(`Required Quantity: ${item.quantity}`);
+        return item.selected_instances.length === item.quantity;
+      });
+
+
+      if (!isValid) {
+        alert('Please select the correct number of instances for each product.');
+        return;
+      }
+
+      // Prepare data for API call
+      const dispatchData = {
+        order_id: this.selectedOrder.id,
+        dispatched_items: this.orderItems.map(item => ({
+          product_id: item.product_id,
+          instance_ids: item.selected_instances.map(instance => instance.id),
+        })),
+      };
+
+      try {
+        // Make API call to update dispatch details
+        await axios.post('/api/dispatch-order', dispatchData);
+        alert('Order dispatched successfully!');
+        this.closeDispatchDialog();
+      } catch (error) {
+        console.error('Error dispatching order:', error);
+        alert('An error occurred while dispatching the order. Please try again.');
+      }
+    },
+    // For future barcode scanning feature
+    handleBarcodeScanned(item) {
+      const scannedInstance = item.available_instances.find(i => i.barcode === item.scannedBarcode);
+      if (scannedInstance) {
+        item.selectedInstance = scannedInstance.id;
+        this.addInstance(item);
+      } else {
+        alert('Invalid barcode or product instance not available.');
+      }
+      item.scannedBarcode = '';
     },
 
     closeProductInstanceDialog() {
@@ -388,16 +440,16 @@ export default {
 
 
     async fetchEntities() {
-  this.isLoading = true;
-  try {
-    const response = await axios.get(this.apiEndpoint);
-    this.entities = response.data;
-  } catch (error) {
-    console.error(`Error fetching ${this.entityName}:`, error);
-  } finally {
-    this.isLoading = false;
-  }
-},
+      this.isLoading = true;
+      try {
+        const response = await axios.get(this.apiEndpoint);
+        this.entities = response.data;
+      } catch (error) {
+        console.error(`Error fetching ${this.entityName}:`, error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
 
     async fetchFilterData() {
       this.typeOptions = await this.fetchDataFromApi('/api/v1/ordercategories');

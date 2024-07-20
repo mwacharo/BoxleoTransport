@@ -20,12 +20,20 @@ class ProductApiController extends BaseController
 
     protected $model = Product::class;
 
-    //
+    public function index()
+    {
+        // Fetch product instances with their bin details
+        // $products = Product::with('productinstances')->get();
+        $products=Product::all();
+        // dd($products);
+    
+        return response()->json($products);
+    } 
     // public function index()
     // {
     //     // Fetch product instances with their bin details
     //     $productInstances = ProductInstance::with('bin')->get();
-    //
+    
     //     return response()->json(['instances' => $productInstances]);
     // }
 

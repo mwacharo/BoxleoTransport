@@ -20,6 +20,13 @@ class ProductInstance extends Model
         return $this->belongsTo(Product::class);
     }
 
+
+    public function orderProductInstances()
+    {
+        return $this->hasMany(OrderProductInstance::class);
+    }
+
+
     public function orderProducts()
     {
         return $this->hasMany(OrderProduct::class);

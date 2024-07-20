@@ -101,12 +101,12 @@ class OrderApiController extends BaseController
         // dd($apiKey);
 
         if (!$apiKey) {
-            \Log::error('Google Maps API key is not set');
+            Log::error('Google Maps API key is not set');
             return response()->json(['error' => 'API key configuration error'], 500);
         }
 
-        \Log::info('Geocoding address: ' . $address);
-        \Log::info('Using API key: ' . substr($apiKey, 0, 5) . '...');  // Log first 5 characters for debugging
+        Log::info('Geocoding address: ' . $address);
+        Log::info('Using API key: ' . substr($apiKey, 0, 5) . '...');  // Log first 5 characters for debugging
 
         $response = Http::get("https://maps.googleapis.com/maps/api/geocode/json", [
             'address' => $address,
@@ -114,7 +114,7 @@ class OrderApiController extends BaseController
         ]);
 
         $data = $response->json();
-        \Log::info('Geocoding response: ' . json_encode($data));
+        Log::info('Geocoding response: ' . json_encode($data));
 
         if ($data['status'] === 'OK') {
             $location = $data['results'][0]['geometry']['location'];
@@ -125,17 +125,56 @@ class OrderApiController extends BaseController
             return response()->json($location);
         }
 
-        \Log::error('Geocoding failed: ' . $data['status']);
+        Log::error('Geocoding failed: ' . $data['status']);
         return response()->json(['error' => 'Geocoding failed: ' . $data['status']], 400);
     }
 
-
     public function index()
     {
-        //
-        $orders = Order::with('orderProducts','products','vendor')->get();
-        return  response()->json($orders);
+        $orders = Order::with([
+            'vendor.products',
+            'products.productInstances',
+            'orderProducts.product',
+            'orderProducts.productInstances'
+        ])->get();
+
+        return response()->json($orders);
     }
+
+
+    // public function index()
+    // {
+    //     $orders = Order::with([
+    //         'orderProducts.productInstances.product',
+    //         'products',
+    //         'vendor',
+    //         'orderProducts.product'
+    //     ])->get();
+
+    //     return response()->json($orders);
+    // }
+
+
+    // public function index()
+    // {
+    //     // Fetch all orders with their related order products, products, vendor, and order product instances
+    //     $orders = Order::with([
+    //         'orderProducts',
+    //         'orderProducts.productInstances.product',
+    //         'products',
+    //         'vendor'
+    //     ])->get();
+
+    //     return response()->json($orders);
+    // }
+
+
+    // public function index()
+    // {
+    //     //
+    //     $orders = Order::with('orderProducts','products','vendor')->get();
+    //     return  response()->json($orders);
+    // }
 
 
     // public function index()
@@ -343,7 +382,7 @@ class OrderApiController extends BaseController
 
             foreach ($order->orderProducts as $orderProduct) {
                 for ($i = 0; $i < $orderProduct->quantity; $i++) {
-                    $uniqueIdentifier = $this->generateUniqueIdentifier();
+                    // $uniqueIdentifier = $this->generateUniqueIdentifier();
 
                     OrderProductInstance::create([
                         'order_id' => $order->id,

@@ -132,7 +132,9 @@ export default {
         { title: 'SKU', value: 'sku' },
         { title: 'Description', value: 'description' },
         { title: 'Quantity Available', value: 'quantity' },
-        // { title: 'Committed stock', value: 'quantity' },
+        // { title: 'Reserved', value: 'quantity' },
+        // { title: 'Committed', value: 'quantity' },
+        // { title: 'Alltime', value: 'quantity' },
         { title: 'Total price', value: 'total_price' },
         { title: 'Actions', value: 'actions', sortable: false }
       ],
