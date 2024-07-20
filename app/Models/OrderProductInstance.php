@@ -29,7 +29,7 @@ class OrderProductInstance extends Model
     // }
 
     protected $fillable = [
-        'order_product_id', 'product_instance_id', 'status'
+        'order_id', 'product_instance_id', 'status'
     ];
 
     public function orderProduct()
