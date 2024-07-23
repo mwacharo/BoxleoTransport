@@ -131,10 +131,10 @@ class Order extends Model
     {
         return $this->hasMany(OrderProduct::class);
     }
-    public function orderproductinstances()
-    {
-        return $this->hasMany(OrderProductInstance::class);
-    }
+    // public function orderproductinstances()
+    // {
+    //     return $this->hasMany(OrderProductInstance::class);
+    // }
 
     // public function orderProductInstances()
     // {

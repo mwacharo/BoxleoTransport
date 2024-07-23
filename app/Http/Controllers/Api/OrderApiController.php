@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController;
 use App\Services\GeocodingService;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderProduct;
 use App\Models\OrderProductInstance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -400,4 +401,108 @@ class OrderApiController extends BaseController
             throw $e;
         }
     }
+
+    // public function updateProductDetails(Request $request)
+    // {
+    //     $request->validate([
+    //         'order_products' => 'required|array',
+    //         'order_products.*.id' => 'required|exists:order_products,id',
+    //         'order_products.*.product_id' => 'required|exists:products,id',
+    //         'order_products.*.quantity' => 'required|integer|min:1',
+    //         'order_products.*.price' => 'required|numeric|min:0',
+    //         'order_products.*.weight' => 'required|numeric|min:0',
+    //     ]);
+
+    //     foreach ($request->order_products as $productDetail) {
+    //         $orderProduct = OrderProduct::find($productDetail['id']);
+    //         $orderProduct->product_id = $productDetail['product_id'];
+    //         $orderProduct->quantity = $productDetail['quantity'];
+    //         $orderProduct->price = $productDetail['price'];
+    //         $orderProduct->weight = $productDetail['weight'];
+    //         $orderProduct->save();
+    //     }
+
+    //     return response()->json([
+    //         'message' => 'Product details updated successfully.',
+    //     ]);
+    // }
+
+
+      public function saveProductDetails(Request $request)
+      
+    {
+        // dd($request);
+        $validatedData = $request->validate([
+
+            'order_id' => 'required|exists:orders,id', // Validate order_id
+            'order_products' => 'required|array',
+            'order_products.*.product_id' => 'required|exists:products,id',
+            'order_products.*.quantity' => 'required|integer|min:1',
+            'order_products.*.price' => 'required|numeric|min:0',
+            'order_products.*.weight' => 'required|numeric|min:0',
+        ]);
+           // Get the validated order_id
+    $order_id = $validatedData['order_id'];
+
+        foreach ($validatedData['order_products'] as $productDetail) {
+        
+
+            // Check if the order product id exists in the table
+            if (isset($productDetail['id']) && is_numeric($productDetail['id']) && OrderProduct::find($productDetail['id'])) {
+                // Update existing order product
+                $orderProduct = OrderProduct::find($productDetail['id']);
+
+            } else {
+                // Create new order product
+                $orderProduct = new OrderProduct();
+            }
+            $orderProduct->order_id = $order_id;
+            $orderProduct->product_id = $productDetail['product_id'];
+            $orderProduct->quantity = $productDetail['quantity'];
+            $orderProduct->price = $productDetail['price'];
+            $orderProduct->weight = $productDetail['weight'];
+            $orderProduct->save();
+        }
+
+        return response()->json([
+            'message' => 'Product details saved successfully.',
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $orderProduct = OrderProduct::find($id);
+
+        if (!$orderProduct) {
+            return response()->json([
+                'message' => 'OrderProduct not found.'
+            ], 404);
+        }
+
+        $orderProduct->delete();
+
+        return response()->json([
+            'message' => 'OrderProduct deleted successfully.'
+        ], 200);
+    }
+
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+            'weight' => 'required|numeric|min:0'
+        ]);
+
+        $orderProduct = OrderProduct::create($validatedData);
+
+        return response()->json([
+            'message' => 'OrderProduct created successfully.',
+            'orderProduct' => $orderProduct
+        ], 201);
+    }
+
+   
 }

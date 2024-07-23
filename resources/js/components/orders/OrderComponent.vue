@@ -39,14 +39,18 @@
                 </div>
               </template>
 
-
+              <!-- 
               <template v-slot:item.product="{ item }">
-                <v-chip 
-                 v-for="(product, index) in item.order_products" :key="index" class="mr-2"
-                 @click="openProductDetails(item)">
-                 
+                <v-chip v-for="(product, index) in item.order_products" :key="index" class="mr-2"
+                  @click="openProductDetails(item)">
+
                   <v-icon class="mx-1" color="blue">mdi-pencil</v-icon>
                 </v-chip>
+              </template> -->
+              <template v-slot:item.product="{ item }">
+                <v-chip>
+                <v-icon class="mx-1" color="blue" @click="openProductDetails(item)">mdi-pencil</v-icon>
+              </v-chip>
               </template>
 
             </v-data-table>
@@ -111,7 +115,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue-darken-1" variant="text" @click="closeProductDetails">Close</v-btn>
-                <v-btn color="blue-darken-1" variant="text" @click="updateProductDetails">Update</v-btn>
+                <v-btn color="blue-darken-1" variant="text" @click="saveProductDetails">Update</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -277,6 +281,7 @@ export default {
       showProductDetails: false,
       selectedProductDetails: [],
       order_products: [],
+      order_id: '',
       productHeaders: [
         { title: 'Product Name', value: 'name' },
         { title: 'Price', value: 'price' },
@@ -285,9 +290,7 @@ export default {
       ],
       // products: [], 
       products: [
-        { id: 1, name: 'Product A' },
-        { id: 2, name: 'Product B' },
-        // Add more products as needed
+
       ],
       branchAddress: { lat: -1.286389, lng: 36.817223 },  // Example branch coordina
       dialog: false,
@@ -386,8 +389,8 @@ export default {
   },
   methods: {
     openProductDetails(item) {
-      // select all products  of the vendor where vendor_id =item.vendor.vendor_id
-      this.products = item.products
+      this.order_id = item.id; // Ensure this is set
+      this.products = item.vendor.products
       this.order_products = item.order_products.map(product => {
         const fullProduct = item.products.find(p => p.id === product.product_id);
         return {
@@ -404,27 +407,65 @@ export default {
       this.showProductDetails = true;
     },
 
-
-
+    saveProductDetails() {
+      console.log(this.order_products);
+      axios.post('/api/v1/order-products/save', {
+        order_id: this.order_id,
+        order_products: this.order_products
+      })
+        .then(response => {
+          this.$toast.success(response.data.message);
+          this.showProductDetails = false;
+        })
+        .catch(error => {
+          this.$toast.error('Failed to save product details.');
+          console.error(error);
+        });
+    },
     closeProductDetails() {
       this.showProductDetails = false;
     },
     addProductDetail() {
-      this.order_products.push({
-        id: Date.now(), // Temporary ID
-        product_id: null,
-        // products:[],
-        product_name: '',
-        quantity: null,
-        price: '0.00',
-        boxes: null,
-        weight: 0
-      });
-    },
+  const newProductDetail = {
+    order_id: this.orderId, // Ensure you have the order ID available
+    product_id: null,
+    quantity: null,
+    price: '0.00',
+    weight: 0
+  };
+
+  // Push the temporary product detail to the local array for immediate UI update
+  this.order_products.push(newProductDetail);
+
+  // Call the backend API to save the new product detail
+  axios.post('/api/v1/order-product', newProductDetail)
+    .then(response => {
+      // Update the temporary product detail with the response data
+      const index = this.order_products.findIndex(product => product === newProductDetail);
+      if (index !== -1) {
+        this.$set(this.order_products, index, response.data.orderProduct);
+        this.$toast.success(response.data.message); // Assuming you have a toast notification setup
+      }
+    })
+    .catch(error => {
+      this.$toast.error('Failed to add the product detail.'); // Handle the error
+      console.error(error);
+    });
+}
+,
     removeProductDetail(item) {
       const index = this.order_products.findIndex(product => product.id === item.id);
       if (index !== -1) {
         this.order_products.splice(index, 1);
+    axios.delete(`/api/v1/order-product/${item.id}`)
+      .then(response => {
+        // If successful, remove the item from the local array
+        this.order_products.splice(index, 1);
+        this.$toastr.success(response.data.message); // Assuming you have a toast notification setup
+      })
+      .catch(error => {
+        this.$toastr.error('Failed to delete the product.'); // Handle the error
+      });
       }
     },
 
@@ -545,8 +586,9 @@ export default {
           ids: this.selectedItems
         });
         console.log('Items deleted:', response.data);
-        this.$toastr.success(response.data.message);
         this.fetchEntities();
+        this.$toastr.success(response.data.message);
+
 
         // Handle successful deletion, e.g., update UI, show success message
       } catch (error) {

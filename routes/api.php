@@ -96,6 +96,10 @@ Route::post('/v1/orders/assignOrders', [OrderApiController::class, 'assignOrders
 // details of a specific order_no
 
 Route::get('/orders/{id}', [OrderApiController::class, 'order']);
+// Route::put('v1/order-products/update', [OrderApiController::class, 'updateProductDetails']);
+Route::post('v1/order-products/save', [OrderApiController::class, 'saveProductDetails']);
+Route::delete('v1/order-product/{id}', [OrderApiController::class, 'destroy']);
+Route::post('v1/order-product', [OrderApiController::class, 'store']);
 
 
 Route::post('/v1/orders/bulk-delete', [OrderApiController::class, 'bulkDelete']);
