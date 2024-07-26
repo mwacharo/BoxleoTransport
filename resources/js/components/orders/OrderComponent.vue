@@ -26,7 +26,7 @@
             <v-icon class="mx-1" color="primary" @click="AutoAllocate" title="Auto Allocate">mdi-auto-fix</v-icon>
             <v-icon class="mx-1" color="primary" @click="optimizeRoute"
               title="Optimize Route">mdi-map-marker-path</v-icon>
-            <v-icon class="mx-1" color="primary" @click="bulkPrint" title="Print">mdi-printer</v-icon>
+            <v-icon class="mx-1" color="primary" @click="printOrders" title="Print">mdi-printer</v-icon>
           </div>
           <v-responsive>
             <v-data-table :headers="headers" :items="filteredEntities" item-value="id" items-per-page="5" show-select
@@ -654,9 +654,7 @@ export default {
         case 'bulkAutoAllocate':
           this.autoAllocateOrders();
           break;
-        case 'bulkPrint':
-          this.printOrders();
-          break;
+       
         default:
           break;
       }
@@ -748,27 +746,34 @@ export default {
         });
     },
     printOrders() {
-      axios
+    axios
         .post('/api/v1/orders/bulk-print', {
-          ids: this.selectedItems
+            order_ids: this.selectedItems
+        }, {
+            responseType: 'blob' // Ensure the response is handled as a Blob
         })
         .then(response => {
-          // Create a download link for the file
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', 'orders.pdf'); // or any other format
-          document.body.appendChild(link);
-          link.click();
-          // Clean up
-          link.remove();
-          window.URL.revokeObjectURL(url);
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            const fileName = 'orders.pdf';
+
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+
+            // Clean up
+            URL.revokeObjectURL(url);
+            document.body.removeChild(link);
         })
         .catch(error => {
-          console.error('Error printing orders:', error);
-          // Handle error, e.g., show error message
+            console.error('Error printing orders:', error);
+            // Handle error, e.g., show error message
         });
-    }
+}
+
+
   }
 };
 </script>

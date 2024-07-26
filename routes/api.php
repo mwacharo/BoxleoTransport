@@ -30,7 +30,7 @@ use App\Http\Controllers\Api\AreaApiController;
 use App\Http\Controllers\Api\WarehouseApiController;
 use App\Http\Controllers\Api\GeofenceApiController;
 use App\Http\Controllers\Api\VehicleApiController;
-
+use Illuminate\Http\Request;
 
 
 

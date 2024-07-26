@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\OrderProductInstance;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -336,42 +337,42 @@ class OrderApiController extends BaseController
         return 1; // This is a placeholder. Return the actual rider/driver ID.
     }
 
-    public function bulkPrint(Request $request)
-    {
-        $ids = $request->input('ids', []);
+    // public function bulkPrint(Request $request)
+    // {
+    //     $ids = $request->input('ids', []);
 
-        if (empty($ids)) {
-            return response()->json(['message' => 'No IDs provided'], 400);
-        }
+    //     if (empty($ids)) {
+    //         return response()->json(['message' => 'No IDs provided'], 400);
+    //     }
 
-        $orders = Order::whereIn('id', $ids)->get();
+    //     $orders = Order::whereIn('id', $ids)->get();
 
-        // Generate a PDF or any other format for the orders
-        // This is a placeholder for the actual PDF generation logic
-        $pdfContent = $this->generatePdf($orders);
+    //     // Generate a PDF or any other format for the orders
+    //     // This is a placeholder for the actual PDF generation logic
+    //     $pdfContent = $this->generatePdf($orders);
 
-        return response($pdfContent)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="orders.pdf"');
-    }
+    //     return response($pdfContent)
+    //         ->header('Content-Type', 'application/pdf')
+    //         ->header('Content-Disposition', 'attachment; filename="orders.pdf"');
+    // }
 
-    protected function generatePdf($orders)
-    {
-        // Implement the actual PDF generation logic here
-        // For example, use a library like Dompdf or TCPDF
-        return 'PDF content'; // This is a placeholder. Return the actual PDF content.
-    }
+    // protected function generatePdf($orders)
+    // {
+    //     // Implement the actual PDF generation logic here
+    //     // For example, use a library like Dompdf or TCPDF
+    //     return 'PDF content'; // This is a placeholder. Return the actual PDF content.
+    // }
 
-    public function order($id)
-    {
-        $order = Order::findOrFail($id);
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'order' => $order
-            ]
-        ], 200);
-    }
+    // public function order($id)
+    // {
+    //     $order = Order::findOrFail($id);
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'data' => [
+    //             'order' => $order
+    //         ]
+    //     ], 200);
+    // }
 
 
     public function dispatchOrder($orderId)
@@ -504,5 +505,61 @@ class OrderApiController extends BaseController
         ], 201);
     }
 
+
+    // public function bulkPrint(Request $request)
+    // {
+
+    //     // dd($request);
+    //     // Ensure order_ids is provided and is an array
+    //     if (!$request->has('order_ids') || !is_array($request->order_ids)) {
+    //         return response()->json(['error' => 'Invalid order_ids'], 400);
+    //     }
+    
+    //     // Fetch the orders you want to include in the PDF
+    //     $orders = Order::whereIn('id', $request->order_ids)
+    //         ->with('orderProducts') // Ensure items relationship is loaded
+    //         ->get();
+
+
+
+    //         if ($orders->isEmpty()) {
+    //             return response()->json(['error' => 'No orders found for the provided IDs'], 404);
+    //         }
+        
+        
+    //     $pdf = Pdf::loadView('orders.waybill', ['orders' => $orders]);
+    
+    //     // Return the generated PDF
+    //     return $pdf->download('orders.pdf');
+    // }
+
+
+    public function bulkPrint(Request $request)
+    {
+        // Validate that order_ids is provided and is an array
+        $request->validate([
+            'order_ids' => 'required|array',
+            'order_ids.*' => 'exists:orders,id',
+        ]);
+
+        // Fetch the orders with their order_products relationship
+        $orders = Order::whereIn('id', $request->order_ids)
+            ->with('orderProducts') // Ensure the orderProducts relationship is loaded
+            ->get();
+
+        // Log the orders to verify data
+        // Log::info('Fetched Orders:', $orders->toArray());
+
+        // Check if orders were fetched
+        if ($orders->isEmpty()) {
+            return response()->json(['error' => 'No orders found for the provided IDs'], 404);
+        }
+
+        // Pass the orders to the view and generate PDF
+        $pdf = Pdf::loadView('orders.waybill', ['orders' => $orders]);
+
+        // Return the generated PDF as a stream
+        return $pdf->stream('document.pdf');
+    }
    
 }
