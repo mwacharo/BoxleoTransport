@@ -52,7 +52,7 @@
 <body>
     <div class="waybill-container">
         <div class="header">
-            <img src="/assets/img/icons/logo.png" alt="Boxleo Courier Logo">
+            <img src="public/assets/img/icons/logo.png" alt="Boxleo Courier Logo">
             <div class="contact-info">
                 <p><strong>Shipped From</strong><br>
                 Boxleo Courier & Fulfillment Services Ltd<br>

@@ -418,7 +418,7 @@ export default {
           this.showProductDetails = false;
         })
         .catch(error => {
-          this.$toast.error('Failed to save product details.');
+          this.$toastr.error('Failed to save product details.');
           console.error(error);
         });
     },
