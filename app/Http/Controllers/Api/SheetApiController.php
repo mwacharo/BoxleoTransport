@@ -48,8 +48,8 @@ class SheetApiController extends BaseController
     {
         // Google Sheets API initialization...
         $client = new GoogleClient();
-        $client->setAuthConfig('/home/engineer/Desktop/BoxleoTransport/public/credentials.json');
-        // $client->setAuthConfig('/var/www/BoxleoTransport/public/credentials.json'); // Ensure the path is correct
+        // $client->setAuthConfig('/home/engineer/Desktop/BoxleoTransport/public/credentials.json');
+        $client->setAuthConfig('/var/www/BoxleoTransport/public/credentials.json'); // Ensure the path is correct
 
         $client->addScope(\Google\Service\Sheets::SPREADSHEETS_READONLY);
         $client->setApplicationName('boxleotransport');
