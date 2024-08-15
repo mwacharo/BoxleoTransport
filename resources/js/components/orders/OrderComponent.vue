@@ -49,9 +49,16 @@
               </template> -->
               <template v-slot:item.product="{ item }">
                 <v-chip>
-                <v-icon class="mx-1" color="blue" @click="openProductDetails(item)">mdi-pencil</v-icon>
+                <v-icon class="mx-1" color="blue" @click="openProductDetails(item)">mdi-eye</v-icon>
               </v-chip>
               </template>
+
+              <template v-slot:item.pod="{ item }">
+                <v-chip>
+                <v-icon class="mx-1" color="success" @click="openPodDetails(item)">mdi-file-check-outline</v-icon>
+              </v-chip>
+              </template>
+
 
             </v-data-table>
           </v-responsive>
@@ -227,7 +234,7 @@
     <MapOrder ref="MapOrderComponent" :orderId="selectedOrderId" :branchAddress="branchAddress" />
     <AutoAllocate ref="AutoAllocateComponent" :selectedItems="selectedItems" />
     <OptimizeRoute ref="OptimizeRouteComponent" :selectedItems="selectedItems" />
-
+  <Pod ref="PodComponent"  :orderNo="orderNo" />
   </v-card>
 </template>
 
@@ -238,13 +245,15 @@ import { fetchDataMixin } from '@/mixins/fetchDataMixin';
 import AutoAllocate from '@/components/orders/AutoAllocate.vue';
 import MapOrder from '@/components/orders/MapOrder.vue';
 import OptimizeRoute from '@/components/orders/OptimizeRoute.vue';
-
+import Pod from '@/components/orders/Pod.vue';
 
 export default {
   components: {
     MapOrder,
     AutoAllocate,
     OptimizeRoute,
+    Pod,
+    
 
   },
   mixins: [fetchDataMixin],
@@ -270,12 +279,15 @@ export default {
         // { name: 'alt_phone', label: 'Alt phone', icon: 'mdi-phone-in-talk' },
         { name: 'product', label: 'Product Details', icon: 'mdi-package-variant' },
         // { name: 'quantity', label: 'Quantity', icon: 'mdi-format-list-numbered' },
+        { name: 'pod', label: 'POD', icon: 'mdi-information' },
         { name: 'status', label: 'Status', icon: 'mdi-information' }
+
       ]
     }
   },
   data() {
     return {
+      orderNo: null,
       selectedOrderId: null,
 
       showProductDetails: false,
@@ -388,6 +400,16 @@ export default {
     this.fetchBulkData();
   },
   methods: {
+
+    openPodDetails(item){
+      this.$refs.PodComponent.show(item);
+      this.orderNo = item.order_no; // Extract and store order_no
+      console.log(item);
+      // this.podDetails = item.pods[0] || {}; 
+
+
+
+    },
     openProductDetails(item) {
       this.order_id = item.id; // Ensure this is set
       this.products = item.vendor.products

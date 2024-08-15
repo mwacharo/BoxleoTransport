@@ -75,9 +75,10 @@ export default {
     addSheet() {
       this.$refs.AddSheetComponent.show();
     },
-    editSheet(sheet) {
+    editSheet(item) {
       // Implement the logic to edit the sheet
-      console.log('Edit:', sheet);
+      console.log('Edit:', item);
+      this.$refs.AddSheetComponent.show(item);
     },
     deleteSheet(sheet) {
       // Implement the logic to delete the sheet

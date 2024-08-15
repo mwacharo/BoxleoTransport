@@ -163,6 +163,15 @@ class Order extends Model
     }
 
 
+    public function pods()
+{
+    return $this->hasMany(OrderPod::class, 'order_no', 'order_no');
+}
+
+
+
+
+
 
     public static $rules = [
         // 'name' => 'required|string|max:255',

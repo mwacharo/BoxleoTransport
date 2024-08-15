@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController;
 use App\Services\GeocodingService;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\OrderPod;
 use App\Models\OrderProduct;
 use App\Models\OrderProductInstance;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -137,7 +138,8 @@ class OrderApiController extends BaseController
             'vendor.products',
             'products.productInstances',
             'orderProducts.product',
-            'orderProducts.productInstances'
+            'pods'
+            // 'orderProducts.productInstances'
         ])->get();
 
         return response()->json($orders);
@@ -561,5 +563,60 @@ class OrderApiController extends BaseController
         // Return the generated PDF as a stream
         return $pdf->stream('document.pdf');
     }
+
+
+//     public function uploadPod(Request $request, $orderNo)
+// {
+//     $request->validate([
+//         'pod' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // Validate file type and size
+//     ]);
+
+//     $order = Order::where('order_no', $orderNo)->firstOrFail();
+
+//     // Store the POD file
+//     $path = $request->file('pod')->store('pods');
+
+//     // Create or update the order_pod record
+//     OrderPod::Create(
+//         ['order_no' => $order->order_no],
+//         ['pod_path' => $path]
+//     );
+
+//     // Update the 'has_pod' column in the orders table
+//     $order->update(['has_pod' => true]);
+
+//     return response()->json(['message' => 'POD uploaded successfully']);
+// }
+
+
+public function uploadPod(Request $request, $orderNo)
+{
+    // Validate the file
+    $request->validate([
+        'pod' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // Validate file type and size
+    ]);
+
+    // Find the order
+    $order = Order::where('order_no', $orderNo)->firstOrFail();
+
+    // Store the POD file
+    $path = $request->file('pod')->store('pods', 'public'); // Store in 'public' disk
+
+    // Find or create the OrderPod record
+    $orderPod = OrderPod::updateOrCreate(
+        ['order_no' => $orderNo], // Conditions to find the existing record
+        ['pod_path' => $path] // Fields to update or create
+    );
+
+    // Update the 'has_pod' column in the orders table
+    $order->update(['pod' => true]);
+
+    return response()->json(['message' => 'POD uploaded successfully']);
+}
+
+
    
 }
+
+
+

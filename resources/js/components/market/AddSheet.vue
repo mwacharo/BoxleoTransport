@@ -13,6 +13,17 @@
             label="Vendor"
             
           ></v-select>
+
+          <v-select
+          :rules="branchRules" required
+            v-model="branch"
+            :items="branches"
+            item-title="name"
+            item-value="id"
+            label="branch"
+            
+          ></v-select>
+
           <v-text-field v-model="sheetName" label="Sheet name" :rules="sheetNameRules" required></v-text-field>
           <v-text-field
             v-model="spreadsheetId"
@@ -47,6 +58,8 @@ export default {
       dialog: false,
       valid: false,
       vendor: '',
+      branch:'',
+      branches:'',
       vendors: [],
       sheetName: '',
       spreadsheetId: '',
@@ -59,12 +72,28 @@ export default {
   },
   created() {
     this.fetchVendors();
+    this.fetchBranches();
   },
   methods: {
 
-    show() {
-      this.dialog = true;
-    },
+    // show() {
+    //   this.dialog = true;
+    // },
+
+    show(item = null) {
+    if (item) {
+      this.vendor = item.vendor_id; // Adjust this to match your item's structure
+      this.branch = item.branch_id; // Adjust this to match your item's structure
+      this.sheetName = item.sheet_name;
+      this.spreadsheetId = item.post_spreadsheet_id;
+    } else {
+      this.vendor = '';
+      this.branch = '';
+      this.sheetName = '';
+      this.spreadsheetId = '';
+    }
+    this.dialog = true;
+  },
     close() {
       this.dialog = false;
     },
@@ -75,6 +104,18 @@ export default {
         .get(url, {})
         .then(response => {
           this.vendors = response.data;
+        })
+        .catch(error => {
+          console.error('Error fetching vendor:', error);
+        });
+    },
+
+    fetchBranches() {
+      const url = `/api/v1/branches`;
+      axios
+        .get(url, {})
+        .then(response => {
+          this.branches = response.data;
         })
         .catch(error => {
           console.error('Error fetching vendor:', error);

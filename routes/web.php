@@ -21,8 +21,6 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\GeofenceController;
 use App\Http\Controllers\FleetController;
 use App\Http\Controllers\DispatchController;
-// use App\Models\Order;
-// use Barryvdh\DomPDF\Facade\Pdf;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -55,11 +53,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/account', [UserController::class, 'userAcount'])->name('account');
     Route::get('/account/settings', [UserController::class, 'acountSettings'])->name('accountSettings');
 
-    // Route::get('/test-pdf', function () {
-    //     $orders = Order::whereIn('id', [452, 453])->with('orderProducts')->get();
-    //     dd($orders);
-    //     $pdf = Pdf::loadView('orders.waybill', ['orders' => $orders]);
-    //     return $pdf->stream('test-document.pdf');
-    // });
+
 });
 Auth::routes();
