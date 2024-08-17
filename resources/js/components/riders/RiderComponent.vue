@@ -21,14 +21,11 @@
 
 
           <v-responsive>
-          <div v-if="selectedItems.length > 0" class="x-actions">
-            <v-icon class="mx-1" color="primary" @click="show" title="Print">mdi-map-marker</v-icon>
-          </div>
+            <div v-if="selectedItems.length > 0" class="x-actions">
+              <v-icon class="mx-1" color="primary" @click="show" title="Print">mdi-map-marker</v-icon>
+            </div>
 
-            <v-data-table :headers="headers" :items="searchRiders"
-            show-select
-              v-model="selectedItems"
-            >
+            <v-data-table :headers="headers" :items="searchRiders" show-select v-model="selectedItems">
               <template v-slot:item.actions="{ item }">
                 <div class="d-flex align-center">
                   <v-icon class="mx-1" color="blue" @click="editRider(item)">mdi-pencil</v-icon>
@@ -44,14 +41,8 @@
             <v-card>
               <v-card-title class="headline">Assign Zone</v-card-title>
               <v-card-text>
-                <v-select
-                  :items="geofences"
-                  label="Select Zone"
-                  clearable
-                  v-model="selectedZone"
-                  item-title="name"
-                  item-value="id"
-                ></v-select>
+                <v-select :items="geofences" label="Select Zone" clearable v-model="selectedZone" item-title="name"
+                  item-value="id"></v-select>
 
               </v-card-text>
               <v-card-actions>
@@ -70,22 +61,25 @@
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12" md="6">
+                    <v-col cols="12">
                       <v-text-field v-model="editedItem.name" label="Name" prepend-icon="mdi-account"></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="6">
+                    <v-col cols="12">
                       <v-text-field v-model="editedItem.email" label="Email" prepend-icon="mdi-email"></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="6">
+                    <v-col cols="12">
                       <v-text-field v-model="editedItem.address" label="Address" prepend-icon="mdi-web"></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="editedItem.phone"
-                        label="Phone (optional)"
-                        prepend-icon="mdi-phone"
-                      ></v-text-field>
+                    <v-col cols="12">
+                      <v-text-field v-model="editedItem.phone" label="Phone (optional)"
+                        prepend-icon="mdi-phone"></v-text-field>
                     </v-col>
+
+                    <v-col cols="12">
+                      <v-select :items="branches" label="Select branch" clearable v-model="selectedBranch"
+                        item-title="name" item-value="id" prepend-icon="mdi-map-marker"></v-select>
+                    </v-col>
+
                   </v-row>
                 </v-container>
               </v-card-text>
@@ -126,10 +120,12 @@ export default {
     return {
       search: '',
       geofenceDialog: false,
+      branches: [],
       riders: [],
-      geofences:[],
-      selectedItems:[],
-      selectedZone:'',
+      geofences: [],
+      selectedItems: [],
+      selectedZone: '',
+      selectedBranch: '',
       currentRiderId: null,
       headers: [
         { title: '#', value: 'index' },
@@ -176,7 +172,8 @@ export default {
 
   created() {
     this.fetchRiders();
-      this.fetchZones();
+    this.fetchZones();
+    this.fetchBranches();
   },
 
   methods: {
@@ -261,28 +258,39 @@ export default {
           console.error('Error fetching riders:', error);
         });
     },
+
+    fetchBranches() {
+      axios
+        .get('/api/v1/branches')
+        .then((response) => {
+          this.branches = response.data;
+        })
+        .catch((error) => {
+          console.error('Error fetching riders:', error);
+        });
+    },
     show(selectedItems) {
-    if (this.selectedItems.length === 1) {
-     this.currentRiderId = this.selectedItems[0];
-     this.geofenceDialog = true;
-   } else {
-     this.$toastr.error('Please select one rider to assign a zone.');
-   }
+      if (this.selectedItems.length === 1) {
+        this.currentRiderId = this.selectedItems[0];
+        this.geofenceDialog = true;
+      } else {
+        this.$toastr.error('Please select one rider to assign a zone.');
+      }
     },
     close() {
       this.geofenceDialog = false;
     },
-    assignZone(){
+    assignZone() {
       axios.put(`/api/riders/${this.currentRiderId}/geofence`, { geofence_id: this.selectedZone })
-      .then((response) => {
-        this.$toastr.success(response.data.message);
-        this.fetchRiders();
-        this.closeDialog();
-      })
-      .catch((error) => {
-        this.$toastr.error('Error adding rider');
-        console.error('Error adding rider:', error);
-      });
+        .then((response) => {
+          this.$toastr.success(response.data.message);
+          this.fetchRiders();
+          this.closeDialog();
+        })
+        .catch((error) => {
+          this.$toastr.error('Error adding rider');
+          console.error('Error adding rider:', error);
+        });
 
     },
 
@@ -300,6 +308,3 @@ export default {
   },
 };
 </script>
-
-
-

@@ -102,6 +102,9 @@ Route::delete('v1/order-product/{id}', [OrderApiController::class, 'destroy']);
 Route::post('v1/order-product', [OrderApiController::class, 'store']);
 // Route::post('v1/order-pod', [OrderApiController::class, 'storePod']);
 Route::post('v1/order-pod/{orderNo}', [OrderApiController::class, 'uploadPod']);
+Route::get('v1/order-pod/{orderNo}', [OrderApiController::class, 'getPod']);
+Route::delete('v1/order-pod/{orderNo}', [OrderApiController::class, 'destroyPod']);
+
 
 
 

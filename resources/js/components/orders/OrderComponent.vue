@@ -345,7 +345,8 @@ export default {
       selectedItems: [],
       // selected: [],
       bulkAction: null,
-      confirmDeleteDialog: false
+      confirmDeleteDialog: false,
+      pod: null,
     };
   },
   computed: {
@@ -403,11 +404,9 @@ export default {
 
     openPodDetails(item){
       this.$refs.PodComponent.show(item);
-      this.orderNo = item.order_no; // Extract and store order_no
+      this.orderNo = item.order_no; 
       console.log(item);
       // this.podDetails = item.pods[0] || {}; 
-
-
 
     },
     openProductDetails(item) {

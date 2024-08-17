@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+
 
 class OrderApiController extends BaseController
 {
@@ -565,28 +567,6 @@ class OrderApiController extends BaseController
     }
 
 
-//     public function uploadPod(Request $request, $orderNo)
-// {
-//     $request->validate([
-//         'pod' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // Validate file type and size
-//     ]);
-
-//     $order = Order::where('order_no', $orderNo)->firstOrFail();
-
-//     // Store the POD file
-//     $path = $request->file('pod')->store('pods');
-
-//     // Create or update the order_pod record
-//     OrderPod::Create(
-//         ['order_no' => $order->order_no],
-//         ['pod_path' => $path]
-//     );
-
-//     // Update the 'has_pod' column in the orders table
-//     $order->update(['has_pod' => true]);
-
-//     return response()->json(['message' => 'POD uploaded successfully']);
-// }
 
 
 public function uploadPod(Request $request, $orderNo)
@@ -600,7 +580,9 @@ public function uploadPod(Request $request, $orderNo)
     $order = Order::where('order_no', $orderNo)->firstOrFail();
 
     // Store the POD file
-    $path = $request->file('pod')->store('pods', 'public'); // Store in 'public' disk
+    // $path = $request->file('pod')->store('pods', 'public'); // Store in 'public' disk
+    $path = $request->file('pod')->store('pods', 'public');
+
 
     // Find or create the OrderPod record
     $orderPod = OrderPod::updateOrCreate(
@@ -609,13 +591,64 @@ public function uploadPod(Request $request, $orderNo)
     );
 
     // Update the 'has_pod' column in the orders table
-    $order->update(['pod' => true]);
+    $order->update(['pod' => 'Yes']);
 
     return response()->json(['message' => 'POD uploaded successfully']);
 }
+public function getPod($orderNo)
+{
+    // Fetch the POD details for the given order number
+    $pod = OrderPod::where('order_no', $orderNo)->first();
+
+    if ($pod) {
+        $path = $pod->pod_path;
+        $file = storage_path('app/public/' . $path);
+
+        if (file_exists($file)) {
+            // Stream the file as a response
+            return response()->file($file);
+        } else {
+            return response()->json(['message' => 'File not found on the server'], 404);
+        }
+    } else {
+        return response()->json(['message' => 'POD not found'], 404);
+    }
+}
 
 
-   
+    // Fetch POD
+    // public function getPod($orderNo)
+    // {
+    //     // Fetch the POD details for the given order number
+    //     $pod = OrderPod::where('order_no', $orderNo)->first();
+
+    //     if ($pod) {
+    //         return response()->json([
+    //             'pod_path' => $pod->pod_path,
+    //         ]);
+    //     } else {
+    //         return response()->json(['message' => 'POD not found'], 404);
+    //     }
+    // }
+
+    // Delete POD
+    public function destroyPod($orderNo)
+    {
+        // Delete the POD for the given order number
+        $pod = OrderPod::where('order_no', $orderNo)->first();
+
+        if ($pod) {
+            // Delete the file from storage
+            Storage::delete($pod->pod_path);
+
+            // Delete the database record
+            $pod->delete();
+
+            return response()->json(['message' => 'POD deleted successfully']);
+        } else {
+            return response()->json(['message' => 'POD not found'], 404);
+        }
+    }
 }
 
 
