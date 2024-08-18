@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AgentClearanceController;
+use App\Http\Controllers\ClearanceController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DealController;
@@ -32,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/drivers', [DriverController::class, 'index'])->name('drivers');
     Route::get('/riders', [RiderController::class, 'index'])->name('riders');
+    Route::get('/clearance', [ClearanceController::class, 'index'])->name('clearance');
     Route::get('/vendors', [VendorController::class, 'index'])->name('vendors');
     Route::get('/market', [MarketController::class, 'index'])->name('market');
     Route::get('/clients', [ClientController::class, 'index'])->name('clients');

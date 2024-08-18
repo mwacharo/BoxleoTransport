@@ -6,7 +6,8 @@
         { name: 'name', label: 'Name', icon: 'mdi-account' },
         { name: 'email', label: 'Email', icon: 'mdi-email' },
         { name: 'address', label: 'Address', icon: 'mdi-web' },
-        { name: 'phone', label: 'Phone', icon: 'mdi-phone' }
+        { name: 'phone', label: 'Phone', icon: 'mdi-account' },
+        { name: 'status', label: 'status', icon: 'mdi-phone' },
       ]"
     />
   </template>

@@ -127,6 +127,8 @@ Route::get('v1/geofences', [GeofenceApiController::class, 'index']);
 
 Route::apiResource('/v1/riders', RiderApiController::class);
 Route::put('riders/{id}/geofence', [RiderApiController::class, 'updateGeofence']);
+// clear rider
+Route::post('/v1/riders/{rider}/clear', [RiderApiController::class, 'clear']);
 
 Route::apiResource('/v1/drivers', DriverApiContoller::class);
 Route::apiResource('/v1/vehicles', VehicleApiController::class);

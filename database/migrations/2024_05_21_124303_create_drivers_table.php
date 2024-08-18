@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('address');
+            $table->string('status')->nullable();
+            $table->string('clearance_status')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->foreignId('branch_id')->constrained()->onDelete('cascade')->nullable();

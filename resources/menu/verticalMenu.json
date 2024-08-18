@@ -35,7 +35,14 @@
           "name": "Dispatch",
           "icon": "menu-icon tf-icons bx bx-send",
           "slug": "dispatch"
+        },
+        {
+          "url": "clearance",
+          "name": "clearance",
+          "icon": "menu-icon tf-icons bx bx-check-circle",
+          "slug": "clearance"
         }
+        
       ]
     },
     {

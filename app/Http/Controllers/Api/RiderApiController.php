@@ -38,4 +38,37 @@ class RiderApiController extends BaseController
       return response()->json(['message' => 'Rider geofence updated successfully', 'rider' => $rider], 201);
   }
 
+
+
+  public function podstaticts()
+  {
+      // Fetch riders with the count of their assigned orders and the status of PODs
+      $riders = Rider::withCount(['orders'])
+          ->with(['orders' => function($query) {
+              $query->select('id', 'rider_id', 'pod_status');
+          }])
+          ->get()
+          ->map(function ($rider) {
+              $podStatuses = $rider->orders->pluck('pod_status');
+              $rider->pod_status = $podStatuses->contains('No') ? 'Pending' : 'Yes';
+              $rider->status = $rider->pod_status === 'Yes' ? 'Cleared' : 'Pending';
+              return $rider;
+          });
+
+      return response()->json($riders);
+  }
+
+  public function clear(Rider $rider)
+  {
+      // Check if all orders have POD status as 'Yes'
+      $allCleared = $rider->orders()->where('pod_status', 'No')->doesntExist();
+
+      if ($allCleared) {
+          $rider->update(['status' => 'Cleared']);
+          return response()->json(['message' => 'Rider cleared successfully.']);
+      } else {
+          return response()->json(['message' => 'Rider cannot be cleared. Not all PODs are marked as Yes.'], 400);
+      }
+  }
+
 }

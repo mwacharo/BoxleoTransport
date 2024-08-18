@@ -20,7 +20,9 @@ class Driver extends Model
         'branch_id',
         'email_verified_at',
         'password ',
-        'remember_token'
+        'remember_token',
+          'status',
+        'clearance_status'
     ];
 
 

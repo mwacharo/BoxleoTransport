@@ -18,6 +18,7 @@ class User extends Authenticatable
         'status',
         'branch_id',
         'password',
+        
     ];
 
     protected $hidden = [
