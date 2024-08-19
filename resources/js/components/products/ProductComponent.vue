@@ -21,7 +21,9 @@
             <v-data-table :headers="headers" :items="searchProducts">
               <template v-slot:item.actions="{ item }">
                 <div class="d-flex align-center">
-                  <v-icon class="mx-1" color="blue" @click="editProduct(item)">mdi-pencil</v-icon>
+                  <v-icon class="mx-1" color="sucesss" @click="Producthistory(item)">mdi-history</v-icon>
+
+                  <v-icon class="mx-1" color="primary" @click="editProduct(item)">mdi-pencil</v-icon>
                   <v-icon class="mx-1" color="blue" @click="viewProductInstances(item.id)">mdi-eye</v-icon>
                   <v-icon class="mx-1" color="red" @click="deleteProduct(item)">mdi-delete</v-icon>
                 </div>
@@ -130,12 +132,22 @@ export default {
         // { title: '#', value: 'index' },
         { title: 'Name', value: 'name' },
         { title: 'SKU', value: 'sku' },
-        { title: 'Description', value: 'description' },
-        { title: 'Quantity Available', value: 'quantity' },
+        // { title: 'Description', value: 'description' },
+        { title: 'Stock remaining ', value: 'quantity_remaining' },
+
+        { title: 'Opening stock  ', value: 'opening_quantity' },
+        { title: 'Stock return ', value: 'return_quantity' },
+
+        { title: 'Stock in hand ', value: 'quantity_inhand' },
+
+        { title: 'Stock in ', value: 'quantity_in' },
+
+        { title: 'Stock out ', value: 'quantity_out' },
+
         // { title: 'Reserved', value: 'quantity' },
         // { title: 'Committed', value: 'quantity' },
         // { title: 'Alltime', value: 'quantity' },
-        { title: 'Total price', value: 'total_price' },
+        // { title: 'Total price', value: 'total_price' },
         { title: 'Actions', value: 'actions', sortable: false }
       ],
       editedIndex: -1,
@@ -182,6 +194,9 @@ export default {
   },
 
   methods: {
+    Producthistory(){
+
+    },
     viewProductInstances(id) {
       this.selectedProductId = id;
       this.$refs.InstanceComponent.show();

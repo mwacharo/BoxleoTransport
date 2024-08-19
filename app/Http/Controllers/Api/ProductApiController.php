@@ -10,13 +10,12 @@ use App\Models\ProductInstance;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\BaseController;
+use Illuminate\Support\Facades\Log;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Validator;
 
 class ProductApiController extends BaseController
 {
-
-
 
     protected $model = Product::class;
 
@@ -45,9 +44,6 @@ class ProductApiController extends BaseController
           'product_instance_ids.*' => 'exists:product_instances,id'
       ]);
 
-
-
-
       $productInstanceIds = $request->product_instance_ids;
 
       try {
@@ -60,50 +56,90 @@ class ProductApiController extends BaseController
   }
 
   // Receive bulk product instances
-  public function receiveBulk(Request $request)
-      {
-          $validator = Validator::make($request->all(), [
-              'products' => 'required|array',
-              'products.*.product_id' => 'required|exists:products,id',
-              'products.*.quantity' => 'required|integer|min:1',
-          ]);
 
-          if ($validator->fails()) {
-              return response()->json(['success' => false, 'message' => $validator->errors()], 400);
-          }
 
-          foreach ($request->products as $productData) {
-              $product = Product::find($productData['product_id']);
-              $vendor = Vendor::find($product->vendor_id);
-              $vendorPrefix = strtoupper(substr($vendor->name, 0, 2)); // Example vendor prefix logic
-              $skuPrefix = strtoupper(substr($product->sku, 0, 3)); // Example SKU prefix logic
-              $lastIdentifier = $vendor->last_identifier;
+public function receiveBulk(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'products' => 'required|array',
+        'products.*.product_id' => 'required|exists:products,id',
+        'products.*.quantity' => 'required|integer|min:1',
+    ]);
 
-              for ($i = 0; $i < $productData['quantity']; $i++) {
-                  $lastIdentifier++;
-                  $uniqueId = sprintf('%05d', $lastIdentifier); // Pads with leading zeros
-                  $uniqueIdentifier = "{$vendorPrefix}-{$skuPrefix}-{$uniqueId}";
+    if ($validator->fails()) {
+        Log::error('Validation failed:', ['errors' => $validator->errors()]);
+        return response()->json(['success' => false, 'message' => $validator->errors()], 400);
+    }
 
-                  // Create product instance
-                  ProductInstance::create([
-                      'product_id' => $product->id,
-                      'status' => 'available',
-                      'barcode' => $uniqueIdentifier,
-                      'unique_identifier' => $uniqueIdentifier, // Assuming you have this column
-                  ]);
-              }
+    foreach ($request->products as $productData) {
+        Log::info('Processing product data:', ['productData' => $productData]);
 
-              // Update the vendor's last identifier
-              $vendor->last_identifier = $lastIdentifier;
-              $vendor->save();
+        $product = Product::find($productData['product_id']);
+        if (!$product) {
+            Log::error('Product not found:', ['product_id' => $productData['product_id']]);
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        }
 
-              // Optionally, update the product's quantity if it's tracked at the product level
-              $product->quantity += $productData['quantity'];  // Optionally, update the product's quantity if it's tracked at the product level
-              $product->save();
-          }
+        $vendor = Vendor::find($product->vendor_id);
+        if (!$vendor) {
+            Log::error('Vendor not found:', ['vendor_id' => $product->vendor_id]);
+            return response()->json(['success' => false, 'message' => 'Vendor not found'], 404);
+        }
 
-          return response()->json(['success' => true, 'message' => 'Received']);
-      }
+        $vendorPrefix = strtoupper(substr($vendor->name, 0, 2));
+        $skuPrefix = strtoupper(substr($product->sku, 0, 3));
+        $lastIdentifier = $vendor->last_identifier;
+
+        for ($i = 0; $i < $productData['quantity']; $i++) {
+            $lastIdentifier++;
+            $uniqueId = sprintf('%05d', $lastIdentifier);
+            $uniqueIdentifier = "{$vendorPrefix}-{$skuPrefix}-{$uniqueId}";
+
+            Log::info('Creating product instance:', [
+                'product_id' => $product->id,
+                'status' => 'available',
+                'barcode' => $uniqueIdentifier,
+                'unique_identifier' => $uniqueIdentifier,
+            ]);
+
+            try {
+                // Create product instance
+                ProductInstance::create([
+                    'product_id' => $product->id,
+                    'status' => 'available',
+                    'barcode' => $uniqueIdentifier,
+                    'unique_identifier' => $uniqueIdentifier,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Error creating ProductInstance:', ['error' => $e->getMessage()]);
+                return response()->json(['success' => false, 'message' => 'Error creating ProductInstance'], 500);
+            }
+        }
+
+        // Update the vendor's last identifier
+        $vendor->last_identifier = $lastIdentifier;
+        $vendor->save();
+
+        Log::info('Updating product quantities:', ['product_id' => $product->id]);
+
+        // Update product quantities
+        if ($product->opening_quantity == 0) {
+            $product->opening_quantity += $productData['quantity'];
+        }
+        
+        $product->quantity_in += $productData['quantity'];
+        $product->quantity_inhand += $productData['quantity']; 
+        $product->quantity_remaining += $productData['quantity'];
+
+        $product->save();
+    }
+
+    Log::info('Bulk receive completed successfully');
+    return response()->json(['success' => true, 'message' => 'Received']);
+}
+
+
+
 
     public function store(Request $request)
     {

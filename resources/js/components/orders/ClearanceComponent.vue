@@ -28,7 +28,7 @@
                 </v-toolbar>
               </template>
               <template v-slot:item.status="{ item }">
-                <v-chip :color="item.status === 'Cleared' ? 'success' : 'warning'" dark>
+                <v-chip :color="item.status === 'Cleared' ? 'success' : 'warning'" dark   @click="openClearance(item)"> 
                   {{ item.status }}
                 </v-chip>
               </template>
@@ -42,14 +42,21 @@
         </v-main>
       </v-app>
     </v-layout>
+  <ClearanceStatus ref="ClearanceStatusComponent"/>
   </v-card>
 </template>
 
 <script>
+import ClearanceStatus from './ClearanceStatus.vue';
+
 export default {
+  components: {
+    ClearanceStatus,
+  },
   data() {
     return {
       search: '',
+   
       headers: [
         { title: 'Rider Name', value: 'name' },
         { title: 'Assigned Orders', value: 'orders_count' },
@@ -68,6 +75,10 @@ export default {
     };
   },
   methods: {
+    openClearance(){
+
+this.$refs.ClearanceStatusComponent.show()
+},
     checkAndClearRider(rider) {
       // Simulating an API call
       setTimeout(() => {
@@ -78,6 +89,8 @@ export default {
         }
       }, 500);
     },
+
+  
   },
 };
 </script>

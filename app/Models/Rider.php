@@ -24,6 +24,8 @@ class Rider extends Model
         'password ',
         'remember_token',
         'geofence_id',
+        'status',
+        'clearance_status'
     ];
 
 
@@ -39,5 +41,9 @@ class Rider extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+    public function geofence(){
+        return $this->belongsTo(Geofence::class);
+
     }
 }

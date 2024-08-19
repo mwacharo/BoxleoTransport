@@ -22,4 +22,12 @@ class Geofence extends Model
     
 
         ];
+
+
+        // public function rider(){
+        //     return $this->belongsTo(Rider::class);
+    
+        // }
+
+
 }

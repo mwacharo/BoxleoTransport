@@ -13,6 +13,8 @@ class ProductInstance extends Model
 
     protected $fillable = [
         'product_id', 'barcode', 'batch_number', 'expiry_date','bin_location', 'status'
+
+        
     ];
 
     public function product()

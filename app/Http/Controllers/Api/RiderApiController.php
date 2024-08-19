@@ -71,4 +71,26 @@ class RiderApiController extends BaseController
       }
   }
 
+
+//   public function updateStatus(Request $request, $id)
+//   {
+//       // Validate the incoming request
+//       $request->validate([
+//           'status' => 'required|string',
+//           'comments' => 'nullable|string',
+//           // add more fields if needed
+//       ]);
+
+//       // Find the rider by ID
+//       $rider = Rider::findOrFail($id);
+
+//       // Update the rider's status and any other fields
+//       $rider->status = $request->input('status');
+//       $rider->comments = $request->input('comments'); // Assuming there's a comments field
+//       $rider->save();
+
+//       // Return a success response
+//       return response()->json(['message' => 'Rider status updated successfully'], 200);
+//   }
+
 }
