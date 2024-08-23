@@ -947,55 +947,123 @@ class OrderApiController extends BaseController
     
 
 
+    // public function returnOrders(Request $request)
+    // {
+    //     try {
+    //         $validatedData = $request->validate([
+    //             'order_ids' => 'required|array|min:1',
+    //             'status' => 'required|string|in:Returned,Awaiting Return',
+    //         ]);
+    //         $orderIds = $validatedData['order_ids'];
+    //         $status = $validatedData['status'];
+    //         Log::info('Order IDs:', ['order_ids' => $validatedData['order_ids']]);
+
+    //         if (!is_array($orderIds) || count($orderIds) === 0) {
+    //             throw new \Exception('No valid order IDs provided.');
+    //         }
+
+    //         DB::beginTransaction();
+
+    //         foreach ($orderIds as $orderId) {
+    //             $order = Order::findOrFail($orderId);
+    //             $order->status = $status;
+
+    //             if ($status === 'Awaiting Returned') {
+    //                 $order->status =  $status;
+
+    //                 // update order status to awaiting return
+    //             } elseif ($status === ' Returned') {
+    //                 //  an order has  orderProducts  
+    //                 foreach ($order->orderProducts as $orderProduct) {
+    //                     $order->status =  $status;
+
+    //                     $inventory = Product::where('id', $orderProduct->product_id)->firstOrFail();
+    //                     $inventory->quantity_remaining += $orderProduct->quantity;
+    //                     $inventory->return_quantity += $orderProduct->quantity;
+    //                     $inventory->save();
+
+    //                 }
+    //             }
+    //             $order->save();
+    //         }
+
+    //         DB::commit();
+    //         return response()->json(['message' => 'Orders returned successfully'], 200);
+    //     } catch (ValidationException $e) {
+    //         return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Error returning orders: ' . $e->getMessage(), ['exception' => $e]);
+    //         return response()->json(['message' => 'Error returned orders: ' . $e->getMessage()], 500);
+    //     }
+    // }
+
+
     public function returnOrders(Request $request)
-    {
-        try {
-            $validatedData = $request->validate([
-                'order_ids' => 'required|array|min:1',
-                'status' => 'required|string|in:Returned,Awaiting Return',
-            ]);
-            $orderIds = $validatedData['order_ids'];
-            $status = $validatedData['status'];
-            Log::info('Order IDs:', ['order_ids' => $validatedData['order_ids']]);
+{
+    try {
+        Log::debug('Starting returnOrders method');
 
-            if (!is_array($orderIds) || count($orderIds) === 0) {
-                throw new \Exception('No valid order IDs provided.');
-            }
+        $validatedData = $request->validate([
+            'order_ids' => 'required|array|min:1',
+            'status' => 'required|string|in:Returned,Awaiting Return',
+        ]);
 
-            DB::beginTransaction();
+        $orderIds = $validatedData['order_ids'];
+        $status = $validatedData['status'];
 
-            foreach ($orderIds as $orderId) {
-                $order = Order::findOrFail($orderId);
-                $order->status = $status;
+        Log::debug('Validated data', ['order_ids' => $orderIds, 'status' => $status]);
 
-                if ($status === 'Awaiting Returned') {
-                    $order->status =  $status;
-
-                    // update order status to awaiting return
-                } elseif ($status === ' Returned') {
-                    //  an order has  orderProducts  
-                    foreach ($order->orderProducts as $orderProduct) {
-                        $order->status =  $status;
-
-                        $inventory = Product::where('id', $orderProduct->product_id)->firstOrFail();
-                        $inventory->quantity_remaining += $orderProduct->quantity;
-                        $inventory->return_quantity += $orderProduct->quantity;
-                        $inventory->save();
-
-                    }
-                }
-                $order->save();
-            }
-
-            DB::commit();
-            return response()->json(['message' => 'Orders returned successfully'], 200);
-        } catch (ValidationException $e) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error returning orders: ' . $e->getMessage(), ['exception' => $e]);
-            return response()->json(['message' => 'Error returned orders: ' . $e->getMessage()], 500);
+        if (!is_array($orderIds) || count($orderIds) === 0) {
+            throw new \Exception('No valid order IDs provided.');
         }
+
+        DB::beginTransaction();
+
+        foreach ($orderIds as $orderId) {
+            Log::debug('Processing order', ['order_id' => $orderId]);
+
+            $order = Order::findOrFail($orderId);
+            Log::debug('Order found', ['order' => $order->toArray()]);
+
+            $order->status = $status;
+
+            if ($status === 'Awaiting Return') {
+                Log::debug('Status set to Awaiting Return for order', ['order_id' => $orderId]);
+                // No additional action needed, status is already set
+            } elseif ($status === 'Returned') {
+                Log::debug('Status set to Returned for order', ['order_id' => $orderId]);
+
+                foreach ($order->orderProducts as $orderProduct) {
+                    Log::debug('Processing order product', ['order_product' => $orderProduct->toArray()]);
+
+                    $inventory = Product::where('id', $orderProduct->product_id)->firstOrFail();
+                    Log::debug('Product inventory found', ['inventory' => $inventory->toArray()]);
+
+                    $inventory->quantity_remaining += $orderProduct->quantity;
+                    $inventory->return_quantity += $orderProduct->quantity;
+                    $inventory->save();
+
+                    Log::debug('Inventory updated', ['inventory' => $inventory->toArray()]);
+                }
+            }
+
+            $order->save();
+            Log::debug('Order status updated and saved', ['order_id' => $orderId]);
+        }
+
+        DB::commit();
+        Log::debug('Transaction committed successfully');
+        return response()->json(['message' => 'Orders returned successfully'], 200);
+    } catch (ValidationException $e) {
+        Log::error('Validation failed', ['errors' => $e->errors()]);
+        return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error returning orders: ' . $e->getMessage(), ['exception' => $e]);
+        return response()->json(['message' => 'Error returning orders: ' . $e->getMessage()], 500);
     }
+}
+
 
 }
