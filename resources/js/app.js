@@ -49,18 +49,7 @@ import PickingComponent from './components/orders/PickingComponent.vue';
 import ClearanceComponent from './components/orders/ClearanceComponent.vue';
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+// app
 app.component('dashboard-component', DashboardComponent);
 app.component('branch-component', BranchComponent);
 app.component('calendar-component', CalendarComponent);

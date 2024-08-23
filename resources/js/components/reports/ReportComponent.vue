@@ -172,7 +172,7 @@ export default {
       vendors:[],
       drivers:[],
       OrderCategory:[],
-      reportTypes: ['Order Report','Rider Clerance', 'Product Report','Merchant Report','Delivery Performance Report', 'Agent/Driver Report', 'Financial Report', 'Vehicle Report', 'Client Report', 'Zone Report'], 
+      reportTypes: ['Order Report','Dispatch Report','Rider Clerance', 'Product Report','Merchant Report','Delivery Performance Report', 'Agent/Driver Report', 'Financial Report', 'Vehicle Report', 'Client Report', 'Zone Report'], 
       cities: [], 
     };
   },

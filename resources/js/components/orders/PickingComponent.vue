@@ -33,8 +33,8 @@
                 <div class="d-flex align-center">
                   <v-icon class="mx-1" color="blue" @click="OpenDispatchDialog(item)">mdi-package-variant</v-icon>
 
-                  <v-icon class="mx-1" color="blue" @click="editEntity(item)">mdi-pencil</v-icon>
-                  <v-icon class="mx-1" color="red" @click="deleteEntity(item)">mdi-delete</v-icon>
+                  <!-- <v-icon class="mx-1" color="blue" @click="editEntity(item)">mdi-pencil</v-icon> -->
+                  <!-- <v-icon class="mx-1" color="red" @click="deleteEntity(item)">mdi-delete</v-icon> -->
                 </div>
               </template>
 
@@ -94,12 +94,14 @@
                             placeholder="Enter Key" :delimiter="[' ', ',']"></v-combobox>
                         </td>
                         <td>
-
-                          <v-select v-if="item.selected_instances.length < item.quantity" v-model="selected_instances"
-                            :items="item.available_instances" item-title="barcode" item-value="id" multiple chips
-                            hide-details
-                            >
+                    
+                        <v-select v-if="item.selected_instances.length < item.quantity"
+                            v-model="item.selected_instances" :items="item.available_instances" item-title="barcode"
+                            item-value="id" multiple chips hide-details>
                           </v-select>
+
+
+
                         </td>
                       </tr>
                     </tbody>
@@ -305,11 +307,14 @@ export default {
   methods: {
 
     OpenDispatchDialog(item) {
+
+
       this.productInstanceDialog = true;
 
       this.selectedOrder = item;
       this.orderItems = item.order_products.map(orderProduct => {
         const product = item.products.find(p => p.id === orderProduct.product_id);
+
         return {
           ...orderProduct,
           product_name: product ? product.name : '',
@@ -347,27 +352,27 @@ export default {
 
 
       if (!isValid) {
-        alert('Please select the correct number of instances for each product.');
+        this.$toastr.error('Please select the correct number of instances for each product.');
         return;
       }
 
       // Prepare data for API call
-      const dispatchData = {
+      const itemsPicked = {
         order_id: this.selectedOrder.id,
-        dispatched_items: this.orderItems.map(item => ({
+        picked_items: this.orderItems.map(item => ({
           product_id: item.product_id,
-          instance_ids: item.selected_instances.map(instance => instance.id),
+          instance_ids: item.selected_instances,
         })),
       };
 
       try {
         // Make API call to update dispatch details
-        await axios.post('/api/dispatch-order', dispatchData);
-        alert('Order dispatched successfully!');
+        await axios.post('/api/v1/pickOrderitems', itemsPicked);
+        this.$toastr.success('Order dispatched successfully!');
         this.closeDispatchDialog();
       } catch (error) {
         console.error('Error dispatching order:', error);
-        alert('An error occurred while dispatching the order. Please try again.');
+        this.$toastr.error('An error occurred while dispatching the order. Please try again.');
       }
     },
     // For future barcode scanning feature
@@ -377,7 +382,7 @@ export default {
         item.selectedInstance = scannedInstance.id;
         this.addInstance(item);
       } else {
-        alert('Invalid barcode or product instance not available.');
+        this.$toastr.errror('Invalid barcode or product instance not available.');
       }
       item.scannedBarcode = '';
     },
@@ -491,6 +496,3 @@ export default {
   }
 };
 </script>
-
-
-

@@ -2,7 +2,7 @@
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
         <v-card-title>
-          <span class="headline">Clear Riders</span>
+          <span class="headline">Update Status</span>
         </v-card-title>
   
         <v-card-text>
@@ -14,7 +14,7 @@
               required
             ></v-select>
   
-            <v-menu
+            <!-- <v-menu
               ref="menu"
               v-model="menu"
               :close-on-content-click="false"
@@ -34,7 +34,7 @@
                   v-on="on"
                 ></v-text-field>
               </template>
-              <<v-date-picker v-model="recallDate" no-title scrollable>
+              <v-date-picker v-model="recallDate" no-title scrollable>
                 <v-spacer></v-spacer>
                 <v-btn text color="primary" @click="menu = false">
                   Cancel
@@ -43,14 +43,14 @@
                   OK
                 </v-btn>
               </v-date-picker> 
-            </v-menu>
-  
+            </v-menu> -->
+<!--   
             <v-textarea
               v-model="comments"
               label="Comments"
               auto-grow
               counter="500"
-            ></v-textarea>
+            ></v-textarea> -->
           </v-form>
         </v-card-text>
   
@@ -65,23 +65,14 @@
   
   <script>
   export default {
-    props: {
-      order: Object,
-      dialog: Boolean,
-    },
+   
     data() {
       return {
-        valid: false,
-        status: this.order.status,
-        recallDate: this.order.recallDate,
-        comments: this.order.comments,
-        statusOptions: [ "Pending", "Cleared"],
-        menu: false,
+        dialog: false,
       };
     },
     methods: {
-      show(item) {
-      this.podDetails.pod_path = item.pods && item.pods.length ? item.pods[0].pod_path : ''; 
+      show() {
       this.dialog = true;
     },
 
@@ -89,18 +80,17 @@
       this.dialog = false;
     },
 
-      updateOrder() {
-        if (this.$refs.form.validate()) {
-          // Emit the updated order details
-          this.$emit("update-order", {
-            ...this.order,
-            status: this.status,
-            recallDate: this.recallDate,
-            comments: this.comments,
-          });
-          this.closeDialog();
-        }
-      },
+      // updateOrder() {
+      //   if (this.$refs.form.validate()) {
+      //     // Emit the updated order details
+      //     this.$emit("update-order", {
+      //       status: this.status,
+      //       recallDate: this.recallDate,
+      //       comments: this.comments,
+      //     });
+      //     this.closeDialog();
+      //   }
+      // },
     },
   };
   </script>

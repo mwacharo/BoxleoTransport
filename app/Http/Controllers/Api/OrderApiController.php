@@ -9,12 +9,19 @@ use App\Models\Order;
 use App\Models\OrderPod;
 use App\Models\OrderProduct;
 use App\Models\OrderProductInstance;
+use App\Models\Product;
+use App\Models\ProductInstance;
+use App\Models\Rider;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+
+;
+use Illuminate\Validation\ValidationException;
 
 
 class OrderApiController extends BaseController
@@ -379,33 +386,147 @@ class OrderApiController extends BaseController
     // }
 
 
-    public function dispatchOrder($orderId)
+
+    public function dispatchOrders(Request $request)
     {
-        DB::beginTransaction();
-
         try {
-            $order = Order::findOrFail($orderId);
+            $validatedData = $request->validate([
+                'order_ids' => 'required|array|min:1',
+                // 'order_ids.*' => 'required|string',
+                'geofence_id' => 'required|integer',
+                'status' => 'required|string|in:Dispatched,In Transit',
+                'rider_id' => 'required_without:driver_id|integer|nullable',
+                'driver_id' => 'required_without:rider_id|integer|nullable',
+            ]);
 
-            foreach ($order->orderProducts as $orderProduct) {
-                for ($i = 0; $i < $orderProduct->quantity; $i++) {
-                    // $uniqueIdentifier = $this->generateUniqueIdentifier();
+            $orderIds = $validatedData['order_ids'];
+            $geofenceId = $validatedData['geofence_id'];
+            $status = $validatedData['status'];
+            $riderId = $validatedData['rider_id'] ?? null;
+            $driverId = $validatedData['driver_id'] ?? null;
 
-                    OrderProductInstance::create([
-                        'order_id' => $order->id,
-                        'product_id' => $orderProduct->product_id,
-                        'product_instance_id' => $orderProduct->id, // Assuming the product instance ID is the same as the order product ID.
-                        // 'unique_identifier' => $uniqueIdentifier,
-                    ]);
+            DB::beginTransaction();
+
+            foreach ($orderIds as $orderId) {
+                $order = Order::findOrFail($orderId);
+                $order->status = $status;
+                $order->geofence_id = $geofenceId;
+
+                if ($status === 'Dispatched') {
+                    $order->rider_id = $riderId;
+                    $order->driver_id = $driverId;
+                } elseif ($status === 'In Transit') {
+                    $this->sendSmsNotification($order->client_phone, 'Your order is now in transit!');
+                    
+                    if ($riderId) {
+                        $rider = Rider::findOrFail($riderId);
+                        $order->rider_id = $riderId;
+                        // Uncomment the following line when you're ready to send emails
+                        // Mail::to($rider->email)->send(new InTransitReport($order));
+                        Log::info("SMS sent to client: {$order->client_phone}, Email sent to rider: {$rider->email}");
+                    } elseif ($driverId) {
+                        $order->driver_id = $driverId;
+                        // Add any driver-specific logic here
+                    }
+
+                    foreach ($order->items as $item) {
+                        $inventory = Product::where('product_id', $item->product_id)->firstOrFail();
+                        if ($inventory->quantity_remaining < $item->quantity) {
+                            throw new \Exception('Insufficient inventory for product ID: ' . $item->product_id);
+                        }
+                        $inventory->quantity_remaining -= $item->quantity;
+                        $inventory->quantity_issued += $item->quantity;
+                        $inventory->save();
+                    }
                 }
+
+                $order->save();
             }
 
             DB::commit();
+            return response()->json(['message' => 'Orders dispatched successfully'], 200);
+
+        } catch (ValidationException $e) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error dispatching order: ' . $e->getMessage(), ['exception' => $e]);
-            throw $e;
+            Log::error('Error dispatching orders: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['message' => 'Error dispatching orders: ' . $e->getMessage()], 500);
         }
     }
+
+    private function sendSmsNotification($phone, $message)
+    {
+        // Implement your SMS sending logic here
+        // This is just a placeholder
+        Log::info("SMS notification sent to $phone: $message");
+    }
+//     public function dispatchOrders(array $orderIds, $riderId, $driverId, $geofenceId, $status)
+// {
+//     DB::beginTransaction();
+
+//     try {
+//         foreach ($orderIds as $orderId) {
+//             // Fetch the order
+//             $order = Order::findOrFail($orderId);
+
+//             // Update the order status
+//             $order->status = $status;
+
+//             if ($status === 'Dispatched') {
+//                 // Update only rider_id and geofence_id if status is "Dispatched"
+//                 $order->rider_id = $riderId;
+//                 $order->geofence_id = $geofenceId;
+//             } elseif ($status === 'In Transit') {
+//                 // For "In Transit" status:
+//                 // SMS notification to the client
+//                 $this->sendSmsNotification($order->client_phone, 'Your order is now in transit!');
+
+//                 // Email in-transit report to the rider
+//                 $rider = Rider::findOrFail($riderId);
+//                 // Mail::to($rider->email)->send(new InTransitReport($order));
+
+//                 // Log that the notifications were sent
+//                 Log::info("SMS sent to client: {$order->client_phone}, Email sent to rider: {$rider->email}");
+
+//                 // Update inventory for each item in the order
+//                 foreach ($order->items as $item) {
+//                     $inventory = Product::where('product_id', $item->product_id)->firstOrFail();
+
+//                     if ($inventory->quantity_remaining < $item->quantity) {
+//                         throw new \Exception('Insufficient inventory for product ID: ' . $item->product_id);
+//                     }
+
+//                     // Subtract from quantity_remaining and add to quantity_issued
+//                     $inventory->quantity_remaining -= $item->quantity;
+//                     $inventory->quantity_issued += $item->quantity;
+//                     $inventory->save();
+//                 }
+
+//                 // Update rider_id and geofence_id for "In Transit" status
+//                 $order->rider_id = $riderId;
+//                 $order->geofence_id = $geofenceId;
+//             }
+
+//             // Save the order
+//             $order->save();
+//         }
+
+//         // Commit the transaction after processing all orders
+//         DB::commit();
+
+//         // Optionally, send notifications for each order
+//         // foreach ($orderIds as $orderId) {
+//         //     $order = Order::find($orderId);
+//         //     $order->client->notify(new OrderStatusNotification($order));
+//         // }
+//     } catch (\Exception $e) {
+//         // Rollback the transaction on error
+//         DB::rollBack();
+//         Log::error('Error dispatching orders: ' . $e->getMessage(), ['exception' => $e]);
+//         throw $e;
+//     }
+// }
 
     // public function updateProductDetails(Request $request)
     // {
@@ -433,8 +554,8 @@ class OrderApiController extends BaseController
     // }
 
 
-      public function saveProductDetails(Request $request)
-      
+    public function saveProductDetails(Request $request)
+
     {
         // dd($request);
         $validatedData = $request->validate([
@@ -446,17 +567,16 @@ class OrderApiController extends BaseController
             'order_products.*.price' => 'required|numeric|min:0',
             'order_products.*.weight' => 'required|numeric|min:0',
         ]);
-           // Get the validated order_id
-    $order_id = $validatedData['order_id'];
+        // Get the validated order_id
+        $order_id = $validatedData['order_id'];
 
         foreach ($validatedData['order_products'] as $productDetail) {
-        
+
 
             // Check if the order product id exists in the table
             if (isset($productDetail['id']) && is_numeric($productDetail['id']) && OrderProduct::find($productDetail['id'])) {
                 // Update existing order product
                 $orderProduct = OrderProduct::find($productDetail['id']);
-
             } else {
                 // Create new order product
                 $orderProduct = new OrderProduct();
@@ -518,7 +638,7 @@ class OrderApiController extends BaseController
     //     if (!$request->has('order_ids') || !is_array($request->order_ids)) {
     //         return response()->json(['error' => 'Invalid order_ids'], 400);
     //     }
-    
+
     //     // Fetch the orders you want to include in the PDF
     //     $orders = Order::whereIn('id', $request->order_ids)
     //         ->with('orderProducts') // Ensure items relationship is loaded
@@ -529,10 +649,10 @@ class OrderApiController extends BaseController
     //         if ($orders->isEmpty()) {
     //             return response()->json(['error' => 'No orders found for the provided IDs'], 404);
     //         }
-        
-        
+
+
     //     $pdf = Pdf::loadView('orders.waybill', ['orders' => $orders]);
-    
+
     //     // Return the generated PDF
     //     return $pdf->download('orders.pdf');
     // }
@@ -569,51 +689,51 @@ class OrderApiController extends BaseController
 
 
 
-public function uploadPod(Request $request, $orderNo)
-{
-    // Validate the file
-    $request->validate([
-        'pod' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // Validate file type and size
-    ]);
+    public function uploadPod(Request $request, $orderNo)
+    {
+        // Validate the file
+        $request->validate([
+            'pod' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048', // Validate file type and size
+        ]);
 
-    // Find the order
-    $order = Order::where('order_no', $orderNo)->firstOrFail();
+        // Find the order
+        $order = Order::where('order_no', $orderNo)->firstOrFail();
 
-    // Store the POD file
-    // $path = $request->file('pod')->store('pods', 'public'); // Store in 'public' disk
-    $path = $request->file('pod')->store('pods', 'public');
+        // Store the POD file
+        // $path = $request->file('pod')->store('pods', 'public'); // Store in 'public' disk
+        $path = $request->file('pod')->store('pods', 'public');
 
 
-    // Find or create the OrderPod record
-    $orderPod = OrderPod::updateOrCreate(
-        ['order_no' => $orderNo], // Conditions to find the existing record
-        ['pod_path' => $path] // Fields to update or create
-    );
+        // Find or create the OrderPod record
+        $orderPod = OrderPod::updateOrCreate(
+            ['order_no' => $orderNo], // Conditions to find the existing record
+            ['pod_path' => $path] // Fields to update or create
+        );
 
-    // Update the 'has_pod' column in the orders table
-    $order->update(['pod' => 'Yes']);
+        // Update the 'has_pod' column in the orders table
+        $order->update(['pod' => 'Yes']);
 
-    return response()->json(['message' => 'POD uploaded successfully']);
-}
-public function getPod($orderNo)
-{
-    // Fetch the POD details for the given order number
-    $pod = OrderPod::where('order_no', $orderNo)->first();
-
-    if ($pod) {
-        $path = $pod->pod_path;
-        $file = storage_path('app/public/' . $path);
-
-        if (file_exists($file)) {
-            // Stream the file as a response
-            return response()->file($file);
-        } else {
-            return response()->json(['message' => 'File not found on the server'], 404);
-        }
-    } else {
-        return response()->json(['message' => 'POD not found'], 404);
+        return response()->json(['message' => 'POD uploaded successfully']);
     }
-}
+    public function getPod($orderNo)
+    {
+        // Fetch the POD details for the given order number
+        $pod = OrderPod::where('order_no', $orderNo)->first();
+
+        if ($pod) {
+            $path = $pod->pod_path;
+            $file = storage_path('app/public/' . $path);
+
+            if (file_exists($file)) {
+                // Stream the file as a response
+                return response()->file($file);
+            } else {
+                return response()->json(['message' => 'File not found on the server'], 404);
+            }
+        } else {
+            return response()->json(['message' => 'POD not found'], 404);
+        }
+    }
 
 
     // Fetch POD
@@ -649,7 +769,77 @@ public function getPod($orderNo)
             return response()->json(['message' => 'POD not found'], 404);
         }
     }
+
+    // pick order items 
+    // result in update  of instance from available to sold 
+    // decrease in product quanity remaining 
+    // increase in quanity issued 
+
+
+    // public function pickOrderitems(){
+
+    // }
+
+    // public function pickOrderitems(Request $request)
+    // {
+    //     $order = Order::findOrFail($request->order_id);
+    //     $pickedItems = $request->picked_items;
+
+    //     foreach ($pickedItems as $item) {
+    //         $product = Product::findOrFail($item['product_id']);
+
+    //         foreach ($item['instance_ids'] as $instanceId) {
+    //             // Update the status of the product instance to "sold"
+    //             $instance = ProductInstance::findOrFail($instanceId);
+    //             $instance->status = 'sold';
+    //             $instance->save();
+    //         }
+
+    //         // Decrease the product quantity in inventory
+    //         $product->quantity_remaining -= count($item['instance_ids']);
+    //         $product->save();
+
+    //         // Increase the quantity issued (assuming you have a field for this)
+    //         $product->quantity_issued += count($item['instance_ids']);
+    //         $product->save();
+    //     }
+
+    //     return response()->json(['message' => 'Order items picked successfully.'], 200);
+    // }
+
+
+    public function pickOrderitem(Request $request)
+    {
+        $order = Order::findOrFail($request->order_id);
+        // updated status of the order picked or packed 
+        $pickedItems = $request->picked_items;
+
+        foreach ($pickedItems as $item) {
+            $product = Product::findOrFail($item['product_id']);
+
+            foreach ($item['instance_ids'] as $instanceId) {
+                // Update the status of the product instance to "sold"
+                $instance = ProductInstance::findOrFail($instanceId);
+                $instance->status = 'sold';
+                $instance->save();
+
+                // Register the record in the order_product_instances table
+                OrderProductInstance::create([
+                    'order_id' => $order->id,
+                    'product_instance_id' => $instanceId,
+                ]);
+            }
+
+            // Decrease the product quantity in inventory
+            // rems
+            $product->quantity_remaining -= count($item['instance_ids']);
+            $product->save();
+
+            // Increase the quantity issued
+            $product->quantity_issued += count($item['instance_ids']);
+            $product->save();
+        }
+
+        return response()->json(['message' => 'Order items picked and recorded successfully.'], 200);
+    }
 }
-
-
-

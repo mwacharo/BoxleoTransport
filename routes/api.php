@@ -116,6 +116,11 @@ Route::post('/v1/orders/bulk-categorize', [OrderApiController::class, 'bulkCateg
 Route::post('/v1/orders/bulk-auto-allocate', [OrderApiController::class, 'bulkAutoAllocate']);
 Route::post('/v1/orders/bulk-print', [OrderApiController::class, 'bulkPrint']);
 
+Route::post('/v1/pickOrderitems', [OrderApiController::class, 'pickOrderitem']);
+Route::post('/v1/dispatchOrders', [OrderApiController::class, 'dispatchOrders']);
+
+
+
 // geocode order
 Route::post('v1/geocodeAddress', [OrderApiController::class, 'geocodeAddress']);
 

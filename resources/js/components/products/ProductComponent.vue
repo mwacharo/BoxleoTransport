@@ -143,6 +143,8 @@ export default {
         { title: 'Stock in ', value: 'quantity_in' },
 
         { title: 'Stock out ', value: 'quantity_out' },
+        { title: 'Stock issued ', value: 'quantity_issued' },
+
 
         // { title: 'Reserved', value: 'quantity' },
         // { title: 'Committed', value: 'quantity' },
