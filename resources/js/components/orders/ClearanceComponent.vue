@@ -60,25 +60,40 @@ export default {
       headers: [
         { title: 'Rider Name', value: 'name' },
         { title: 'Assigned Orders', value: 'orders_count' },
-        { title: 'POD Status', value: 'pod_status' },
+        { title: 'POD Submitted', value: 'pod_count' },
+        { title: 'POD not Submitted ', value: 'no_pod_count' },
+
+        // { title: 'POD Status', value: 'pod_status' },
+
         { title: 'Status', value: 'status' },
         // { title: 'Actions', value: 'actions', sortable: false },
       ],
-      // riders:[],
-      riders: [
-        { id: 1, name: 'John Doe', orders_count: 5, pod_status: 5, status: 'Pending' },
-        { id: 2, name: 'Jane Smith', orders_count: 3, pod_status: 4, status: 'Pending' },
-        { id: 3, name: 'Bob Johnson', orders_count: 7, pod_status: 7, status: 'Cleared' },
-        { id: 4, name: 'Alice Brown', orders_count: 2, pod_status: 2, status: 'Pending' },
-        { id: 5, name: 'Charlie Davis', orders_count: 4, pod_status: 2, status: 'Pending' },
-      ],
+      riders:[],
+    
     };
+  },
+  created() {
+    this.fetchRiders();
+  
+
   },
   methods: {
     openClearance(){
 
 this.$refs.ClearanceStatusComponent.show()
 },
+
+fetchRiders() {
+      const url = `/api/v1/riders`;
+      axios
+        .get(url, {})
+        .then(response => {
+          this.riders = response.data;
+        })
+        .catch(error => {
+          console.error('Error fetching riders:', error);
+        });
+    },
     checkAndClearRider(rider) {
       // Simulating an API call
       setTimeout(() => {

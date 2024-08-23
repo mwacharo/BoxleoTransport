@@ -24,6 +24,7 @@ use App\Http\Controllers\GeofenceController;
 use App\Http\Controllers\FleetController;
 use App\Http\Controllers\DispatchController;
 use App\Http\Controllers\PickingController;
+use App\Http\Controllers\ReturnController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -45,13 +46,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/fleet', [FleetController::class, 'index'])->name('index');
     Route::get('/dispatch', [DispatchController::class, 'index'])->name('index');
     Route::get('/picking', [PickingController::class, 'index'])->name('index');
-
-
-
-
-
-
-
+    Route::get('/return', [ReturnController::class, 'index'])->name('index');
+    
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::get('/user-roles', [UserController::class, 'userRoles'])->name('user.roles');

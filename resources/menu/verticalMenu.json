@@ -45,6 +45,12 @@
           "slug": "dispatch"
         },
         {
+          "url": "return",
+          "name": "Return",
+          "icon": "menu-icon tf-icons bx bx-undo",
+          "slug": "return"
+        },
+        {
           "url": "clearance",
           "name": "clearance",
           "icon": "menu-icon tf-icons bx bx-check-circle",

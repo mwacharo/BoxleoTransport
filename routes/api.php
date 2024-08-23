@@ -118,6 +118,8 @@ Route::post('/v1/orders/bulk-print', [OrderApiController::class, 'bulkPrint']);
 
 Route::post('/v1/pickOrderitems', [OrderApiController::class, 'pickOrderitem']);
 Route::post('/v1/dispatchOrders', [OrderApiController::class, 'dispatchOrders']);
+Route::post('/v1/returnOrders', [OrderApiController::class, 'returnOrders']);
+
 
 
 

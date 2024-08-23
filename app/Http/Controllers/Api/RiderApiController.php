@@ -13,6 +13,86 @@ class RiderApiController extends BaseController
     protected $model =Rider::class;
 
 
+
+       // The index method that calls the private podStatistics method
+       public function index()
+       {
+           // Call the private function to fetch riders with POD statistics
+           $ridersWithStatistics = $this->podStatistics();
+   
+           // Return the response
+           return response()->json($ridersWithStatistics, 200);
+       }
+   
+       // Private function to fetch riders with POD statistics
+    //    private function podStatistics()
+    //    {
+    //        // Fetch riders with the count of their assigned orders
+    //        // Also fetch the status of PODs (Proof of Delivery) for each order
+    //        $riders = Rider::withCount(['orders'])
+    //            ->with(['orders' => function($query) {
+    //                $query->select('id', 'rider_id', 'pod');
+    //            }])
+    //            ->get()
+    //            ->map(function ($rider) {
+    //                // Extract POD statuses for the rider's orders
+    //                $podStatuses = $rider->orders->pluck('pod_status');
+   
+    //                // Determine if there are any pending PODs
+    //                $rider->pod_status = $podStatuses->contains('No') ? 'Pending' : 'Yes';
+   
+    //                // Set rider status based on POD status
+    //                $rider->status = $rider->pod_status === 'Yes' ? 'Cleared' : 'Pending';
+   
+    //                return $rider;
+    //            });
+   
+    //        return $riders;
+    //    }
+
+
+    private function podStatistics()
+{
+    // Fetch riders with the count of their assigned orders
+    // Also fetch the status of PODs (Proof of Delivery) for each order
+    $riders = Rider::withCount(['orders'])
+        ->with(['orders' => function($query) {
+            $query->select('id', 'rider_id', 'pod');
+        }])
+        ->get()
+        ->map(function ($rider) {
+            // Extract POD statuses for the rider's orders
+            $podStatuses = $rider->orders->pluck('pod');
+
+            // Count the number of orders with and without POD
+            $rider->pod_count = $podStatuses->filter(function ($value) {
+                return $value === 'Yes';
+            })->count();
+
+            $rider->no_pod_count = $podStatuses->filter(function ($value) {
+                return $value !== 'Yes';
+                        })->count();
+
+            // Determine if there are any pending PODs
+            $rider->pod_status = $rider->no_pod_count > 0 ? 'Pending' : 'Yes';
+
+            // Set rider status based on POD status
+            $rider->status = $rider->pod_status === 'Yes' ? 'Cleared' : 'Pending';
+
+            return $rider;
+        });
+
+    return $riders;
+}
+
+
+
+    // public function index()
+    // {
+    //     return response()->json($this->model::all(), 200);
+    // }
+
+
     public function updateGeofence(Request $request, $id)
   {
       // Validate the incoming request
@@ -40,23 +120,23 @@ class RiderApiController extends BaseController
 
 
 
-  public function podstaticts()
-  {
-      // Fetch riders with the count of their assigned orders and the status of PODs
-      $riders = Rider::withCount(['orders'])
-          ->with(['orders' => function($query) {
-              $query->select('id', 'rider_id', 'pod_status');
-          }])
-          ->get()
-          ->map(function ($rider) {
-              $podStatuses = $rider->orders->pluck('pod_status');
-              $rider->pod_status = $podStatuses->contains('No') ? 'Pending' : 'Yes';
-              $rider->status = $rider->pod_status === 'Yes' ? 'Cleared' : 'Pending';
-              return $rider;
-          });
+//   public function podstaticts()
+//   {
+//       // Fetch riders with the count of their assigned orders and the status of PODs
+//       $riders = Rider::withCount(['orders'])
+//           ->with(['orders' => function($query) {
+//               $query->select('id', 'rider_id', 'pod_status');
+//           }])
+//           ->get()
+//           ->map(function ($rider) {
+//               $podStatuses = $rider->orders->pluck('pod_status');
+//               $rider->pod_status = $podStatuses->contains('No') ? 'Pending' : 'Yes';
+//               $rider->status = $rider->pod_status === 'Yes' ? 'Cleared' : 'Pending';
+//               return $rider;
+//           });
 
-      return response()->json($riders);
-  }
+//       return response()->json($riders);
+//   }
 
   public function clear(Rider $rider)
   {

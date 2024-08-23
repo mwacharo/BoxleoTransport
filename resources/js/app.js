@@ -47,6 +47,8 @@ import FleetComponent from './components/fleet/FleetComponent.vue';
 import DispatchComponent from './components/orders/DispatchComponent.vue';
 import PickingComponent from './components/orders/PickingComponent.vue';
 import ClearanceComponent from './components/orders/ClearanceComponent.vue';
+import ReturnComponent from './components/orders/ReturnComponent.vue';
+
 
 
 // app
@@ -75,6 +77,7 @@ app.component('fleet-component',FleetComponent);
 app.component('dispatch-component',DispatchComponent);
 app.component('picking-component',PickingComponent);
 app.component('clearance-component', ClearanceComponent);
+app.component('return-component', ReturnComponent);
 
 
 

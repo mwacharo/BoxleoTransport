@@ -18,9 +18,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Storage;;
 
-;
 use Illuminate\Validation\ValidationException;
 
 
@@ -387,146 +386,158 @@ class OrderApiController extends BaseController
 
 
 
-    public function dispatchOrders(Request $request)
-    {
-        try {
-            $validatedData = $request->validate([
-                'order_ids' => 'required|array|min:1',
-                // 'order_ids.*' => 'required|string',
-                'geofence_id' => 'required|integer',
-                'status' => 'required|string|in:Dispatched,In Transit',
-                'rider_id' => 'required_without:driver_id|integer|nullable',
-                'driver_id' => 'required_without:rider_id|integer|nullable',
-            ]);
+    // public function dispatchOrders(Request $request)
+    // {
+    //     try {
+    //         $validatedData = $request->validate([
+    //             'order_ids' => 'required|array|min:1',
+    //             // 'order_ids.*' => 'required|string',
+    //             'geofence_id' => 'required|integer',
+    //             'status' => 'required|string|in:Dispatched,In Transit',
+    //             'rider_id' => 'required_without:driver_id|integer|nullable',
+    //             'driver_id' => 'required_without:rider_id|integer|nullable',
+    //         ]);
 
-            $orderIds = $validatedData['order_ids'];
-            $geofenceId = $validatedData['geofence_id'];
-            $status = $validatedData['status'];
-            $riderId = $validatedData['rider_id'] ?? null;
-            $driverId = $validatedData['driver_id'] ?? null;
+    //         $orderIds = $validatedData['order_ids'];
+    //         $geofenceId = $validatedData['geofence_id'];
+    //         $status = $validatedData['status'];
+    //         $riderId = $validatedData['rider_id'] ?? null;
+    //         $driverId = $validatedData['driver_id'] ?? null;
 
-            DB::beginTransaction();
+    //         Log::info('Order IDs:', ['order_ids' => $validatedData['order_ids']]);
 
-            foreach ($orderIds as $orderId) {
-                $order = Order::findOrFail($orderId);
-                $order->status = $status;
-                $order->geofence_id = $geofenceId;
 
-                if ($status === 'Dispatched') {
-                    $order->rider_id = $riderId;
-                    $order->driver_id = $driverId;
-                } elseif ($status === 'In Transit') {
-                    $this->sendSmsNotification($order->client_phone, 'Your order is now in transit!');
-                    
-                    if ($riderId) {
-                        $rider = Rider::findOrFail($riderId);
-                        $order->rider_id = $riderId;
-                        // Uncomment the following line when you're ready to send emails
-                        // Mail::to($rider->email)->send(new InTransitReport($order));
-                        Log::info("SMS sent to client: {$order->client_phone}, Email sent to rider: {$rider->email}");
-                    } elseif ($driverId) {
-                        $order->driver_id = $driverId;
-                        // Add any driver-specific logic here
-                    }
+    //         $orderIds = $validatedData['order_ids'] ?? [];
 
-                    foreach ($order->items as $item) {
-                        $inventory = Product::where('product_id', $item->product_id)->firstOrFail();
-                        if ($inventory->quantity_remaining < $item->quantity) {
-                            throw new \Exception('Insufficient inventory for product ID: ' . $item->product_id);
-                        }
-                        $inventory->quantity_remaining -= $item->quantity;
-                        $inventory->quantity_issued += $item->quantity;
-                        $inventory->save();
-                    }
-                }
+    //         if (!is_array($orderIds) || count($orderIds) === 0) {
+    //             throw new \Exception('No valid order IDs provided.');
+    //         }
 
-                $order->save();
-            }
+    //         DB::beginTransaction();
 
-            DB::commit();
-            return response()->json(['message' => 'Orders dispatched successfully'], 200);
 
-        } catch (ValidationException $e) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error dispatching orders: ' . $e->getMessage(), ['exception' => $e]);
-            return response()->json(['message' => 'Error dispatching orders: ' . $e->getMessage()], 500);
-        }
-    }
 
-    private function sendSmsNotification($phone, $message)
-    {
-        // Implement your SMS sending logic here
-        // This is just a placeholder
-        Log::info("SMS notification sent to $phone: $message");
-    }
-//     public function dispatchOrders(array $orderIds, $riderId, $driverId, $geofenceId, $status)
-// {
-//     DB::beginTransaction();
+    //         foreach ($orderIds as $orderId) {
+    //             $order = Order::findOrFail($orderId);
+    //             $order->status = $status;
+    //             $order->geofence_id = $geofenceId;
 
-//     try {
-//         foreach ($orderIds as $orderId) {
-//             // Fetch the order
-//             $order = Order::findOrFail($orderId);
+    //             if ($status === 'Dispatched') {
+    //                 $order->rider_id = $riderId;
+    //                 $order->driver_id = $driverId;
+    //             } elseif ($status === 'In Transit') {
+    //                 $this->sendSmsNotification($order->client_phone, 'Your order is now in transit!');
 
-//             // Update the order status
-//             $order->status = $status;
+    //                 if ($riderId) {
+    //                     $rider = Rider::findOrFail($riderId);
+    //                     $order->rider_id = $riderId;
+    //                     // Uncomment the following line when you're ready to send emails
+    //                     // Mail::to($rider->email)->send(new InTransitReport($order));
+    //                     Log::info("SMS sent to client: {$order->client_phone}, Email sent to rider: {$rider->email}");
+    //                 } elseif ($driverId) {
+    //                     $order->driver_id = $driverId;
+    //                     // Add any driver-specific logic here
+    //                 }
 
-//             if ($status === 'Dispatched') {
-//                 // Update only rider_id and geofence_id if status is "Dispatched"
-//                 $order->rider_id = $riderId;
-//                 $order->geofence_id = $geofenceId;
-//             } elseif ($status === 'In Transit') {
-//                 // For "In Transit" status:
-//                 // SMS notification to the client
-//                 $this->sendSmsNotification($order->client_phone, 'Your order is now in transit!');
 
-//                 // Email in-transit report to the rider
-//                 $rider = Rider::findOrFail($riderId);
-//                 // Mail::to($rider->email)->send(new InTransitReport($order));
+    //                 //  an order has  orderProducts  
+    //                 foreach ($order->orderProducts as $orderProduct) {
+    //                     $inventory = Product::where('id', $orderProduct->product_id)->firstOrFail();
+    //                     if ($inventory->quantity_remaining < $orderProduct->quantity) {
+    //                         throw new \Exception('Insufficient inventory for product ID: ' . $orderProduct->product_id);
+    //                     }
+    //                     $inventory->quantity_remaining -= $orderProduct->quantity;
+    //                     $inventory->quantity_issued += $orderProduct->quantity;
+    //                     $inventory->save();
+    //                 }
+    //             }
 
-//                 // Log that the notifications were sent
-//                 Log::info("SMS sent to client: {$order->client_phone}, Email sent to rider: {$rider->email}");
+    //             $order->save();
+    //         }
 
-//                 // Update inventory for each item in the order
-//                 foreach ($order->items as $item) {
-//                     $inventory = Product::where('product_id', $item->product_id)->firstOrFail();
+    //         DB::commit();
+    //         return response()->json(['message' => 'Orders dispatched successfully'], 200);
+    //     } catch (ValidationException $e) {
+    //         return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Error dispatching orders: ' . $e->getMessage(), ['exception' => $e]);
+    //         return response()->json(['message' => 'Error dispatching orders: ' . $e->getMessage()], 500);
+    //     }
+    // }
 
-//                     if ($inventory->quantity_remaining < $item->quantity) {
-//                         throw new \Exception('Insufficient inventory for product ID: ' . $item->product_id);
-//                     }
+    // private function sendSmsNotification($phone, $message)
+    // {
+    //     // Implement your SMS sending logic here
+    //     // This is just a placeholder
+    //     Log::info("SMS notification sent to $phone: $message");
+    // }
+    //     public function dispatchOrders(array $orderIds, $riderId, $driverId, $geofenceId, $status)
+    // {
+    //     DB::beginTransaction();
 
-//                     // Subtract from quantity_remaining and add to quantity_issued
-//                     $inventory->quantity_remaining -= $item->quantity;
-//                     $inventory->quantity_issued += $item->quantity;
-//                     $inventory->save();
-//                 }
+    //     try {
+    //         foreach ($orderIds as $orderId) {
+    //             // Fetch the order
+    //             $order = Order::findOrFail($orderId);
 
-//                 // Update rider_id and geofence_id for "In Transit" status
-//                 $order->rider_id = $riderId;
-//                 $order->geofence_id = $geofenceId;
-//             }
+    //             // Update the order status
+    //             $order->status = $status;
 
-//             // Save the order
-//             $order->save();
-//         }
+    //             if ($status === 'Dispatched') {
+    //                 // Update only rider_id and geofence_id if status is "Dispatched"
+    //                 $order->rider_id = $riderId;
+    //                 $order->geofence_id = $geofenceId;
+    //             } elseif ($status === 'In Transit') {
+    //                 // For "In Transit" status:
+    //                 // SMS notification to the client
+    //                 $this->sendSmsNotification($order->client_phone, 'Your order is now in transit!');
 
-//         // Commit the transaction after processing all orders
-//         DB::commit();
+    //                 // Email in-transit report to the rider
+    //                 $rider = Rider::findOrFail($riderId);
+    //                 // Mail::to($rider->email)->send(new InTransitReport($order));
 
-//         // Optionally, send notifications for each order
-//         // foreach ($orderIds as $orderId) {
-//         //     $order = Order::find($orderId);
-//         //     $order->client->notify(new OrderStatusNotification($order));
-//         // }
-//     } catch (\Exception $e) {
-//         // Rollback the transaction on error
-//         DB::rollBack();
-//         Log::error('Error dispatching orders: ' . $e->getMessage(), ['exception' => $e]);
-//         throw $e;
-//     }
-// }
+    //                 // Log that the notifications were sent
+    //                 Log::info("SMS sent to client: {$order->client_phone}, Email sent to rider: {$rider->email}");
+
+    //                 // Update inventory for each item in the order
+    //                 foreach ($order->items as $item) {
+    //                     $inventory = Product::where('product_id', $item->product_id)->firstOrFail();
+
+    //                     if ($inventory->quantity_remaining < $item->quantity) {
+    //                         throw new \Exception('Insufficient inventory for product ID: ' . $item->product_id);
+    //                     }
+
+    //                     // Subtract from quantity_remaining and add to quantity_issued
+    //                     $inventory->quantity_remaining -= $item->quantity;
+    //                     $inventory->quantity_issued += $item->quantity;
+    //                     $inventory->save();
+    //                 }
+
+    //                 // Update rider_id and geofence_id for "In Transit" status
+    //                 $order->rider_id = $riderId;
+    //                 $order->geofence_id = $geofenceId;
+    //             }
+
+    //             // Save the order
+    //             $order->save();
+    //         }
+
+    //         // Commit the transaction after processing all orders
+    //         DB::commit();
+
+    //         // Optionally, send notifications for each order
+    //         // foreach ($orderIds as $orderId) {
+    //         //     $order = Order::find($orderId);
+    //         //     $order->client->notify(new OrderStatusNotification($order));
+    //         // }
+    //     } catch (\Exception $e) {
+    //         // Rollback the transaction on error
+    //         DB::rollBack();
+    //         Log::error('Error dispatching orders: ' . $e->getMessage(), ['exception' => $e]);
+    //         throw $e;
+    //     }
+    // }
 
     // public function updateProductDetails(Request $request)
     // {
@@ -842,4 +853,149 @@ class OrderApiController extends BaseController
 
         return response()->json(['message' => 'Order items picked and recorded successfully.'], 200);
     }
+
+
+    public function dispatchOrders(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'order_ids' => 'required|array|min:1',
+                // 'order_ids.*' => 'required|string',
+                'geofence_id' => 'required|integer',
+                'status' => 'required|string|in:Dispatched,In Transit',
+                'rider_id' => 'required_without:driver_id|integer|nullable',
+                'driver_id' => 'required_without:rider_id|integer|nullable',
+            ]);
+
+            $orderIds = $validatedData['order_ids'];
+            $geofenceId = $validatedData['geofence_id'];
+            $status = $validatedData['status'];
+            $riderId = $validatedData['rider_id'] ?? null;
+            $driverId = $validatedData['driver_id'] ?? null;
+
+            Log::info('Order IDs:', ['order_ids' => $validatedData['order_ids']]);
+
+
+            $orderIds = $validatedData['order_ids'] ?? [];
+
+            if (!is_array($orderIds) || count($orderIds) === 0) {
+                throw new \Exception('No valid order IDs provided.');
+            }
+
+            DB::beginTransaction();
+
+
+
+            foreach ($orderIds as $orderId) {
+                $order = Order::findOrFail($orderId);
+                $order->status = $status;
+                $order->geofence_id = $geofenceId;
+
+                if ($status === 'Dispatched') {
+                    $order->rider_id = $riderId;
+                    $order->driver_id = $driverId;
+                } elseif ($status === 'In Transit') {
+                    $this->sendSmsNotification($order->client_phone, 'Your order is now in transit!');
+
+                    if ($riderId) {
+                        $rider = Rider::findOrFail($riderId);
+                        $order->rider_id = $riderId;
+                        // Uncomment the following line when you're ready to send emails
+                        // Mail::to($rider->email)->send(new InTransitReport($order));
+                        Log::info("SMS sent to client: {$order->client_phone}, Email sent to rider: {$rider->email}");
+                    } elseif ($driverId) {
+                        $order->driver_id = $driverId;
+                        // Add any driver-specific logic here
+                    }
+
+
+                    //  an order has  orderProducts  
+                    foreach ($order->orderProducts as $orderProduct) {
+                        $inventory = Product::where('id', $orderProduct->product_id)->firstOrFail();
+                        if ($inventory->quantity_remaining < $orderProduct->quantity) {
+                            throw new \Exception('Insufficient inventory for product ID: ' . $orderProduct->product_id);
+                        }
+                        $inventory->quantity_remaining -= $orderProduct->quantity;
+                        $inventory->quantity_issued += $orderProduct->quantity;
+                        $inventory->save();
+                    }
+                }
+
+                $order->save();
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Orders dispatched successfully'], 200);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error dispatching orders: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['message' => 'Error dispatching orders: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function sendSmsNotification($phone, $message)
+    {
+        // Implement your SMS sending logic here
+        // This is just a placeholder
+        Log::info("SMS notification sent to $phone: $message");
+    }
+
+
+    // return an order 
+    
+
+
+    public function returnOrders(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'order_ids' => 'required|array|min:1',
+                'status' => 'required|string|in:Returned,Awaiting Return',
+            ]);
+            $orderIds = $validatedData['order_ids'];
+            $status = $validatedData['status'];
+            Log::info('Order IDs:', ['order_ids' => $validatedData['order_ids']]);
+
+            if (!is_array($orderIds) || count($orderIds) === 0) {
+                throw new \Exception('No valid order IDs provided.');
+            }
+
+            DB::beginTransaction();
+
+            foreach ($orderIds as $orderId) {
+                $order = Order::findOrFail($orderId);
+                $order->status = $status;
+
+                if ($status === 'Awaiting Returned') {
+                    $order->status =  $status;
+
+                    // update order status to awaiting return
+                } elseif ($status === ' Returned') {
+                    //  an order has  orderProducts  
+                    foreach ($order->orderProducts as $orderProduct) {
+                        $order->status =  $status;
+
+                        $inventory = Product::where('id', $orderProduct->product_id)->firstOrFail();
+                        $inventory->quantity_remaining += $orderProduct->quantity;
+                        $inventory->return_quantity += $orderProduct->quantity;
+                        $inventory->save();
+
+                    }
+                }
+                $order->save();
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Orders returned successfully'], 200);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error returning orders: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['message' => 'Error returned orders: ' . $e->getMessage()], 500);
+        }
+    }
+
 }

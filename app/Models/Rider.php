@@ -25,7 +25,8 @@ class Rider extends Model
         'remember_token',
         'geofence_id',
         'status',
-        'clearance_status'
+        'clearance_status',
+        'comment'
     ];
 
 

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('status')->nullable();
+            $table->string('comment')->nullable();
             $table->string('clearance_status')->nullable();
             $table->string('address');
             $table->string('latitude')->nullable();
