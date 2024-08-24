@@ -73,7 +73,7 @@ class PODReportExport implements FromView
         
         $orders = $query->with('vendor', 'rider')->get();
 
-    dd($orders);
+    // dd($orders);
 
 
         return view('reports.pod', [
