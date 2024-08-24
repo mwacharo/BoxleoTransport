@@ -894,6 +894,10 @@ class OrderApiController extends BaseController
                 if ($status === 'Dispatched') {
                     $order->rider_id = $riderId;
                     $order->driver_id = $driverId;
+
+
+                    Log::debug('Status set to dispatched_on for order', ['order_id' => $orderId]);
+                    $order->dispatched_on =now();
                 } elseif ($status === 'In Transit') {
                     $this->sendSmsNotification($order->client_phone, 'Your order is now in transit!');
 
@@ -919,6 +923,11 @@ class OrderApiController extends BaseController
                         $inventory->quantity_issued += $orderProduct->quantity;
                         $inventory->save();
                     }
+
+                       // updating dispatched_on 
+                Log::debug('Status set to dispatched_on for order', ['order_id' => $orderId]);
+                $order->dispatched_on =now();
+
                 }
 
                 $order->save();
@@ -1046,8 +1055,12 @@ class OrderApiController extends BaseController
 
                     Log::debug('Inventory updated', ['inventory' => $inventory->toArray()]);
                 }
-            }
 
+                // updating return_on 
+                Log::debug('Status set to return_on for order', ['order_id' => $orderId]);
+                $order->returned_on =now();
+
+            }
             $order->save();
             Log::debug('Order status updated and saved', ['order_id' => $orderId]);
         }

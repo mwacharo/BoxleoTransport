@@ -2,73 +2,85 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\DynamicReportExport;
 use Carbon\Carbon;
-use App\Models\Deal;
-use App\Exports\DealsExport;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportApiController extends Controller
 {
 
-    public function generate(Request $request)
+    protected $reportClasses = [
+        // 'Order Report' => \App\Exports\OrderReportExport::class,
+        // 'Rider Report' => \App\Exports\RiderReportExport::class,
+        'Dispatch Report' => \App\Exports\DispatchReportExport::class,
+        // 'Rider Clearance' => \App\Exports\RiderClearanceExport::class,
+        // 'Product Report' => \App\Exports\ProductReportExport::class,
+        // 'Merchant Report' => \App\Exports\MerchantReportExport::class,
+        // 'Delivery Performance Report' => \App\Exports\DeliveryPerformanceReportExport::class,
+        // 'Agent/Driver Report' => \App\Exports\AgentDriverReportExport::class,
+        // 'Financial Report' => \App\Exports\FinancialReportExport::class,
+        // 'Vehicle Report' => \App\Exports\VehicleReportExport::class,
+        // 'Client Report' => \App\Exports\ClientReportExport::class,
+        // 'Zone Report' => \App\Exports\ZoneReportExport::class,
+        'POD Report' => \App\Exports\PODReportExport::class,
+
+    ];
+    
+    public function generateReport(Request $request)
     {
-        DB::enableQueryLog();
-        $deals = Deal::query();
+        $reportType = $request->input('report_type');
 
-        if ($request->filled('sales_person_id')) {
-            $deals->whereHas('user', function($q) use ($request) {
-                $q->where('user_id', $request->sales_person_id);
-            });
-        }
-        if ($request->filled('branch_id')) {
-            $deals->whereHas('branches', function($q) use ($request) {
-                $q->where('branch_id', $request->branch_id);
-            });
+        if (!array_key_exists($reportType, $this->reportClasses)) {
+            return response()->json(['error' => 'Invalid report type'], 400);
         }
 
-        if ($request->filled('status')) {
-            $deals->where('status', $request->status);
+        $reportClass = $this->reportClasses[$reportType];
+
+        try {
+            // Instantiate the report class to retrieve the data
+            $reportInstance = new $reportClass($request->all());
+            $reportData = $reportInstance->view()->getData()['orders']; // Assuming 'orders' is the key for the data
+
+
+            return response()->json([
+                'reportData' => $reportData,
+                // 'url' => $url,
+                'message' => 'Report generated successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Excel generation failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to generate report: ' . $e->getMessage()], 500);
         }
-
-        if ($request->filled('industry_id')) {
-            $deals->whereHas('industries', function($q) use ($request) {
-                $q->where('industry_id', $request->industry_id);
-            });
-        }
-
-        if ($request->filled('service_id')) {
-            $deals->whereHas('services', function($q) use ($request) {
-                $q->where('service_id', $request->service_id);
-            });
-        }
-
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $deals->whereBetween('created_at', [$request->start_date, $request->end_date]);
-        }
-
-        if ($request->filled('priority')) {
-            $deals->where('priority', $request->priority);
-        }
-
-
-        // Execute the query with eager loading of relationships
-        $deals = $deals->with(['user', 'branches', 'services', 'industries'])->get();
-        // return response()->json(
-        //     [
-        //         'deals' => $deals,
-        //     ]
-        // );
-        // (DB::getQueryLog()); // Debug to check SQL queries generated
-
-        // Generate the Excel file and save it
-        Excel::store(new DealsExport($deals), 'public/report.xlsx');
-
-        // Return the path or a token linked to the file
-        return response()->json(['url' => asset('storage/report.xlsx')]);
     }
+  
+    public function downloadExcel(Request $request)
+    {
+        try {
+            $reportData = $request->input('reportData');
+            
+            if (empty($reportData)) {
+                return response()->json(['error' => 'No report data provided'], 400);
+            }
 
+            $export = new DynamicReportExport($reportData);
+            
+            return Excel::download($export, 'report.xlsx');
+        } catch (\Exception $e) {
+            Log::error('Excel generation failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to generate Excel: ' . $e->getMessage()], 500);
+        }
+    }
+    
 }
+
+
+   
+
+
 

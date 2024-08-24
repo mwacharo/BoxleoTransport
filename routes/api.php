@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\PODReportExport;
 use App\Models\Branch;
 use App\Models\OrderCategory;
 use Illuminate\Support\Facades\Route;
@@ -35,8 +36,11 @@ use Illuminate\Http\Request;
 
 
 
-use App\Http\Controllers\Api\ReportApiController as ApiReportApiController;
 
+use App\Http\Controllers\Api\ReportApiController as ApiReportApiController;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PODReportCsvExport;
+ 
 Route::apiResource('v1/users', UsersApiController::class)->only([
   'index', 'store', 'update', 'destroy'
 ]);
@@ -51,7 +55,10 @@ Route::apiResource('v1/calendar', CalendarApiController::class)->only([
   'index', 'store', 'update', 'destroy'
 ]);
 
-Route::post('/reports/generate', [ApiReportApiController::class, 'generate']);
+Route::post('/reports/generateReport', [ApiReportApiController::class, 'generateReport']);
+Route::post('v1/reports/downloadExcel', [ApiReportApiController::class, 'downloadExcel']);
+
+
 
 
 // Route::apiResource('v1/industries', IndustriesApiController::class)->only([
@@ -171,6 +178,10 @@ Route::post('/v1/bulkDelete', [ProductApiController::class, 'bulkDelete']);
 // // Receiving Inventory
 // Route::post('/api/receive-single', [ProductApiController::class, 'receiveSingle']);
 Route::post('/v1/receiveBulk', [ProductApiController::class, 'receiveBulk']);
+
+// report
+
+
 
 // // Storage and Binning
 // Route::post('/api/assign-bin', [ProductApiController::class, 'assignBin']);

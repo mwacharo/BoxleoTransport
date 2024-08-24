@@ -32,12 +32,12 @@
     <v-card-text>
       <v-row>
         <!-- Zone From -->
-        <v-col cols="12" md="6">
+        <v-col cols="12" md="3">
           <v-select v-model="zoneFrom" :items="zones" item-title="name" item-value="id" label="Zone From"></v-select>
         </v-col>
 
         <!-- Zone To -->
-        <v-col cols="12" md="6">
+        <v-col cols="12" md="3">
           <v-select v-model="zoneTo" :items="zones" item-title="name" item-value="id" label="Zone To"></v-select>
         </v-col>
 
@@ -54,16 +54,16 @@
 
 
         <!-- Rider -->
-        <!-- <v-col cols="12" md="6">
+        <!-- <v-col cols="12" md="3">
           <v-select v-model="rider" item-title="name" :items="riders"   item-value="id" label="Rider"></v-select>
         </v-col>
 
-        <v-col cols="12" md="6">
+        <v-col cols="12" md="3">
           <v-select v-model="driver" item-title="name" :items="drivers"   item-value="id" label="Driver"></v-select>
         </v-col> -->
 
         <!-- Manual Zone Location -->
-        <!-- <v-col cols="12" md="6">
+        <!-- <v-col cols="12" md="3">
                 <v-switch
                   v-model="manualZone"
                   label="Manual Zone Location"

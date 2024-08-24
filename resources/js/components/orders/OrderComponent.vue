@@ -216,7 +216,7 @@
                   label="Filter by Vendor" clearable></v-select>
                 <v-select v-model="filterAgent" :items="agentOptions" item-title="name" item-value="id"
                   label="Filter by Agent" clearable></v-select>
-                <v-select v-model="filterStatus" :items="statusOptions" item-title="name" item-value="id"
+                <v-select v-model="filterStatus" :items="statusOptions" item-title="name" item-value="name"
                   label="Filter by Status" clearable></v-select>
                 <v-text-field v-model="filterAddress" label="Filter by Address" clearable></v-text-field>
                 <v-text-field v-model="startSelectedDate" label="Start Date" type="date"></v-text-field>
@@ -253,8 +253,7 @@ export default {
     AutoAllocate,
     OptimizeRoute,
     Pod,
-    
-
+  
   },
   mixins: [fetchDataMixin],
   props: {
@@ -365,11 +364,11 @@ export default {
       }
 
       if (this.filterVendor) {
-        filtered = filtered.filter(entity => entity.vendor === this.filterVendor);
+        filtered = filtered.filter(entity => entity.vendor_id === this.filterVendor);
       }
 
       if (this.filterAgent) {
-        filtered = filtered.filter(entity => entity.agent === this.filterAgent);
+        filtered = filtered.filter(entity => entity.rider_id === this.filterAgent);
       }
 
       if (this.filterStatus) {
@@ -435,11 +434,11 @@ export default {
         order_products: this.order_products
       })
         .then(response => {
-          this.$toast.success(response.data.message);
+          this.$toastr.success(response.data.message);
           this.showProductDetails = false;
         })
         .catch(error => {
-          this.$toastr.error('Failed to save product details.');
+          this.$toastr.error(esponse.data.message);
           console.error(error);
         });
     },

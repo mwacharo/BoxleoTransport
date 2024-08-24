@@ -157,6 +157,11 @@ class Order extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    public function rider()
+    {
+        return $this->belongsTo(Rider::class);
+    }
+
     public function geofence()
     {
         return $this->belongsTo(Geofence::class);
