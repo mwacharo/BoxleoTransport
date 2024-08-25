@@ -153,10 +153,17 @@
     },
     
     {
-      "url": "user-roles",
+      "url": "roles",
       "icon": "menu-icon tf-icons bx bx-shield",
-      "name": "User Roles",
-      "slug": "user-role"
+      "name": "Roles",
+      "slug": "role"
+    },
+
+    {
+      "url": "permissions",
+      "icon": "menu-icon tf-icons bx bx-shield",
+      "name": "Permissions",
+      "slug": "permissions"
     }
   ]
 }

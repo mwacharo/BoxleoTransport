@@ -27,7 +27,7 @@ class ReportApiController extends Controller
         // 'Financial Report' => \App\Exports\FinancialReportExport::class,
         // 'Vehicle Report' => \App\Exports\VehicleReportExport::class,
         // 'Client Report' => \App\Exports\ClientReportExport::class,
-        // 'Zone Report' => \App\Exports\ZoneReportExport::class,
+        'Zone Report' => \App\Exports\ZoneReportExport::class,
         'POD Report' => \App\Exports\PODReportExport::class,
 
     ];

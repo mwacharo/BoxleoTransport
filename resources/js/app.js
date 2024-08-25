@@ -48,6 +48,9 @@ import DispatchComponent from './components/orders/DispatchComponent.vue';
 import PickingComponent from './components/orders/PickingComponent.vue';
 import ClearanceComponent from './components/orders/ClearanceComponent.vue';
 import ReturnComponent from './components/orders/ReturnComponent.vue';
+import RoleComponent from './components/users/RoleComponent.vue';
+import PermissionComponent from './components/users/PermissionComponent.vue';
+
 
 
 
@@ -78,6 +81,8 @@ app.component('dispatch-component',DispatchComponent);
 app.component('picking-component',PickingComponent);
 app.component('clearance-component', ClearanceComponent);
 app.component('return-component', ReturnComponent);
+app.component('role-component', RoleComponent);
+app.component('permission-component', PermissionComponent);
 
 
 

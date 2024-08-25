@@ -51,6 +51,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::get('/user-roles', [UserController::class, 'userRoles'])->name('user.roles');
+    Route::get('/roles', [UserController::class, 'roles'])->name('user.roles');
+    Route::get('/permissions', [UserController::class, 'permissions'])->name('permissions');
+
+
 
     Route::get('/account', [UserController::class, 'userAcount'])->name('account');
     Route::get('/account/settings', [UserController::class, 'acountSettings'])->name('accountSettings');

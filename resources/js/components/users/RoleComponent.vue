@@ -1,13 +1,7 @@
 <template>
-    <AppLayout>
-        <VCard class="my-card">
-            <v-container>
-                <v-text-field v-model="searchQuery" label="Search" @keyup.enter="performSearch"
-                    variant="outlined"></v-text-field>
-            </v-container>
-        </VCard>
-
-        <VCard class="my-card" outlined>
+ 
+   
+  <v-card> 
             <v-data-table :headers="headers" :loading="loading" :items="roles"
                 :sort-by="[{ key: 'name', order: 'asc' }]">
                 <template v-slot:top>
@@ -86,20 +80,19 @@
                     <v-btn color="primary" @click="initialize"> Reset </v-btn>
                 </template>
             </v-data-table>
-            <RolesPermissions ref="RolesPermissionsComponent" />
-        </vcard>
-    </AppLayout>
+            <!-- <RolesPermissions ref="RolesPermissionsComponent" /> -->
+    </v-card> 
 </template>
 
 <script>
-import AppLayout from "@/Layouts/AppLayout.vue";
-import RolesPermissions from "@/Pages/RolePermissions.vue";
+// import AppLayout from "@/Layouts/AppLayout.vue";
+// import RolesPermissions from "@/Pages/RolePermissions.vue";
 import axios from "axios";
 
 export default {
     components: {
-        AppLayout,
-        RolesPermissions,
+     
+        // RolesPermissions,
     },
     data: () => ({
         dialog: false,

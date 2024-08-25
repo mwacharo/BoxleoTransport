@@ -30,7 +30,7 @@
             </v-col>
 
 
-            <v-col cols="12" md="3" v-if="selectedReportType === 'Driver Report'">
+            <v-col cols="12" md="3" v-if="selectedReportType === 'Driver Report' || 'POD Report'">
               <v-select v-model="selectedDriver" :items="drivers" item-value="id" item-title="name"
                 label="Select Driver" outlined dense multiple prepend-icon="mdi-account"></v-select>
             </v-col>
@@ -61,6 +61,18 @@
               <v-text-field v-model="endSelectedDate" label="End Date" prepend-icon="mdi-calendar"
                 type="date"></v-text-field>
             </v-col>
+
+
+            <v-col cols="12" md="3" v-if="selectedReportType === 'Dispatch Report' ">
+              <v-text-field v-model="dispatched_startDate" label=" Start Dispatched" prepend-icon="mdi-calendar"
+                type="date"></v-text-field>
+            </v-col>
+
+            <v-col cols="12" md="3" v-if="selectedReportType === 'Dispatch Report' ">
+              <v-text-field v-model="dispatched_endDate" label="End Dispatched" prepend-icon="mdi-calendar"
+                type="date"></v-text-field>
+            </v-col>
+
 
           </v-row>
         </v-container>
@@ -146,7 +158,7 @@ export default {
       reportData: [],
       reportUrl: null,
       headers: [
-        { title: 'Created On', value: 'created_on' },
+        { title: 'Created On', value: 'created_at' },
         { title: 'Order No', value: 'order_no' },
         { title: 'Client Name', value: 'client_name' },
         { title: 'Client Address', value: 'address' },
@@ -161,6 +173,8 @@ export default {
       selectedVendor: null,
       selectedVehicle: null,
       startSelectedDate: null,
+      dispatched_startDate:null,
+      dispatched_endDate:null,
       endSelectedDate: null,
       selectedReportType: null,
       selectedCity: null,
@@ -195,6 +209,8 @@ export default {
           vehicle_id: this.selectedVehicle,
           start_date: this.startSelectedDate,
           end_date: this.endSelectedDate,
+          dispatched_startDate: this.dispatched_startDate,
+          dispatched_endDate: this.dispatched_endDate,
           report_type: this.selectedReportType,
           city_id: this.selectedCity,
             status: this.selectedOrderStatus,

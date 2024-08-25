@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -110,6 +111,11 @@ class Order extends Model
 
     ];
 
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->format('Y-m-d H:i:s');
+    }
+
     public function products()
     {
         return $this->hasManyThrough(Product::class, OrderProduct::class, 'order_id', 'id', 'id', 'product_id');
@@ -162,7 +168,17 @@ class Order extends Model
         return $this->belongsTo(Rider::class);
     }
 
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class);
+    }
+
+
     public function geofence()
+    {
+        return $this->belongsTo(Geofence::class);
+    }
+    public function zone()
     {
         return $this->belongsTo(Geofence::class);
     }

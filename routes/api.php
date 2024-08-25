@@ -181,6 +181,46 @@ Route::post('/v1/receiveBulk', [ProductApiController::class, 'receiveBulk']);
 
 // report
 
+Route::get('v1/roles', [UsersApiController::class, 'roles']);
+Route::get('v1/permissions', [UsersApiController::class, 'permissions']);
+
+
+
+// Route::put('/users/{userId}/role', [ApiUserController::class, 'updateRole']);
+// Route::put('/users/{userId}/permissions', [ApiUserController::class, 'updatePermissions']);
+
+
+Route::get('v1/users/{id}/permissions', [UsersApiController::class, 'show']);
+Route::put('v1/users/{id}/permissions', [UsersApiController::class, 'update']);
+
+Route::get('/v1/roles/{roleId}/permissions', [UsersApiController::class, 'getRolePermissions']);
+Route::put('v1/roles/{roleId}/permissions', [UsersApiController::class, 'updateRolePermissions']);
+
+
+
+Route::post('/v1/permissions', [UsersApiController::class, 'storePermission']);
+
+// specific permission
+Route::get('/v1/permissions/{permissionId}', [UsersApiController::class, 'showPermission']);
+Route::put('/v1/permissions/{permissionId}', [UsersApiController::class, 'updatePermission']);
+Route::delete('/v1/permissions/{permissionId}', [UsersApiController::class, 'destroyPermission']);
+
+
+//  roles
+Route::post('/v1/roles', [UsersApiController::class, 'storeRole']);
+// Route::get('/v1/roles/{roleId}', [UsersApiController::class, 'showRole']);
+Route::put('/v1/roles/{roleId}', [UsersApiController::class, 'updateRole']);
+Route::delete('/v1/roles/{roleId}', [UsersApiController::class, 'destroyRole']);
+
+
+//  specific user
+Route::get('/users/{userId}/permissions', [UsersApiController::class, 'showUserPermissions']);
+Route::put('/users/{userId}/permissions', [UsersApiController::class, 'updateUserPermissions']);
+
+
+// Show permissions for a specific role
+Route::get('/roles/{roleId}/permissions', [UsersApiController::class, 'getRolePermissions']);
+Route::put('/roles/{roleId}/permissions', [UsersApiController::class, 'updateRolePermissions']);
 
 
 // // Storage and Binning
