@@ -39,11 +39,7 @@ class UsersApiController extends Controller
         $roles= Role::all();
         // dd($roles);
 
-
-
         return response()->json($roles);
-
-
     }
 
 
