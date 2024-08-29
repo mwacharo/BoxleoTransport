@@ -27,7 +27,7 @@ class GeocodeAddress implements ShouldQueue
     public function handle()
 {
     try {
-        Log::warning('*****************************************');
+        Log::warning('********* am here ********************************');
         $apiKey = env('GOOGLE_MAPS_API_KEY');
         $address = $this->order->address;
 

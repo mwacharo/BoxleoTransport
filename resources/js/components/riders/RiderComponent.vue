@@ -76,9 +76,16 @@
                     </v-col>
 
                     <v-col cols="12">
-                      <v-select :items="branches" label="Select branch" clearable v-model="selectedBranch"
+                      <v-select :items="branches" label="Select branch" clearable v-model="editedItem.branch_id"
                         item-title="name" item-value="id" prepend-icon="mdi-map-marker"></v-select>
                     </v-col>
+
+
+                     <v-col cols="12">
+                      <v-select :items="geofences" label="Select Zone" clearable v-model="editedItem.geofence_id" item-title="name"
+                      item-value="id" prepend-icon="mdi-map-marker"></v-select>
+              
+                    </v-col> -
 
                   </v-row>
                 </v-container>
@@ -124,8 +131,9 @@ export default {
       riders: [],
       geofences: [],
       selectedItems: [],
+      geofence_id: '',
+      branch_id: '',
       selectedZone: '',
-      selectedBranch: '',
       currentRiderId: null,
       headers: [
         { title: '#', value: 'index' },
@@ -142,6 +150,8 @@ export default {
         user_id: this.user_id,
         address: '',
         phone: '',
+        branch_id:'',
+        geofence_id:'',
       },
       defaultItem: {
         name: '',
@@ -149,6 +159,8 @@ export default {
         address: '',
         user_id: this.user_id,
         phone: '',
+        branch_id:'',
+        geofence_id:'',
       },
       dialog: false,
       dialogDelete: false,

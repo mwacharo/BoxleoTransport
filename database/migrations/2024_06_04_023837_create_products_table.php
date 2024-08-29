@@ -57,10 +57,14 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('unit_buying_price', 8, 2)->nullable();
             $table->decimal('unit_price', 10, 2)->nullable();
-            // this value of stock sold  to customers 
             // ondispatch of item  the  quantity_issued increases
             // result  in reduction of quantity_remaining with same value
+            // commited stock 
             $table->decimal('quantity_issued', 10, 2)->nullable();
+
+
+            // this value of stock sold  to customers 
+            $table->decimal('quantity_delivered', 10, 2)->nullable();
 
             $table->decimal('inventory_value', 10, 2)->nullable();
             $table->decimal('sales_value', 10, 2)->nullable();

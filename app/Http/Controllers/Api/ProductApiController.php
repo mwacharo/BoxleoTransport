@@ -125,11 +125,14 @@ public function receiveBulk(Request $request)
         // Update product quantities
         if ($product->opening_quantity == 0) {
             $product->opening_quantity += $productData['quantity'];
+            $product->quantity_inhand += $productData['quantity']; 
+
         }
         
         $product->quantity_in += $productData['quantity'];
-        $product->quantity_inhand += $productData['quantity']; 
+        // $product->quantity_inhand += $productData['quantity']; 
         $product->quantity_remaining += $productData['quantity'];
+        $product->quantity_inhand=  $product->quantity_remaining +$product->quantity_in;
 
         $product->save();
     }
@@ -432,7 +435,7 @@ public function receiveBulk(Request $request)
 
          $product = Product::findOrFail($request->product_id);
          $product->warehouse_id = $request->new_warehouse_id;
-         $produc->save();
+         $product->save();
 
          return response()->json(['success' => true, 'message' => 'Product instance transferred']);
      }

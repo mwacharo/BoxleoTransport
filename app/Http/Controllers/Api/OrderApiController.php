@@ -261,20 +261,52 @@ class OrderApiController extends BaseController
         return response()->json(['message' => 'Orders deleted successfully']);
     }
 
+    // public function bulkAssignRider(Request $request)
+    // {
+    //     $ids = $request->input('ids', []);
+    //     $riderId = $request->input('rider');
+    //     // dd($riderId);
+
+    //     if (empty($ids) || !$riderId) {
+    //         return response()->json(['message' => 'Invalid input'], 400);
+    //     }
+
+    //     Order::whereIn('id', $ids)->update(['rider_id' => $riderId]);
+    //     // update status to dispatached 
+    //     // update status to  in transit 
+    //     // update geofence_id with  rider geofence  
+    //     // rider has geofence 
+    //     Order::whereIn('id', $ids)->update(['rider_id' => $riderId]);
+
+    //     return response()->json(['message' => 'Rider assigned successfully']);
+    // }
+
+
     public function bulkAssignRider(Request $request)
-    {
-        $ids = $request->input('ids', []);
-        $riderId = $request->input('rider');
-        // dd($riderId);
+{
+    $ids = $request->input('ids', []);
+    $riderId = $request->input('rider');
 
-        if (empty($ids) || !$riderId) {
-            return response()->json(['message' => 'Invalid input'], 400);
-        }
-
-        Order::whereIn('id', $ids)->update(['rider_id' => $riderId]);
-
-        return response()->json(['message' => 'Rider assigned successfully']);
+    if (empty($ids) || !$riderId) {
+        return response()->json(['message' => 'Invalid input'], 400);
     }
+
+    // Retrieve the rider to get the geofence
+    $rider = Rider::find($riderId);
+    if (!$rider || !$rider->geofence_id) {
+        return response()->json(['message' => 'Rider or geofence not found'], 400);
+    }
+
+    // Update orders with rider_id, status, and geofence_id
+    Order::whereIn('id', $ids)->update([
+        'rider_id' => $riderId,
+        'status' => 'in transit',
+        'geofence_id' => $rider->geofence_id
+    ]);
+
+    return response()->json(['message' => 'Rider assigned successfully']);
+}
+
 
     public function bulkAssignDriver(Request $request)
     {

@@ -42,6 +42,7 @@ class Product extends Model
         'unit_buying_price',
         'unit_price',
         'quantity_issued',
+        'quanity_delivered',
         'inventory_value',
         'sales_value',
         'quantity_remaining',

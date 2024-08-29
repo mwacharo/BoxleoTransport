@@ -105,10 +105,24 @@ export default {
         console.error('Error syncing sheet:', error);
       }
     },
-    updateSheet(sheet) {
-      // Implement the logic to update the sheet
-      console.log('Update:', sheet);
+
+    async updateSheet(item) {
+        try {
+            const response = await axios.post(`/api/v1/update-sheet`, { item: item });
+            if (response.data.success) {
+                this.$toastr.success('Sheet updated successfully!');
+            } else {
+                this.$toastr.error('Failed to update the sheet.');
+            }
+        } catch (error) {
+            this.$toastr.error('An error occurred while updating the sheet.');
+            console.error(error);
+        }
     }
+    // updateSheet(sheet) {
+    //   // Implement the logic to update the sheet
+    //   console.log('Update:', sheet);
+    // }
   }
 };
 </script>

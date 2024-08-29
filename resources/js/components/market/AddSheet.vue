@@ -16,7 +16,7 @@
 
           <v-select
           :rules="branchRules" required
-            v-model="branch"
+            v-model="selectedbranch"
             :items="branches"
             item-title="name"
             item-value="id"
@@ -59,6 +59,7 @@ export default {
       valid: false,
       vendor: '',
       branch:'',
+      selectedbranch:'',
       branches:'',
       vendors: [],
       sheetName: '',
@@ -127,7 +128,8 @@ export default {
         const response = await axios.post('/api/v1/sheets', {
           vendor_id: this.vendor,
           sheet_name: this.sheetName,
-          post_spreadsheet_id: this.spreadsheetId
+          post_spreadsheet_id: this.spreadsheetId,
+          branch_id:this.selectedbranch
         });
         console.log(response.data);
         this.$toastr.success(response.data.message);
