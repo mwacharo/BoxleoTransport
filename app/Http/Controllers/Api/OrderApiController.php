@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\BaseController;
 use App\Services\GeocodingService;
 use App\Http\Controllers\Controller;
+use App\Imports\OrderImport;
 use App\Models\Order;
 use App\Models\OrderPod;
 use App\Models\OrderProduct;
@@ -14,6 +15,7 @@ use App\Models\ProductInstance;
 use App\Models\Rider;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +23,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;;
 
 use Illuminate\Validation\ValidationException;
-
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderApiController extends BaseController
 {
@@ -32,6 +34,265 @@ class OrderApiController extends BaseController
 
     protected $model = Order::class, $geocodingService;
 
+
+    public function orderImport(Request $request)
+    {
+
+     $user =Auth::User();
+    //  dd($user);
+
+        // Validate that the uploaded file is an Excel file
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+            // 'vendor_id' => 'required',
+            // 'branch_id' => 'required',
+
+            'vendor_id' => 'required|exists:vendors,id',
+            'branch_id' => 'required|exists:branches,id',
+
+        ]);
+
+        // Initialize the OrderImport class
+        $import = new OrderImport();
+
+        // Handle the Excel file import, but only collect data
+        Excel::import($import, $request->file('file'));
+
+
+        // dd($import);
+
+        $skippedOrders = []; // Array to hold skipped orders
+
+
+        //  Here we can create the orders using the collected data
+    foreach ($import->orderData as $orderData) {
+
+        if (empty($orderData['order_no'])) {
+
+            Log::info("Skipping order with empty order_no: " . json_encode($orderData));
+    
+            continue; // Skip this order and move to the next one
+    
+        }
+
+
+        // $existingOrder = Order::where('order_no', $orderData)->first();
+            $existingOrder = Order::where('order_no', $orderData['order_no'])->first();
+
+
+
+        if ($existingOrder) {
+
+               // Skip processing this order if it already exists
+               $skippedOrders[] = $orderData['order_no'];
+
+               Log::info("Order skipped: " . $orderData['order_no']);
+               continue; // Move to the next order
+        }
+                    //    dd($skippedOrders);
+            //   dd($skippedOrders);
+
+        // Create the order
+        $order = Order::create([
+            'order_no' => $orderData['order_no'],
+            'cod_amount' => $orderData['cod_amount'],
+            'client_name' => $orderData['client_name'],
+            'address' => $orderData['address'],
+            'phone' => $orderData['phone'],
+            'alt_phone' => $orderData['alt_phone'],
+            'city' => $orderData['city'],
+            'status' => $orderData['status'],
+            'delivery_date' => $orderData['delivery_date'],
+
+            'vendor_id' => $request->vendor_id, // Add vendor_id
+            'branch_id' => $request->branch_id, // Add branch_id
+            'user_id' => $request->user_id, // Add user_id
+
+        ]);
+
+        // Collect the product data related to this order and create order products
+        $this->createOrderProducts($import->products, $order);
+    }
+
+        // Return the data read from the Excel file
+        return response()->json([
+            'message' => 'Data read from Excel file',
+            'order_data' => $import->orderData,
+            'products' => $import->products,
+            'skipped_orders' => $skippedOrders, // Return the skipped orders
+
+        ], 200);
+
+        // Order creation logic would go here if needed, but we are just returning the data for now.
+    }
+    private function createOrderProducts($products, $order)
+    {
+        foreach ($products as $productData) {
+            try {
+
+                $vendorId = $order->vendor_id;
+                $branchId = $order->branch_id;
+                // Logging the start of product processing
+                Log::info('Processing product for order', [
+                    'order_id' => $order->id,
+                    'order_no' => $order->order_no,
+                    'product_data' => $productData,
+                ]);
+    
+                // Create or update the product
+                $product = Product::updateOrCreate(
+                    [
+                        'sku' => $productData['sku_number'],
+                    ],
+                    [
+                        'name' => $productData['product_name'],
+
+                        'vendor_id' => $vendorId, // Ensure vendor_id is set
+                        'branch_id' => $branchId, // Ensure branch_id is set if needed
+                    ],
+
+                  
+                );
+    
+                Log::info('Product created or updated', [
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'sku' => $product->sku,
+                ]);
+    
+                // Create the OrderProduct entry
+                OrderProduct::create([
+                    'order_id' => $order->id,
+                    'product_id' => $product->id,
+                    'quantity' => $productData['quantity'],
+                    'weight' => $productData['weight'] ?? 0,
+                    'vendor_id' => $order->vendor_id, // Add vendor_id
+                    'branch_id' => $order->branch_id, // Add branch_id
+                ]);
+    
+                Log::info('OrderProduct created successfully', [
+                    'order_id' => $order->id,
+                    'product_id' => $product->id,
+                    'quantity' => $productData['quantity'],
+                ]);
+    
+            } catch (\Exception $e) {
+                // Log the error with detailed information
+                Log::error('Error creating OrderProduct', [
+                    'order_id' => $order->id,
+                    'product_data' => $productData,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(), // Include stack trace for more insight
+                ]);
+            }
+        }
+    }
+    
+
+
+//     private function createOrderProducts($products, $order)
+// {
+//     foreach ($products as $productData) {
+//         try {
+          
+//                 // Create or update the product
+//                 $product = Product::updateOrCreate(
+//                     [
+//                         'name' => $productData['product_name'],
+//                         'sku' => $productData['sku_number'],
+//                     ]
+//                 );
+
+//                 // Create the OrderProduct entry
+//                 OrderProduct::create([
+//                     'order_id' => $order->id,
+//                     'product_id' => $product->id,
+//                     'quantity' => $productData['quantity'],
+//                     'weight' => $productData['weight'] ?? 0,
+//                     'vendor_id' => $order->vendor_id, // Add vendor_id
+//                     'branch_id' => $order->branch_id, // Add branch_id
+//                 ]);
+        
+//         } catch (\Exception $e) {
+//             // Handle any exceptions
+//             Log::error('Error creating OrderProduct', [
+//                 'error' => $e->getMessage(),
+//                 'product_data' => $productData,
+//             ]);
+//         }
+//     }
+// }
+
+    // private function createOrderProducts($products, $order)
+    // {
+    //     $orderProducts = [];
+
+    //     foreach ($products as $productData) {
+    //         try {
+    //             $product = Product::updateOrCreate(
+    //                 [
+    //                     'name' => $productData['product_name'],
+    //                     'sku' => $productData['sku_number'],
+                       
+    //                 ]
+    //             );
+
+    //             $weight = !empty($productData['weight']) && is_numeric($productData['weight'])
+    //                 ? intval($productData['weight'])
+    //                 : 0;
+
+    //             $quantity = !empty($productData['quantity']) && is_numeric($productData['quantity'])
+    //                 ? intval($productData['quantity'])
+    //                 : 1;
+
+    //             $orderProducts[] = [
+    //                 'order_id' => $order->id,
+    //                 'product_id' => $product->id,
+    //                 'quantity' => $quantity,
+    //                 'price' => 0,
+    //                 'weight' => $weight,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //             ];
+
+    //             Log::info('Prepared OrderProduct', [
+    //                 'order_id' => $order->id,
+    //                 'product_id' => $product->id,
+    //                 'quantity' => $quantity,
+    //                 'weight' => $weight,
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             Log::error('Error preparing OrderProduct', [
+    //                 'error' => $e->getMessage(),
+    //                 'product_data' => $productData,
+    //             ]);
+    //         }
+    //     }
+
+    //     if (!empty($orderProducts)) {
+    //         OrderProduct::insert($orderProducts);
+    //         Log::info('Inserted OrderProducts', ['count' => count($orderProducts)]);
+    //     }
+    
+
+    // }
+
+    
+    
+
+
+
+
+    // private function createProductData($data)
+    // {
+    //     return [
+    //         'sku_number' => $data['sku number'] ?? null,
+    //         'product_name' => $data['product name'] ?? null,
+    //         'quantity' => $data['quantity'] ?? null,
+    //         'boxes' => $data['boxes'] ?? null,
+    //         'weight' => $data['weight'] ?? null,
+    //     ];
+    // }
 
 
     //   public function geocodeAddress(Request $request)

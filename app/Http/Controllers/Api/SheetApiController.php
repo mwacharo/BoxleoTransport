@@ -57,6 +57,8 @@ class SheetApiController extends BaseController
         $client = new GoogleClient();
         $client->setAuthConfig('/home/engineer/Desktop/BoxleoTransport/public/credentials.json');
         // $client->setAuthConfig('/var/www/BoxleoTransport/public/credentials.json'); // Ensure the path is correct
+        // $client->setAuthConfig(base_path(config('services.google.credentials_path')));
+
 
         $client->addScope(\Google\Service\Sheets::SPREADSHEETS_READONLY);
         $client->setApplicationName('boxleotransport');
@@ -69,6 +71,8 @@ class SheetApiController extends BaseController
         try {
             $response = $service->spreadsheets_values->get($spreadsheetId, $range);
             $values = $response->getValues();
+
+            // dd($values);
 
             if (empty($values)) {
                 throw new \Exception('No data found in the spreadsheet.');
@@ -109,6 +113,7 @@ class SheetApiController extends BaseController
 
             $orderData[$orderNo]['products'][] = $this->createProductData($data);
         }
+        // dd($orderData);
 
         return $orderData;
     }
@@ -353,7 +358,7 @@ private function updateGoogleSheet($spreadsheetId, $sheetName, $updateData)
         $orderIdIndex = array_search('Order No', $headerRow);
         $statusIndex = array_search('Status', $headerRow);
         $podIndex = array_search('POD', $headerRow);
-        // $specialInstructionsIndex = array_search('Special Instructions', $headerRow);
+        // $specialInstructionsIndex = array_search('Special Instruction', $headerRow);
 
         // dd($specialInstructionsIndex);
 
@@ -399,10 +404,10 @@ private function updateGoogleSheet($spreadsheetId, $sheetName, $updateData)
                     'values' => [[$updateData[$orderId]['pod']]]
                 ];
 
-                // $updates[] = [
-                //     'range' => "$sheetName!U$rowNumber",
-                //     'values' => [[$updateData[$orderId]['special_instruction']]]
-                // ];
+                $updates[] = [
+                    'range' => "$sheetName!U$rowNumber",
+                    'values' => [[$updateData[$orderId]['special_instruction']]]
+                ];
                 Log::debug("Update added for POD at range $sheetName!P$rowNumber with value: " . $updateData[$orderId]['pod']);
             } else {
                 Log::debug("Order ID $orderId not found in update data");
@@ -640,3 +645,6 @@ private function setupGoogleClient(): GoogleClient
         return response()->json($response);
     }
 }
+
+
+

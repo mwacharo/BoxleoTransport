@@ -33,7 +33,12 @@ return [
     // google maps
     'google_maps' => [
         'api_key' => env('GOOGLE_MAPS_API_KEY'),
+
     ],
+    'google' => [
+    'credentials_path' => env('GOOGLE_CREDENTIALS_PATH'),
+],
+
     
 
 ];

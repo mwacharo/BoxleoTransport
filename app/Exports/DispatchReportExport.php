@@ -25,6 +25,7 @@ class DispatchReportExport implements FromView
     {
         $this->cityId = $filters['city_id'] ?? null;
         $this->agentId = $filters['agent_id'] ?? null;
+        $this->driverId = $filters['driver_id'] ?? null;
         $this->startDate = $filters['start_date'] ?? null;
         $this->endDate = $filters['end_date'] ?? null;
         $this->dispatched_startDate = $filters['dispatched_startDate'] ?? null;
@@ -57,7 +58,11 @@ class DispatchReportExport implements FromView
         }
 
 
+        // filter by driver 
 
+        if($this->driverId){
+            $query->whereIn('driver_id', $this->driverId);
+        }
         // Agent filtering
         if ($this->agentId) {
             $query->whereIn('rider_id', $this->agentId);

@@ -40,6 +40,21 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Api\ReportApiController as ApiReportApiController;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PODReportCsvExport;
+use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Auth;
+
+Route::post('v1/login', [AuthController::class, 'riderLogin']);
+
+// Route::post('/test-login', function (Request $request) {
+//   $credentials = $request->only('email', 'password');
+//   if (Auth::attempt($credentials)) {
+//       $user = Auth::user();
+//       return response()->json(['user' => $user]);
+//   } else {
+//       return response()->json(['message' => 'Invalid credentials'], 401);
+//   }
+// });
+
  
 Route::apiResource('v1/users', UsersApiController::class)->only([
   'index', 'store', 'update', 'destroy'
@@ -57,6 +72,7 @@ Route::apiResource('v1/calendar', CalendarApiController::class)->only([
 
 Route::post('/reports/generateReport', [ApiReportApiController::class, 'generateReport']);
 Route::post('v1/reports/downloadExcel', [ApiReportApiController::class, 'downloadExcel']);
+Route::post('v1/reports/downloadPDF', [ApiReportApiController::class, 'downloadPDF']);
 
 
 
@@ -105,6 +121,8 @@ Route::post('/v1/orders/assignOrders', [OrderApiController::class, 'assignOrders
 // details of a specific order_no
 
 Route::get('/orders/{id}', [OrderApiController::class, 'order']);
+Route::post('v1/orderImport', [OrderApiController::class, 'orderImport']);
+
 // Route::put('v1/order-products/update', [OrderApiController::class, 'updateProductDetails']);
 Route::post('v1/order-products/save', [OrderApiController::class, 'saveProductDetails']);
 Route::delete('v1/order-product/{id}', [OrderApiController::class, 'destroy']);

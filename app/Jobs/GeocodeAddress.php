@@ -21,6 +21,9 @@ class GeocodeAddress implements ShouldQueue
     public function __construct(Order $order)
     {
         $this->order = $order;
+
+
+        // dd($order);
     }
 
 
@@ -116,3 +119,5 @@ public function calculateDistance($lat, $lng)
 
   
 }
+
+

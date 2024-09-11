@@ -2,15 +2,62 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\RIderCreated;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeEmail;
 use App\Models\Rider;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+
+use Illuminate\Support\Str;
+
 class RiderApiController extends BaseController
 {
     protected $model =Rider::class;
+
+
+    public function store(Request $request)
+{
+    // Validate the request data
+    $validatedData = $request->validate([
+        'name' => 'required|max:255',
+        'email' => 'required|email|max:255|unique:riders,email',
+        'address' => 'required|max:255',
+        'phone' => 'required|max:255',
+        'branch_id' => 'required|max:255',
+        'geofence_id' => 'required|max:255',
+    ]);
+
+    // Generate a random password
+    $password = Str::random(8);
+    $validatedData['password'] = Hash::make($password);
+
+    $name= $validatedData['name'];
+    $email = $validatedData['email'];
+
+    // Create the rider
+    $rider = Rider::create($validatedData);
+
+    // Log the creation
+    Log::info('New rider created:', $validatedData);
+
+    // Dispatch the RiderCreated event
+    event(new RiderCreated($rider, $password));
+
+    // Send a welcome email
+    Mail::to($rider->email)->send(new WelcomeEmail($rider, $password ,$name, $email));
+
+    // Return a response
+    return response()->json(['message' => 'Rider created successfully', 'data' => $rider], 201);
+}
+    
+
+    // $password = Str::random(8);
+    // $validatedData['password'] = Hash::make($password);
 
 
 

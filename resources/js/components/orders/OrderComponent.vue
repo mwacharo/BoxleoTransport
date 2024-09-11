@@ -7,6 +7,9 @@
             <v-toolbar-title>{{ entityName }}</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
+            <v-btn color="primary" @click="orderImport">
+              <v-icon>mdi-file-excel</v-icon>
+              </v-btn>
             <v-btn color="primary" @click="addEntity">
               <v-icon>mdi-plus</v-icon>
             </v-btn>
@@ -235,6 +238,7 @@
     <AutoAllocate ref="AutoAllocateComponent" :selectedItems="selectedItems" />
     <OptimizeRoute ref="OptimizeRouteComponent" :selectedItems="selectedItems" />
   <Pod ref="PodComponent"  :orderNo="orderNo" />
+  <OrderImport ref="OrderImportComponent"/>
   </v-card>
 </template>
 
@@ -246,6 +250,7 @@ import AutoAllocate from '@/components/orders/AutoAllocate.vue';
 import MapOrder from '@/components/orders/MapOrder.vue';
 import OptimizeRoute from '@/components/orders/OptimizeRoute.vue';
 import Pod from '@/components/orders/Pod.vue';
+import OrderImport from '@/components/orders/OrderImport.vue';
 
 export default {
   components: {
@@ -253,6 +258,7 @@ export default {
     AutoAllocate,
     OptimizeRoute,
     Pod,
+    OrderImport,
   
   },
   mixins: [fetchDataMixin],
@@ -443,8 +449,10 @@ export default {
         });
     },
     closeProductDetails() {
-      this.showProductDetails = false;
+      this.showProductDetails = true;
     },
+    orderImport(){
+      this.$refs.OrderImportComponent.show();    },
     addProductDetail() {
   const newProductDetail = {
     order_id: this.orderId, // Ensure you have the order ID available

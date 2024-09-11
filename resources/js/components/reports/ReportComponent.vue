@@ -99,13 +99,13 @@
 
 
           <!-- Generate Report Button with Tooltip -->
-          <!-- <v-tooltip text="PDF">
+          <v-tooltip text="PDF">
             <template v-slot:activator="{ props }">
-              <v-btn type="searchReport" color="red" class="mr-4" v-bind="props">
+              <v-btn  @click ="downloadPDF" color="red" class="mr-4" v-bind="props">
                 <v-icon left>mdi-file-document</v-icon>
               </v-btn>
             </template>
-          </v-tooltip> -->
+          </v-tooltip>
 
 
 
@@ -130,14 +130,14 @@
           </v-tooltip>
 
           <!-- Generate PDF Report Button with Tooltip -->
-          <v-tooltip text="PDF">
+          <!-- <v-tooltip text="PDF">
             <template v-slot:activator="{ props }">
-              <v-btn color="error" @click="exportReport('pdf')" v-bind="props">
+              <v-btn color="error" @click="generateReport()" v-bind="props">
                 <v-icon left>mdi-file-pdf</v-icon>
 
               </v-btn>
-            </template>
-          </v-tooltip>
+            </template> 
+          </v-tooltip> -->
         </v-card-actions>
 
         <!-- Report Table -->
@@ -263,6 +263,36 @@ export default {
         this.$toastr.error('No report data available for download');
       }
     },
+
+  //   downloadPDF(){
+  //  console.log('you clicked me' , 0);
+  //   },
+  downloadPDF() {
+      if (this.reportData.length > 0) {
+        console.log('Attempting to download PDF');
+        axios.post('api/v1/reports/downloadPDF', {
+          reportData: this.reportData
+        }, {
+          responseType: 'blob'
+        })
+        .then(response => {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'report.pdf');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        })
+        .catch(error => {
+          console.error('Download error:', error);
+          this.$toastr.error('Failed to download the PDF file');
+        });
+      } else {
+        this.$toastr.error('No report data available for download');
+      }},
+
+  
     fetchAgents() {
       const url = '/api/v1/riders';
       axios

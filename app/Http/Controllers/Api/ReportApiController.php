@@ -7,10 +7,13 @@ use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpParser\Node\Stmt\TryCatch;
+use Svg\Tag\Rect;
 
 class ReportApiController extends Controller
 {
@@ -76,11 +79,44 @@ class ReportApiController extends Controller
             return response()->json(['error' => 'Failed to generate Excel: ' . $e->getMessage()], 500);
         }
     }
+
+
+    // pdf
+
+    public function downloadPDf (Request $request){
+
+       try {
+        //code...
+
+        $reportData = $request->input('reportData');
+
+        // dd($reportData);
+
+        if (empty($reportData)) {
+            return response()->json(['error' => 'No report data provided'], 400);
+        }
+
+        $pdf = Pdf::loadView('orders.dispatchList', ['orders' => $reportData]);
+
+        // Return the generated PDF as a stream
+        return $pdf->stream('document.pdf');
     
+       } catch (\Exception $e) {
+        //throw $th;
+
+
+        Log::error('Failed to generate pd: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to generate pdf: ' . $e->getMessage()], 500);
+       }
+
+
+
+
+    }
+
+
+  
 }
-
-
-   
 
 
 

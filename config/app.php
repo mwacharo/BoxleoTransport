@@ -170,6 +170,8 @@ return [
         App\Providers\HorizonServiceProvider::class,
     App\Providers\RouteServiceProvider::class,
     App\Providers\MenuServiceProvider::class,
+    Laravel\Passport\PassportServiceProvider::class,
+
   ])->toArray(),
 
   /*
