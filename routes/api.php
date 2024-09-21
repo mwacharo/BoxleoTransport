@@ -84,6 +84,8 @@ Route::post('v1/reports/downloadPDF', [ApiReportApiController::class, 'downloadP
 Route::apiResource('v1/services', ServicesApiController::class)->only([
   'index', 'store', 'update', 'destroy'
 ]);
+Route::get('v1/services-with-conditions', [ServicesApiController::class, 'getServicesWithConditions']);
+
 
 Route::get('v1/service-statistics',[ServicesApiController::class,'statistics']);
 

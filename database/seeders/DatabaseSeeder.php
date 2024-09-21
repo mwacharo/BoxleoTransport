@@ -5,6 +5,8 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 // use App\Models\OrderCategory;
+
+use App\Models\Condition;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -29,6 +31,11 @@ class DatabaseSeeder extends Seeder
             DriverSeeder::class,
             ClientSeeder::class,
             RolePermissionSeeder::class,
+            FullTrackSeeder::class,
+            ServiceSeeder::class,
+            ConditionSeeder::class,
+
+
             // MarketSeeder::class,
             // OrderSeeder::class,
             // OrderProductSeeder::class,

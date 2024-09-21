@@ -59,9 +59,10 @@ class OrderApiController extends BaseController
         Excel::import($import, $request->file('file'));
 
 
-        // dd($import);
+        dd($import);
 
-        $skippedOrders = []; // Array to hold skipped orders
+        $skippedOrders = []; 
+        // Array to hold skipped orders
 
 
         //  Here we can create the orders using the collected data
@@ -1378,3 +1379,6 @@ class OrderApiController extends BaseController
         }
     }
 }
+
+
+

@@ -69,4 +69,9 @@ class Vendor extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function service()
+    {
+        return $this->hasMany(Service::class);
+    }
+
 }

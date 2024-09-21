@@ -23,6 +23,7 @@
               <template v-slot:item.actions="{ item }">
                 <div class="d-flex align-center">
                   <v-icon class="mx-1" color="blue" @click="editVendor(item)">mdi-pencil</v-icon>
+                  <v-icon class="mx-1" color="success" @click="showServicesModal(item)">mdi-cog</v-icon>
                   <v-icon class="mx-1" color="red" @click="deleteVendor(item)">mdi-delete</v-icon>
                 </div>
               </template>
@@ -77,11 +78,19 @@
         </v-main>
       </v-app>
     </v-layout>
+    <Service ref="ServiceComponent"/>
   </v-card>
+
 </template>
 
 <script>
+import Service from '@/components/vendors/Service.vue';
 export default {
+
+  components: {
+    Service
+,
+  },
   props: {
     user_id: {
       type: Number,
@@ -141,6 +150,9 @@ export default {
   },
 
   methods: {
+    showServicesModal(item){
+this.$refs.ServiceComponent.show(item);
+    },
     addVendor() {
       this.editedItem = { ...this.defaultItem };
       this.dialog = true;
