@@ -78,10 +78,12 @@
                   <v-table>
                     <thead>
                       <tr>
-                        <th class="text-left">Product Name</th>
+                        <th class="text-left"> Name</th>
+                        <th class="text-left">Description</th>
+
                         <th class="text-left">Quantity</th>
-                        <th class="text-left">Price</th>
-                        <th class="text-left">Weight</th>
+                        <th class="text-left">Unit cost </th>
+                        <th class="text-left">Total</th>
                         <th class="text-left">Actions</th>
                       </tr>
                     </thead>

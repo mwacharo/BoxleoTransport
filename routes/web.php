@@ -27,6 +27,7 @@ use App\Http\Controllers\PickingController;
 use App\Http\Controllers\ReturnController;
 
 Route::middleware(['auth'])->group(function () {
+    // Route::get('logs', '\Arcanedev\LogViewer\Http\Controllers\LogViewerController@index');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('mappedOrders', [MappedOrderController::class, 'index'])->name('mappedOrders');
@@ -62,3 +63,6 @@ Route::middleware(['auth'])->group(function () {
 
 });
 Auth::routes();
+
+
+

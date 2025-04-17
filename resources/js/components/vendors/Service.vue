@@ -17,51 +17,13 @@
             <v-card v-if="service.selected" outlined class="mt-2">
 
 
+
               <v-card-text>
-                <!-- Loop through filtered conditions only -->
-                <div v-for="condition in filteredConditions(service)" :key="condition.id">
-                  <v-text-field v-if="condition.condition_amount !== null" v-model="condition.condition_amount"
-                    :label="`Amount for ${service.service_name}`" type="number" />
-                  <v-text-field v-if="condition.condition_percentage !== null" v-model="condition.condition_percentage"
-                    :label="`Percentage for ${service.service_name}`" type="number" />
-                </div>
-
-                <v-btn @click="addCondition(service)" color="primary" text>
-                  Add Condition
-                </v-btn>
-
-                <div v-for="(newCondition, index) in service.newConditions" :key="'new-' + index">
-                  <v-select v-model="newCondition.type" :items="[
-                    { title: 'Amount', value: 'amount' },
-                    { title: 'Percentage', value: 'percentage' },
-                    { title: '3 Tonne', value: 'rate_3t' },
-                    { title: '5 Tonne', value: 'rate_5t' },
-                    { title: '7 Tonne', value: 'rate_7t' },
-                    { title: '10 Tonne', value: 'rate_10t' },
-                  ]" label="Condition Type" dense></v-select>
-                  
-                  <!-- Dynamically display new condition inputs based on selection -->
-                  <v-text-field v-if="newCondition.type === 'amount'" v-model="newCondition.condition_amount"
-                    :label="`New Amount for ${service.service_name}`" type="number" />
-                  <v-text-field v-if="newCondition.type === 'percentage'" v-model="newCondition.condition_percentage"
-                    :label="`New Percentage for ${service.service_name}`" type="number" />
-
-                  <v-text-field v-if="newCondition.type === 'rate_3t'" v-model="newCondition.rate_3t"
-                    label="Rate for 3 Tonne" type="number" />
-                  <v-text-field v-if="newCondition.type === 'rate_5t'" v-model="newCondition.rate_5t"
-                    label="Rate for 5 Tonne" type="number" />
-                  <v-text-field v-if="newCondition.type === 'rate_7t'" v-model="newCondition.rate_7t"
-                    label="Rate for 7 Tonne" type="number" />
-                  <v-text-field v-if="newCondition.type === 'rate_10t'" v-model="newCondition.rate_10t"
-                    label="Rate for 10 Tonne" type="number" />
-                </div>
-              </v-card-text>
-              <!-- <v-card-text>
                 <div v-for="condition in service.conditions" :key="condition.id">
                   <v-text-field v-if="condition.condition_amount !== null" v-model="condition.condition_amount"
-                    :label="`Amount for ${service.service_name}`" type="number" />
+                    :label="`Amount for ${service.service_name}`" type="text" />
                   <v-text-field v-if="condition.condition_percentage !== null" v-model="condition.condition_percentage"
-                    :label="`Percentage for ${service.service_name}`" type="number" />
+                    :label="`Percentage for ${service.service_name}`" type="text" />
                 </div>
 
                 <v-btn @click="addCondition(service)" color="primary" text>
@@ -76,26 +38,33 @@
                     { title: '5 Tonne', value: 'rate_5t' },
                     { title: '7 Tonne', value: 'rate_7t' },
                     { title: '10 Tonne', value: 'rate_10t' },
+                    { title: 'Region', value: 'region' },
+                    { title: 'Route', value: 'route' },
                   ]" label="Condition Type" dense></v-select>
                   <v-text-field v-if="newCondition.type === 'amount'" v-model="newCondition.condition_amount"
-                    :label="`New Amount for ${service.service_name}`" type="number" />
+                    :label="`New Amount for ${service.service_name}`" type="text" />
                   <v-text-field v-if="newCondition.type === 'percentage'" v-model="newCondition.condition_percentage"
-                    :label="`New Percentage for ${service.service_name}`" type="number" />
+                    :label="`New Percentage for ${service.service_name}`" type="text" />
 
 
                   <v-text-field v-if="newCondition.type === 'rate_3t'" v-model="newCondition.rate_3t"
-                    label="Rate for 3 Tonne" type="number" />
+                    label="Rate for 3 Tonne" type="text" />
 
                   <v-text-field v-if="newCondition.type === 'rate_5t'" v-model="newCondition.rate_5t"
-                    label="Rate for 5 Tonne" type="number" />
+                    label="Rate for 5 Tonne" type="text" />
 
                   <v-text-field v-if="newCondition.type === 'rate_7t'" v-model="newCondition.rate_7t"
-                    label="Rate for 7 Tonne" type="number" />
+                    label="Rate for 7 Tonne" type="text" />
 
                   <v-text-field v-if="newCondition.type === 'rate_10t'" v-model="newCondition.rate_10t"
-                    label="Rate for 10 Tonne" type="number" />
+                    label="Rate for 10 Tonne" type="text" />
+                    <v-text-field v-if="newCondition.type === 'region'" v-model="newCondition.region"
+                    label="Region" type="text" />
+
+                    <v-text-field v-if="newCondition.type === 'route'" v-model="newCondition.route"
+                    label="Route" type="text" />
                 </div>
-              </v-card-text> -->
+              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
@@ -103,7 +72,9 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn @click="closeDialog" text>Cancel</v-btn>
-        <v-btn @click="saveServices" color="primary" :loading="saving">Save</v-btn>
+        <!-- <v-btn @click="saveServices" color="primary" :loading="saving">Save</v-btn> -->
+        <v-btn @click="saveServices" color="primary" >Save</v-btn>
+
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -114,22 +85,15 @@ import axios from 'axios';
 
 export default {
 
-  computed: {
-  filteredConditions() {
-    return (item) => {
-      // Filter the conditions where item.vendor_id matches condition.vendor_id
-      return item.conditions.filter(condition => condition.vendor_id === item.vendor_id);
-    };
-  }
-},
+
   data() {
     return {
       dialog: false,
       services: [],
-      loading: false,
+      // loading: false,
       saving: false,
       error: null,
-      vendor_id:null,
+      vendor_id: null,
     };
   },
 
@@ -139,11 +103,18 @@ export default {
 
 
   methods: {
-    async fetchServices() {
-      this.loading = true;
+    show(item) {
+      this.dialog = true;
+      this.fetchServices(item);
+
+    },
+    async fetchServices(item) {
+      // this.loading = true;
       this.error = null;
       try {
-        const response = await axios.get('/api/v1/services-with-conditions');
+        this.vendor_id = item.id;
+
+        const response = await axios.get(`/api/v1/services-with-conditions/${this.vendor_id}`);
         this.services = response.data.map(service => ({
           ...service,
           selected: false,
@@ -157,10 +128,7 @@ export default {
       }
     },
 
-    show(item) {
-      this.dialog = true;
-      this.vendor_id= item.vendor_id;
-    },
+
 
     closeDialog() {
       this.dialog = false;
@@ -170,7 +138,13 @@ export default {
       service.newConditions.push({
         type: null,
         condition_amount: null,
-        condition_percentage: null
+        condition_percentage: null,
+        rate_3t: null ,
+        rate_5t: null ,
+        rate_7t: null ,
+        rate_10t: null ,
+        region: null ,
+        route: null ,
       });
     },
 
@@ -182,12 +156,26 @@ export default {
         service.conditions = [
           ...service.conditions,
           ...service.newConditions.map(newCondition => ({
+            // vendor_id = item.id,
+            vendor_id: this.vendor_id,
             service_id: service.id,
             condition_amount: newCondition.type === 'amount' ? newCondition.condition_amount : null,
-            condition_percentage: newCondition.type === 'percentage' ? newCondition.condition_percentage : null
+            condition_percentage: newCondition.type === 'percentage' ? newCondition.condition_percentage : null,
+
+            rate_3t: newCondition.type === 'rate_3t' ? newCondition.rate_3t : null,
+
+            rate_5t: newCondition.type === 'rate_5t' ? newCondition.rate_5t : null,
+
+            rate_7t: newCondition.type === 'rate_7t' ? newCondition.rate_7t : null,
+
+            rate_10t: newCondition.type === 'rate_10t' ? newCondition.rate_10t : null,
+            region: newCondition.type === 'region' ? newCondition.region : null,
+            route: newCondition.type === 'route' ? newCondition.route : null,
+
+
           }))
         ];
-        delete service.newConditions;
+        // delete service.newConditions;
       });
 
       try {
